@@ -62,7 +62,7 @@ func (svc *Players) UpdatePlayer(player model.PlayerModel) error {
 func (svc *Players) GetPlayers() []model.PlayerModel {
 	var players []model.PlayerModel
 
-	err := svc.db.Find(&players).Error
+	err := svc.db.Preload("Stats").Find(&players).Error
 	if err != nil {
 		if gorm.ErrRecordNotFound == err {
 			return nil

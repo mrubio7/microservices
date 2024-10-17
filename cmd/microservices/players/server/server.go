@@ -2,17 +2,65 @@ package microservice_players
 
 import (
 	"context"
-	"fmt"
+	"errors"
+	"ibercs/pkg/config"
+	"ibercs/pkg/database"
+	"ibercs/pkg/logger"
+	"ibercs/pkg/service"
 	pb "ibercs/proto/players"
 )
 
 type Server struct {
 	pb.UnimplementedPlayerServiceServer
+	PlayersService *service.Players
+}
+
+func New() *Server {
+	cfg, err := config.Load()
+	if err != nil {
+		logger.Error("Unable to create grpc player server")
+		return nil
+	}
+	db := database.New(cfg.Database)
+	playerService := service.NewPlayersService(db)
+
+	return &Server{
+		PlayersService: playerService,
+	}
 }
 
 func (s *Server) GetPlayers(context.Context, *pb.Empty) (*pb.PlayerList, error) {
-	fmt.Println("TOOOOOOOOOOMMMMMMAAAAAAA!!!")
-	return nil, nil
+	// Obtener los jugadores desde la base de datos
+	playerModels := s.PlayersService.GetPlayers()
+	if playerModels == nil {
+		return nil, errors.New("unable to get any player")
+	}
+
+	// Convertir los modelos de la base de datos a los modelos de protobuf
+	var players []*pb.Player
+	for _, p := range playerModels {
+		player := &pb.Player{
+			Id:       p.ID,
+			Nickname: p.Nickname,
+			FaceitId: p.FaceitId,
+			SteamId:  p.SteamId,
+			Stats: &pb.PlayerStats{
+				PlayerId:               p.Stats.ID,
+				KdRatio:                p.Stats.KdRatio,
+				KrRatio:                p.Stats.KrRatio,
+				KillsAverage:           p.Stats.KillsAverage,
+				DeathsAverage:          p.Stats.DeathsAverage,
+				HeadshotPercentAverage: p.Stats.HeadshotPercentAverage,
+				MVPAverage:             p.Stats.MVPAverage,
+				AssistAverage:          p.Stats.AssistAverage,
+				Elo:                    p.Stats.Elo,
+			},
+		}
+		players = append(players, player)
+	}
+
+	// Retornar el resultado en el formato gRPC
+	return &pb.PlayerList{Players: players}, nil
 }
 
 func (s *Server) NewPlayer(context.Context, *pb.NewPlayerRequest) (*pb.PlayerResponse, error) {

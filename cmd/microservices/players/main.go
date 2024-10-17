@@ -20,7 +20,9 @@ func main() {
 	}
 
 	grpcServer := grpc.NewServer()
-	pb.RegisterPlayerServiceServer(grpcServer, &microservice_players.Server{})
+	microservicePlayers := microservice_players.New()
+
+	pb.RegisterPlayerServiceServer(grpcServer, microservicePlayers)
 
 	if err := grpcServer.Serve(listener); err != nil {
 		logger.Error("Cannot initialize the server: %s", err.Error())

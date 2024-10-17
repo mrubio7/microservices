@@ -24,6 +24,7 @@ func (ph *Player_Handlers) GetAllPlayers(c *gin.Context) {
 	if err != nil {
 		logger.Error(err.Error())
 		c.JSON(http.StatusBadRequest, response.BuildError("Error getting all players"))
+		return
 	}
 
 	c.JSON(http.StatusOK, response.BuildOk("Ok", res))

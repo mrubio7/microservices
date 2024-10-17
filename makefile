@@ -1,23 +1,25 @@
-.PHONY: proto clean build run build-workers
+.PHONY: proto clean build run workers microservices
 
 proto:
 	protoc --proto_path=proto --go_out=. --go-grpc_out=. players.proto
 
 build:
-	go build -o cmd/api_gateway/api-gateway.exe cmd/api_gateway/api-gateway.go
+	go build -o cmd/api_gateway/api-gateway.exe cmd/api_gateway/main.go
 
-run: 
+run:
+	go build -o cmd/api_gateway/api-gateway.exe cmd/api_gateway/main.go
 	./cmd/api_gateway/api-gateway.exe
 	
 clean:
 	del /s /q *.exe
 	if exist logs rmdir /s /q logs & mkdir logs
 
-build-workers:
+workers:
 	go build -o cmd/workers/players/worker-players.exe cmd/workers/players/worker-players.go
 
-build-microservices:
+microservices:
 	go build -o cmd/microservices/players/microservice-players.exe cmd/microservices/players/main.go
 
-run-ms-players:
+ms-players:
+	go build -o cmd/microservices/players/microservice-players.exe cmd/microservices/players/main.go
 	./cmd/microservices/players/microservice-players.exe
