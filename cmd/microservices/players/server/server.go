@@ -30,7 +30,7 @@ func New() *Server {
 		http.HandleFunc("GET /healthz", func(w http.ResponseWriter, r *http.Request) {
 			w.Write([]byte(time.Now().String()))
 		})
-		if err := http.ListenAndServe(":8080", nil); err != nil {
+		if err := http.ListenAndServe(":8081", nil); err != nil {
 			logger.Error(err.Error())
 		}
 	}()
