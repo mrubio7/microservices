@@ -8,7 +8,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"google.golang.org/grpc"
-	"google.golang.org/grpc/credentials/insecure"
+	"google.golang.org/grpc/credentials"
 )
 
 type Router struct {
@@ -33,7 +33,8 @@ func (r *Router) Listen() {
 }
 
 func (r *Router) registerPlayersServer() {
-	conn, err := grpc.NewClient(os.Getenv("MICROSERVICE_PLAYERS_HOST"), grpc.WithTransportCredentials(insecure.NewCredentials()))
+	creds := credentials.NewTLS(nil)
+	conn, err := grpc.NewClient(os.Getenv("MICROSERVICE_PLAYERS_HOST"), grpc.WithTransportCredentials(creds))
 	if err != nil {
 		logger.Error("Cannot connect to players grpc server: %s", err.Error())
 		return
