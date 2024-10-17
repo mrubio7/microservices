@@ -27,7 +27,7 @@ func New() *Server {
 	playerService := service.NewPlayersService(db)
 
 	go func() {
-		http.HandleFunc("GET /healthz", func(w http.ResponseWriter, r *http.Request) {
+		http.HandleFunc("/healthz", func(w http.ResponseWriter, r *http.Request) {
 			w.Write([]byte(time.Now().String()))
 		})
 		if err := http.ListenAndServe(":8080", nil); err != nil {

@@ -17,6 +17,8 @@ func main() {
 	if err != nil {
 		logger.Error("Cannot create tcp connection: %s", err.Error())
 		return
+	} else {
+		logger.Info("gRPC server started on port 50051")
 	}
 
 	grpcServer := grpc.NewServer()
