@@ -10,7 +10,7 @@ RUN go mod download
 COPY . .
 
 # Build
-RUN go build -o cmd/microservices/players/microservice-players cmd/microservices/players/main.go
+RUN go build -o /microservice-players cmd/microservices/players/main.go
 
 # Expose ports
 EXPOSE 8081

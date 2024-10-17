@@ -10,7 +10,7 @@ RUN go mod download
 COPY . .
 
 # Build
-RUN go build -o cmd/api_gateway/api-gateway cmd/api_gateway/main.go
+RUN go build -o /api-gateway cmd/api_gateway/main.go
 
 # Expose ports
 EXPOSE 8080
