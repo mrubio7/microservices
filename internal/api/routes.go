@@ -4,6 +4,7 @@ import (
 	"ibercs/pkg/logger"
 	pb_players "ibercs/proto/players"
 	"net/http"
+	"os"
 
 	"github.com/gin-gonic/gin"
 	"google.golang.org/grpc"
@@ -32,7 +33,7 @@ func (r *Router) Listen() {
 }
 
 func (r *Router) registerPlayersServer() {
-	conn, err := grpc.NewClient("localhost:50051", grpc.WithTransportCredentials(insecure.NewCredentials()))
+	conn, err := grpc.NewClient(os.Getenv("MICROSERVICE_PLAYERS_HOST"), grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
 		logger.Error("Cannot connect to players grpc server: %s", err.Error())
 		return
