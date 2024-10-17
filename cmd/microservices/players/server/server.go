@@ -8,8 +8,6 @@ import (
 	"ibercs/pkg/logger"
 	"ibercs/pkg/service"
 	pb "ibercs/proto/players"
-	"net/http"
-	"time"
 )
 
 type Server struct {
@@ -25,15 +23,6 @@ func New() *Server {
 	}
 	db := database.New(cfg.Database)
 	playerService := service.NewPlayersService(db)
-
-	go func() {
-		http.HandleFunc("/healthz", func(w http.ResponseWriter, r *http.Request) {
-			w.Write([]byte(time.Now().String()))
-		})
-		if err := http.ListenAndServe(":8080", nil); err != nil {
-			logger.Error(err.Error())
-		}
-	}()
 
 	return &Server{
 		PlayersService: playerService,

@@ -13,7 +13,6 @@ COPY . .
 RUN go build -o /microservice-players cmd/microservices/players/main.go
 
 # Expose ports
-EXPOSE 8080
 EXPOSE 50051/tcp
 
 # Run
