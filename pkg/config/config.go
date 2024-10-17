@@ -1,12 +1,11 @@
 package config
 
 import (
-	"fmt"
 	"ibercs/pkg/logger"
+	"log"
 	"os"
-	"path/filepath"
 
-	"github.com/spf13/viper"
+	"github.com/joho/godotenv"
 )
 
 type (
@@ -27,25 +26,23 @@ type (
 func Load() (Config, error) {
 	logger.Debug("Loading config...")
 
-	// Obtener el directorio actual del ejecutable
-	exePath, err := os.Executable()
-	if err != nil {
-		fmt.Printf("Error getting executable path: %v\n", err)
-		return Config{}, err
+	env := os.Getenv("ENV")
+	if env == "" {
+		err := godotenv.Load()
+		if err != nil {
+			log.Fatal("Error al cargar el archivo .env")
+		}
 	}
 
-	configPath := filepath.Join(filepath.Dir(exePath), "config.json")
-	viper.SetConfigFile(configPath)
-
-	if err := viper.ReadInConfig(); err != nil {
-		fmt.Printf("Error reading config file: %v\n", err)
-		return Config{}, err
-	}
-
-	var config Config
-	if err := viper.Unmarshal(&config); err != nil {
-		fmt.Printf("Error unmarshaling config: %v\n", err)
-		return Config{}, err
+	config := Config{
+		Database: DatabaseConfig{
+			Host:     os.Getenv("DB_HOST"),
+			DbName:   os.Getenv("DB_NAME"),
+			Port:     os.Getenv("DB_PORT"),
+			User:     os.Getenv("DB_USER"),
+			Password: os.Getenv("DB_PASSWORD"),
+		},
+		FaceitApiToken: os.Getenv("FACEIT_API_TOKEN"),
 	}
 
 	logger.Debug("Config loaded successfully")
