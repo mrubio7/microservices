@@ -15,7 +15,7 @@ const (
 
 func main() {
 	logger.Initialize()
-	mode := flag.String("flag", "", fmt.Sprintf("[%s] (Update all the players stats)\n[%s] (Finds new players in ladderboard)", UPDATE, FIND))
+	mode := flag.String("mode", "", fmt.Sprintf("[%s] (Update all the players stats)\n[%s] (Finds new players in ladderboard)", UPDATE, FIND))
 	number := flag.Int("size", 5000, "Number of players to find when use find option")
 	flag.Parse()
 
