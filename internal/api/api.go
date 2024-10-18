@@ -36,7 +36,7 @@ func (api *Api) Start() {
 
 	players_handlers := handlers.NewPlayersHandlers(api.router.PlayersServer)
 
-	api.router.gin.GET("/players/get-all", players_handlers.GetAllPlayers)
+	api.router.gin.GET("/api/v1/players/get-all", players_handlers.GetAllPlayers)
 
 	api.router.Listen()
 }
