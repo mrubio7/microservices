@@ -15,9 +15,10 @@ import (
 func New(cfg config.DatabaseConfig) *gorm.DB {
 	logger.Debug("Initializing database...")
 
-	dsn := fmt.Sprintf("host=%s user=%s password=%s dbname=%s port=%s sslmode=disable TimeZone=Europe/Madrid", cfg.Host, cfg.User, cfg.Password, cfg.DbName, cfg.Port)
+	dsn := fmt.Sprintf("host=%s user=%s password=%s dbname=%s port=%s sslmode=disable TimeZone=Europe/Madrid prefer_simple_protocol=true", cfg.Host, cfg.User, cfg.Password, cfg.DbName, cfg.Port)
 	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{
-		Logger: lgr.Default.LogMode(lgr.Silent),
+		Logger:      lgr.Default.LogMode(lgr.Silent),
+		PrepareStmt: false,
 	})
 	if err != nil {
 		return nil

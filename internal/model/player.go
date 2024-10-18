@@ -5,6 +5,7 @@ type PlayerModel struct {
 	Nickname string           `gorm:"not null"`
 	FaceitId string           `gorm:"unique;index"`
 	SteamId  string           `gorm:"null"`
+	Avatar   string           `gorm:"null"`
 	Stats    PlayerStatsModel `gorm:"foreignKey:ID;references:ID"`
 }
 
