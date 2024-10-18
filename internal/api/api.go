@@ -2,6 +2,7 @@ package api
 
 import (
 	"ibercs/internal/api/handlers"
+	"ibercs/internal/api/middlewares"
 	"ibercs/pkg/config"
 	"ibercs/pkg/database"
 	"ibercs/pkg/logger"
@@ -36,6 +37,7 @@ func (api *Api) Start() {
 
 	players_handlers := handlers.NewPlayersHandlers(api.router.PlayersServer)
 
+	api.router.gin.Use(middlewares.CORSMiddleware())
 	api.router.gin.GET("/api/v1/players/get-all", players_handlers.GetAllPlayers)
 
 	api.router.Listen()
