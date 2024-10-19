@@ -78,7 +78,18 @@ func (svc *Players) GetPlayers() []model.PlayerModel {
 }
 
 func (svc *Players) GetNewProminentPlayers() *model.ProminentWeekModel {
-	// Definir la consulta SQL para obtener los jugadores prominentes
+	year, week := time.Now().ISOWeek()
+
+	var existingWeek model.ProminentWeekModel
+	err := svc.db.Where("year = ? AND week = ?", int16(year), int16(week)).First(&existingWeek).Error
+	if err == nil {
+		logger.Info("Prominent week already exists for the current week and year.")
+		return &existingWeek
+	} else if err != gorm.ErrRecordNotFound {
+		logger.Error("Error checking for existing prominent week:", err)
+		return nil
+	}
+
 	query := `
 		SELECT ps.id, p.nickname, p.faceit_id, p.steam_id, p.avatar, 
 			((ps.kills_average - ps.deaths_average + (ps.assist_average * 0.3)) * ps.kr_ratio * ps.mvp_average) as Score
@@ -90,13 +101,12 @@ func (svc *Players) GetNewProminentPlayers() *model.ProminentWeekModel {
 
 	var results []model.PlayerProminentModel
 
-	err := svc.db.Raw(query).Scan(&results).Error
+	err = svc.db.Raw(query).Scan(&results).Error
 	if err != nil {
 		logger.Error("Error fetching prominent players:", err)
 		return nil
 	}
 
-	year, week := time.Now().ISOWeek()
 	prominentWeek := model.ProminentWeekModel{
 		Week:    int16(week),
 		Year:    int16(year),
