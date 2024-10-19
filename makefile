@@ -1,4 +1,4 @@
-.PHONY: proto clean build run workers microservices
+.PHONY: proto clean build run workers microservices w-players
 
 proto:
 	protoc --proto_path=proto --go_out=. --go-grpc_out=. players.proto
@@ -16,6 +16,9 @@ clean:
 
 workers:
 	go build -o cmd/workers/players/worker-players.exe cmd/workers/players/worker-players.go
+
+w-players: 
+	./cmd/workers/players/worker-players.exe
 
 microservices:
 	go build -o cmd/microservices/players/microservice-players.exe cmd/microservices/players/main.go
