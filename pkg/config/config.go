@@ -12,6 +12,7 @@ type (
 	Config struct {
 		Database       DatabaseConfig
 		FaceitApiToken string
+		Workers        WorkersConfig
 	}
 
 	DatabaseConfig struct {
@@ -20,6 +21,10 @@ type (
 		Port     string
 		User     string
 		Password string
+	}
+
+	WorkersConfig struct {
+		PlayersHost string
 	}
 )
 
@@ -43,6 +48,9 @@ func Load() (Config, error) {
 			Password: os.Getenv("DB_PASSWORD"),
 		},
 		FaceitApiToken: os.Getenv("FACEIT_API_TOKEN"),
+		Workers: WorkersConfig{
+			PlayersHost: os.Getenv("WORKER_PLAYERS_HOST"),
+		},
 	}
 
 	logger.Debug("Config loaded successfully")
