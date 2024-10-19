@@ -40,5 +40,8 @@ func (api *Api) Start() {
 	api.router.gin.Use(middlewares.CORSMiddleware())
 	api.router.gin.GET("/api/v1/players/get-all", players_handlers.GetAllPlayers)
 
+	api.router.gin.GET("/api/v1/worker/players/find", nil)
+	api.router.gin.GET("/api/v1/worker/players/update", nil)
+
 	api.router.Listen()
 }
