@@ -50,16 +50,16 @@ message PlayerResponse {
 }
 
 message ProminentPlayer {
-    int32 id = 1;
-    float score = 2;
-    string nickname = 3;
-    string faceit_id = 4;
-    string steam_id = 5;
-    string avatar = 6; 
+    int32 Id = 1;
+    float Score = 2;
+    string Nickname = 3;
+    string Faceit_id = 4;
+    string Steam_id = 5;
+    string Avatar = 6; 
 }
 
 message ProminentPlayerList {
     repeated ProminentPlayer players = 1;
-    int32 week = 2;    
-    int32 year = 3;   
+    int32 Week = 2;    
+    int32 Year = 3;   
 }
