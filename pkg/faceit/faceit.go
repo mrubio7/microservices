@@ -112,6 +112,7 @@ func (c *FaceitClient) GetPlayerAverageDetails(userId string, matchesNumber int)
 		FaceitId: p.PlayerId,
 		SteamId:  p.Platforms["steam"],
 		Nickname: p.Nickname,
+		Avatar:   p.Avatar,
 		Stats: model.PlayerStatsModel{
 			Elo:                    stats.Elo,
 			KdRatio:                stats.KdRatio / float32(matchesNumber),

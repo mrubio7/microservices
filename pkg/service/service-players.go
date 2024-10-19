@@ -25,6 +25,7 @@ func (svc *Players) UpdatePlayer(player model.PlayerModel) error {
 
 	svc.mutex.Lock()
 	defer svc.mutex.Unlock()
+
 	// Busca al jugador existente por FaceitId
 	err := svc.db.Preload("Stats").First(&existingPlayer, "faceit_id = ?", player.FaceitId).Error
 	if err != nil {
@@ -35,8 +36,8 @@ func (svc *Players) UpdatePlayer(player model.PlayerModel) error {
 		return err
 	}
 
-	// Actualiza el jugador si hay cambios
-	if existingPlayer.Nickname != player.Nickname || existingPlayer.SteamId != player.SteamId {
+	// Actualiza el jugador si hay cambios en el Nickname, SteamId o Avatar
+	if existingPlayer.Nickname != player.Nickname || existingPlayer.SteamId != player.SteamId || existingPlayer.Avatar != player.Avatar {
 		if err := svc.db.Model(&existingPlayer).Updates(player).Error; err != nil {
 			return err
 		}
