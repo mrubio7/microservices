@@ -39,7 +39,7 @@ func (w *Workers_Handlers) Update(c *gin.Context) {
 func (w *Workers_Handlers) Find(c *gin.Context) {
 	size := c.DefaultQuery("size", "5000")
 
-	url := fmt.Sprintf("%s?size=%s", w.playersWorkerHost, size)
+	url := fmt.Sprintf("%s/find?size=%s", w.playersWorkerHost, size)
 
 	resp, err := http.Get(url)
 	if err != nil {

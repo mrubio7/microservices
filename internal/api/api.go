@@ -40,6 +40,7 @@ func (api *Api) Start() {
 
 	api.router.gin.Use(middlewares.CORSMiddleware())
 	api.router.gin.GET("/api/v1/players/get-all", players_handlers.GetAllPlayers)
+	api.router.gin.GET("/api/v1/players/get-prominent-players", players_handlers.GetProminentPlayers)
 
 	api.router.gin.GET("/api/v1/workers/players/find", workers_handlers.Find)
 	api.router.gin.GET("/api/v1/workers/players/update", workers_handlers.Update)

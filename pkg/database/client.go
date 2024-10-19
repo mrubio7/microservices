@@ -33,4 +33,6 @@ func migrateTables(db *gorm.DB) {
 	logger.Trace("Updating database tables")
 	db.AutoMigrate(&model.PlayerModel{})
 	db.AutoMigrate(&model.PlayerStatsModel{})
+	db.AutoMigrate(&model.PlayerProminentModel{})
+	db.AutoMigrate(&model.ProminentWeekModel{})
 }

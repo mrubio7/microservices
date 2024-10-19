@@ -29,3 +29,14 @@ func (ph *Player_Handlers) GetAllPlayers(c *gin.Context) {
 
 	c.JSON(http.StatusOK, response.BuildOk("Ok", res))
 }
+
+func (ph *Player_Handlers) GetProminentPlayers(c *gin.Context) {
+	res, err := ph.players_client.GetProminentPlayers(c, nil)
+	if err != nil {
+		logger.Error(err.Error())
+		c.JSON(http.StatusBadRequest, response.BuildError("Error getting prominent players"))
+		return
+	}
+
+	c.JSON(http.StatusOK, response.BuildOk("Ok", res))
+}

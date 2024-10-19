@@ -10,7 +10,13 @@
             "request": "launch",
             "mode": "auto",
             "program": "${workspaceFolder}/cmd/workers/players/worker-players.go",
-            "args": ["-flag", "update"],
+        },
+        {
+            "name": "API_GATEWAY",
+            "type": "go",
+            "request": "launch",
+            "mode": "auto",
+            "program": "${workspaceFolder}/cmd/api_gateway/main.go",
         }
     ]
 }
