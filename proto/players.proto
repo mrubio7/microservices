@@ -9,7 +9,8 @@ message Player {
     string Nickname = 2;
     string FaceitId = 3;
     string SteamId = 4;
-    PlayerStats Stats = 5;
+    string Avatar = 5;
+    PlayerStats Stats = 6;
 }
 
 message PlayerStats {
