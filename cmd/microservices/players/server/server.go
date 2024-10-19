@@ -43,6 +43,7 @@ func (s *Server) GetPlayers(context.Context, *pb.Empty) (*pb.PlayerList, error) 
 			Nickname: p.Nickname,
 			FaceitId: p.FaceitId,
 			SteamId:  p.SteamId,
+			Avatar:   p.Avatar,
 			Stats: &pb.PlayerStats{
 				PlayerId:               p.Stats.ID,
 				KdRatio:                p.Stats.KdRatio,
