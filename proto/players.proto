@@ -32,6 +32,7 @@ message Empty {}
 
 service PlayerService {
     rpc GetPlayers (Empty) returns (PlayerList);
+    rpc GetProminentPlayers (Empty) returns (ProminentPlayerList);
     rpc NewPlayer (NewPlayerRequest) returns (PlayerResponse);
 }
 
@@ -45,4 +46,19 @@ message NewPlayerRequest {
 message PlayerResponse {
     string message = 1;
     int32 playerId = 2;
+}
+
+message ProminentPlayer {
+    int32 id = 1;
+    float score = 2;
+    string nickname = 3;
+    string faceit_id = 4;
+    string steam_id = 5;
+    string avatar = 6; 
+}
+
+message ProminentPlayerList {
+    repeated ProminentPlayer players = 1;
+    int32 week = 2;    
+    int32 year = 3;   
 }

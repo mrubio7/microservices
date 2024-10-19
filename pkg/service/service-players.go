@@ -4,7 +4,9 @@ import (
 	"errors"
 	"fmt"
 	"ibercs/internal/model"
+	"ibercs/pkg/logger"
 	"sync"
+	"time"
 
 	"gorm.io/gorm"
 )
@@ -73,4 +75,55 @@ func (svc *Players) GetPlayers() []model.PlayerModel {
 	}
 
 	return players
+}
+
+func (svc *Players) GetNewProminentPlayers() *model.ProminentWeekModel {
+	// Definir la consulta SQL para obtener los jugadores prominentes
+	query := `
+		SELECT ps.id, p.nickname, p.faceit_id, p.steam_id, p.avatar, 
+			((ps.kills_average - ps.deaths_average + (ps.assist_average * 0.3)) * ps.kr_ratio * ps.mvp_average) as Score
+		FROM player_stats_models ps
+		INNER JOIN player_models p ON p.id = ps.id
+		ORDER BY Score DESC
+		LIMIT 5;
+	`
+
+	var results []model.PlayerProminentModel
+
+	err := svc.db.Raw(query).Scan(&results).Error
+	if err != nil {
+		logger.Error("Error fetching prominent players:", err)
+		return nil
+	}
+
+	year, week := time.Now().ISOWeek()
+	prominentWeek := model.ProminentWeekModel{
+		Week:    int16(week),
+		Year:    int16(year),
+		Players: results,
+	}
+
+	err = svc.db.Create(&prominentWeek).Error
+	if err != nil {
+		logger.Error("Error saving new prominent week:", err)
+		return nil
+	}
+
+	return &prominentWeek
+}
+
+func (svc *Players) GetProminentPlayers() *model.ProminentWeekModel {
+	var week model.ProminentWeekModel
+
+	err := svc.db.Preload("Players").Order("year DESC, week DESC").First(&week).Error
+	if err != nil {
+		if err == gorm.ErrRecordNotFound {
+			logger.Error("No prominent week found.")
+			return nil
+		}
+		logger.Error("Error fetching prominent week:", err)
+		return nil
+	}
+
+	return &week
 }

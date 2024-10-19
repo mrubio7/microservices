@@ -8,6 +8,7 @@ import (
 	"ibercs/pkg/logger"
 	"ibercs/pkg/service"
 	pb "ibercs/proto/players"
+	"time"
 )
 
 type Server struct {
@@ -30,13 +31,11 @@ func New() *Server {
 }
 
 func (s *Server) GetPlayers(context.Context, *pb.Empty) (*pb.PlayerList, error) {
-	// Obtener los jugadores desde la base de datos
 	playerModels := s.PlayersService.GetPlayers()
 	if playerModels == nil {
 		return nil, errors.New("unable to get any player")
 	}
 
-	// Convertir los modelos de la base de datos a los modelos de protobuf
 	var players []*pb.Player
 	for _, p := range playerModels {
 		player := &pb.Player{
@@ -59,8 +58,38 @@ func (s *Server) GetPlayers(context.Context, *pb.Empty) (*pb.PlayerList, error) 
 		players = append(players, player)
 	}
 
-	// Retornar el resultado en el formato gRPC
 	return &pb.PlayerList{Players: players}, nil
+}
+
+func (s *Server) GetProminentPlayers(ctx context.Context, req *pb.Empty) (*pb.ProminentPlayerList, error) {
+	latestWeek := s.PlayersService.GetProminentPlayers()
+	currentYear, currentWeek := time.Now().ISOWeek()
+
+	if latestWeek == nil || latestWeek.Year < int16(currentYear) || latestWeek.Week < int16(currentWeek-1) {
+		logger.Info("Generating a new prominent week since no valid week was found or the week is outdated.")
+		latestWeek = s.PlayersService.GetNewProminentPlayers()
+	}
+
+	if latestWeek == nil {
+		err := errors.New("failed to retrieve or generate prominent players")
+		logger.Error(err.Error())
+		return nil, err
+	}
+
+	var players []*pb.ProminentPlayer
+	for _, p := range latestWeek.Players {
+		player := &pb.ProminentPlayer{
+			Id:       p.ID,
+			Nickname: p.Nickname,
+			FaceitId: p.FaceitId,
+			SteamId:  p.SteamId,
+			Avatar:   p.Avatar,
+			Score:    p.Score,
+		}
+		players = append(players, player)
+	}
+
+	return &pb.ProminentPlayerList{Players: players}, nil
 }
 
 func (s *Server) NewPlayer(context.Context, *pb.NewPlayerRequest) (*pb.PlayerResponse, error) {
