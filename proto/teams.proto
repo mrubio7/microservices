@@ -24,7 +24,7 @@ message TeamStats {
 
 message TeamMapStats {
     string MapName = 1;
-    int32 WinRate = 2;
+    int32 Winrate = 2;
     int32 Matches = 3;
 }
 

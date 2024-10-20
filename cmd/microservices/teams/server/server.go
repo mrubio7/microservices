@@ -47,8 +47,8 @@ func (s *Server) NewTeam(ctx context.Context, teamRequest *pb.NewTeamRequest) (*
 	for _, m := range t.Stats.MapStats {
 		mapStats[m.MapName] = &pb.TeamMapStats{
 			MapName: m.MapName,
-			WinRate: m.WinRate,
-			Matches: m.WinRate,
+			Winrate: m.WinRate,
+			Matches: m.Matches,
 		}
 	}
 
@@ -84,8 +84,8 @@ func (s *Server) GetTeam(ctx context.Context, teamRequest *pb.NewTeamRequest) (*
 	for _, m := range t.Stats.MapStats {
 		mapStats[m.MapName] = &pb.TeamMapStats{
 			MapName: m.MapName,
-			WinRate: m.WinRate,
-			Matches: m.WinRate,
+			Winrate: m.WinRate,
+			Matches: m.Matches,
 		}
 	}
 
@@ -124,8 +124,8 @@ func (s *Server) GetTeams(ctx context.Context, teamRequest *pb.GetTeamsRequest) 
 		for _, m := range t.Stats.MapStats {
 			mapStats[m.MapName] = &pb.TeamMapStats{
 				MapName: m.MapName,
-				WinRate: m.WinRate,
-				Matches: m.WinRate,
+				Winrate: m.WinRate,
+				Matches: m.Matches,
 			}
 		}
 
