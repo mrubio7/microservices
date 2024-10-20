@@ -2,6 +2,7 @@ package update_players
 
 import (
 	"ibercs/pkg/config"
+	"ibercs/pkg/consts"
 	"ibercs/pkg/database"
 	"ibercs/pkg/faceit"
 	"ibercs/pkg/logger"
@@ -39,7 +40,7 @@ func Start() {
 	defer bar.Close()
 
 	for _, p := range playersList {
-		player := client.GetPlayerAverageDetails(p.FaceitId, 12)
+		player := client.GetPlayerAverageDetails(p.FaceitId, consts.LAST_MATCHES_NUMBER)
 
 		svcPlayers.UpdatePlayer(*player)
 		bar.Add(1)
