@@ -1,0 +1,29 @@
+syntax = "proto3";
+
+package teams;
+option go_package = "./proto/teams;proto";
+
+message Team {
+    int32 Id = 1;
+    string FaceitId = 2;
+    string Name = 3;
+    string Nickname = 4;
+    string Avatar = 5;
+    repeated string PlayersId = 6;
+}
+
+message Empty {}
+
+service TeamService {
+    rpc GetTeams (Empty) returns (TeamList);
+    rpc GetTeam (NewTeamRequest) returns (Team);
+    rpc NewTeam (NewTeamRequest) returns (Team);
+}
+
+message TeamList {
+    repeated Team teams = 1;
+}
+
+message NewTeamRequest {
+    string FaceitId = 1;
+}

@@ -2,7 +2,6 @@ package service
 
 import (
 	"errors"
-	"fmt"
 	"ibercs/internal/model"
 	"ibercs/pkg/logger"
 	"sync"
@@ -70,7 +69,7 @@ func (svc *Players) GetPlayers() []model.PlayerModel {
 		if gorm.ErrRecordNotFound == err {
 			return nil
 		}
-		fmt.Println(err)
+		logger.Error(err.Error())
 		return nil
 	}
 

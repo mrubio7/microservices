@@ -3,6 +3,7 @@ package api
 import (
 	"ibercs/pkg/logger"
 	pb_players "ibercs/proto/players"
+	pb_teams "ibercs/proto/teams"
 	"net/http"
 	"os"
 
@@ -15,6 +16,7 @@ import (
 type Router struct {
 	gin           *gin.Engine
 	PlayersServer pb_players.PlayerServiceClient
+	TeamsServer   pb_teams.TeamServiceClient
 }
 
 func NewRouter() *Router {
@@ -23,6 +25,7 @@ func NewRouter() *Router {
 	}
 
 	r.registerPlayersServer()
+	r.registerTeamsServer()
 
 	return r
 }
@@ -52,4 +55,32 @@ func (r *Router) registerPlayersServer() {
 
 	r.PlayersServer = playersGrpc
 	logger.Trace("Players grpc server connected succesfully")
+}
+
+func (r *Router) registerTeamsServer() {
+	var creds credentials.TransportCredentials
+
+	if env := os.Getenv("ENV"); env == "" {
+		creds = insecure.NewCredentials()
+	} else {
+		creds = credentials.NewTLS(nil)
+	}
+
+	var host string
+	if hostEnv := os.Getenv("MICROSERVICE_TEAMS_HOST"); hostEnv == "" {
+		host = "localhost:50051"
+	} else {
+		host = hostEnv
+	}
+
+	conn, err := grpc.NewClient(host, grpc.WithTransportCredentials(creds))
+	if err != nil {
+		logger.Error("Cannot connect to teams grpc server: %s", err.Error())
+		return
+	}
+
+	teamsGrpc := pb_teams.NewTeamServiceClient(conn)
+
+	r.TeamsServer = teamsGrpc
+	logger.Trace("Teams grpc server connected succesfully")
 }

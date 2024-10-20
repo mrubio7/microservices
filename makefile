@@ -2,6 +2,7 @@
 
 proto:
 	protoc --proto_path=proto --go_out=. --go-grpc_out=. players.proto
+	protoc --proto_path=proto --go_out=. --go-grpc_out=. teams.proto
 
 build:
 	go build -o cmd/api_gateway/api-gateway.exe cmd/api_gateway/main.go
@@ -26,3 +27,7 @@ microservices:
 ms-players:
 	go build -o cmd/microservices/players/microservice-players.exe cmd/microservices/players/main.go
 	./cmd/microservices/players/microservice-players.exe
+
+ms-teams:
+	go build -o cmd/microservices/teams/microservice-teams.exe cmd/microservices/teams/main.go
+	./cmd/microservices/teams/microservice-teams.exe
