@@ -19,6 +19,7 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
+	PlayerService_GetPlayer_FullMethodName           = "/players.PlayerService/GetPlayer"
 	PlayerService_GetPlayers_FullMethodName          = "/players.PlayerService/GetPlayers"
 	PlayerService_GetProminentPlayers_FullMethodName = "/players.PlayerService/GetProminentPlayers"
 	PlayerService_NewPlayer_FullMethodName           = "/players.PlayerService/NewPlayer"
@@ -28,6 +29,7 @@ const (
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type PlayerServiceClient interface {
+	GetPlayer(ctx context.Context, in *GetPlayerRequest, opts ...grpc.CallOption) (*Player, error)
 	GetPlayers(ctx context.Context, in *Empty, opts ...grpc.CallOption) (*PlayerList, error)
 	GetProminentPlayers(ctx context.Context, in *Empty, opts ...grpc.CallOption) (*ProminentPlayerList, error)
 	NewPlayer(ctx context.Context, in *NewPlayerRequest, opts ...grpc.CallOption) (*PlayerResponse, error)
@@ -39,6 +41,16 @@ type playerServiceClient struct {
 
 func NewPlayerServiceClient(cc grpc.ClientConnInterface) PlayerServiceClient {
 	return &playerServiceClient{cc}
+}
+
+func (c *playerServiceClient) GetPlayer(ctx context.Context, in *GetPlayerRequest, opts ...grpc.CallOption) (*Player, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(Player)
+	err := c.cc.Invoke(ctx, PlayerService_GetPlayer_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
 }
 
 func (c *playerServiceClient) GetPlayers(ctx context.Context, in *Empty, opts ...grpc.CallOption) (*PlayerList, error) {
@@ -75,6 +87,7 @@ func (c *playerServiceClient) NewPlayer(ctx context.Context, in *NewPlayerReques
 // All implementations must embed UnimplementedPlayerServiceServer
 // for forward compatibility.
 type PlayerServiceServer interface {
+	GetPlayer(context.Context, *GetPlayerRequest) (*Player, error)
 	GetPlayers(context.Context, *Empty) (*PlayerList, error)
 	GetProminentPlayers(context.Context, *Empty) (*ProminentPlayerList, error)
 	NewPlayer(context.Context, *NewPlayerRequest) (*PlayerResponse, error)
@@ -88,6 +101,9 @@ type PlayerServiceServer interface {
 // pointer dereference when methods are called.
 type UnimplementedPlayerServiceServer struct{}
 
+func (UnimplementedPlayerServiceServer) GetPlayer(context.Context, *GetPlayerRequest) (*Player, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetPlayer not implemented")
+}
 func (UnimplementedPlayerServiceServer) GetPlayers(context.Context, *Empty) (*PlayerList, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetPlayers not implemented")
 }
@@ -116,6 +132,24 @@ func RegisterPlayerServiceServer(s grpc.ServiceRegistrar, srv PlayerServiceServe
 		t.testEmbeddedByValue()
 	}
 	s.RegisterService(&PlayerService_ServiceDesc, srv)
+}
+
+func _PlayerService_GetPlayer_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetPlayerRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(PlayerServiceServer).GetPlayer(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: PlayerService_GetPlayer_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(PlayerServiceServer).GetPlayer(ctx, req.(*GetPlayerRequest))
+	}
+	return interceptor(ctx, in, info, handler)
 }
 
 func _PlayerService_GetPlayers_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
@@ -179,6 +213,10 @@ var PlayerService_ServiceDesc = grpc.ServiceDesc{
 	ServiceName: "players.PlayerService",
 	HandlerType: (*PlayerServiceServer)(nil),
 	Methods: []grpc.MethodDesc{
+		{
+			MethodName: "GetPlayer",
+			Handler:    _PlayerService_GetPlayer_Handler,
+		},
 		{
 			MethodName: "GetPlayers",
 			Handler:    _PlayerService_GetPlayers_Handler,
