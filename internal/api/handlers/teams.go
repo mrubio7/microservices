@@ -20,11 +20,24 @@ func NewTeamsHandlers(teamsClient pb_teams.TeamServiceClient) *Team_Handlers {
 }
 
 func (th *Team_Handlers) GetAll(c *gin.Context) {
-	res, err := th.teams_client.GetTeams(c, nil)
-	if err != nil {
-		logger.Error(err.Error())
-		c.JSON(http.StatusBadRequest, response.BuildError("Error getting all teams"))
-		return
+	var res *pb_teams.TeamList
+	var err error
+
+	active := c.Query("active")
+	if active == "" {
+		res, err = th.teams_client.GetTeams(c, &pb_teams.GetTeamsRequest{Active: false})
+		if err != nil {
+			logger.Error(err.Error())
+			c.JSON(http.StatusBadRequest, response.BuildError("Error getting all teams"))
+			return
+		}
+	} else {
+		res, err = th.teams_client.GetTeams(c, &pb_teams.GetTeamsRequest{Active: true})
+		if err != nil {
+			logger.Error(err.Error())
+			c.JSON(http.StatusBadRequest, response.BuildError("Error getting all teams"))
+			return
+		}
 	}
 
 	c.JSON(http.StatusOK, response.BuildOk("Ok", res))

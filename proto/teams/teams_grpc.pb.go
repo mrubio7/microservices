@@ -28,7 +28,7 @@ const (
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type TeamServiceClient interface {
-	GetTeams(ctx context.Context, in *Empty, opts ...grpc.CallOption) (*TeamList, error)
+	GetTeams(ctx context.Context, in *GetTeamsRequest, opts ...grpc.CallOption) (*TeamList, error)
 	GetTeam(ctx context.Context, in *NewTeamRequest, opts ...grpc.CallOption) (*Team, error)
 	NewTeam(ctx context.Context, in *NewTeamRequest, opts ...grpc.CallOption) (*Team, error)
 }
@@ -41,7 +41,7 @@ func NewTeamServiceClient(cc grpc.ClientConnInterface) TeamServiceClient {
 	return &teamServiceClient{cc}
 }
 
-func (c *teamServiceClient) GetTeams(ctx context.Context, in *Empty, opts ...grpc.CallOption) (*TeamList, error) {
+func (c *teamServiceClient) GetTeams(ctx context.Context, in *GetTeamsRequest, opts ...grpc.CallOption) (*TeamList, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(TeamList)
 	err := c.cc.Invoke(ctx, TeamService_GetTeams_FullMethodName, in, out, cOpts...)
@@ -75,7 +75,7 @@ func (c *teamServiceClient) NewTeam(ctx context.Context, in *NewTeamRequest, opt
 // All implementations must embed UnimplementedTeamServiceServer
 // for forward compatibility.
 type TeamServiceServer interface {
-	GetTeams(context.Context, *Empty) (*TeamList, error)
+	GetTeams(context.Context, *GetTeamsRequest) (*TeamList, error)
 	GetTeam(context.Context, *NewTeamRequest) (*Team, error)
 	NewTeam(context.Context, *NewTeamRequest) (*Team, error)
 	mustEmbedUnimplementedTeamServiceServer()
@@ -88,7 +88,7 @@ type TeamServiceServer interface {
 // pointer dereference when methods are called.
 type UnimplementedTeamServiceServer struct{}
 
-func (UnimplementedTeamServiceServer) GetTeams(context.Context, *Empty) (*TeamList, error) {
+func (UnimplementedTeamServiceServer) GetTeams(context.Context, *GetTeamsRequest) (*TeamList, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetTeams not implemented")
 }
 func (UnimplementedTeamServiceServer) GetTeam(context.Context, *NewTeamRequest) (*Team, error) {
@@ -119,7 +119,7 @@ func RegisterTeamServiceServer(s grpc.ServiceRegistrar, srv TeamServiceServer) {
 }
 
 func _TeamService_GetTeams_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(Empty)
+	in := new(GetTeamsRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -131,7 +131,7 @@ func _TeamService_GetTeams_Handler(srv interface{}, ctx context.Context, dec fun
 		FullMethod: TeamService_GetTeams_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(TeamServiceServer).GetTeams(ctx, req.(*Empty))
+		return srv.(TeamServiceServer).GetTeams(ctx, req.(*GetTeamsRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }

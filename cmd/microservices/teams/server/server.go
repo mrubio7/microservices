@@ -48,6 +48,7 @@ func (s *Server) NewTeam(ctx context.Context, teamRequest *pb.NewTeamRequest) (*
 		Name:      t.Name,
 		Nickname:  t.Nickname,
 		Avatar:    t.Avatar,
+		Active:    t.Active,
 		PlayersId: t.PlayersId,
 	}
 
@@ -68,14 +69,15 @@ func (s *Server) GetTeam(ctx context.Context, teamRequest *pb.NewTeamRequest) (*
 		Name:      t.Name,
 		Nickname:  t.Nickname,
 		Avatar:    t.Avatar,
+		Active:    t.Active,
 		PlayersId: t.PlayersId,
 	}
 
 	return pbTeam, nil
 }
 
-func (s *Server) GetTeams(context.Context, *pb.Empty) (*pb.TeamList, error) {
-	teams := s.TeamsService.GetAll()
+func (s *Server) GetTeams(ctx context.Context, teamRequest *pb.GetTeamsRequest) (*pb.TeamList, error) {
+	teams := s.TeamsService.GetAll(teamRequest.Active)
 	if teams == nil {
 		err := errors.New("team not found")
 		logger.Error(err.Error())
@@ -91,6 +93,7 @@ func (s *Server) GetTeams(context.Context, *pb.Empty) (*pb.TeamList, error) {
 			Name:      t.Name,
 			Nickname:  t.Nickname,
 			Avatar:    t.Avatar,
+			Active:    t.Active,
 			PlayersId: t.PlayersId,
 		})
 	}

@@ -9,19 +9,24 @@ message Team {
     string Name = 3;
     string Nickname = 4;
     string Avatar = 5;
-    repeated string PlayersId = 6;
+    bool Active = 6;
+    repeated string PlayersId = 7;
 }
 
 message Empty {}
 
 service TeamService {
-    rpc GetTeams (Empty) returns (TeamList);
+    rpc GetTeams (GetTeamsRequest) returns (TeamList);
     rpc GetTeam (NewTeamRequest) returns (Team);
     rpc NewTeam (NewTeamRequest) returns (Team);
 }
 
 message TeamList {
     repeated Team teams = 1;
+}
+
+message GetTeamsRequest {
+    bool active = 1;
 }
 
 message NewTeamRequest {

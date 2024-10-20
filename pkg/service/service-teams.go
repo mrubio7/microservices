@@ -20,16 +20,27 @@ func NewTeamsService(database *gorm.DB) *Teams {
 	}
 }
 
-func (s *Teams) GetAll() []model.TeamModel {
+func (s *Teams) GetAll(active bool) []model.TeamModel {
 	var teams []model.TeamModel
 
-	err := s.db.Find(&teams).Error
-	if err != nil {
-		if gorm.ErrRecordNotFound == err {
+	if active {
+		err := s.db.Model(&model.TeamModel{}).Where("active = ?", active).Find(&teams).Error
+		if err != nil {
+			if gorm.ErrRecordNotFound == err {
+				return nil
+			}
+			logger.Error(err.Error())
 			return nil
 		}
-		logger.Error(err.Error())
-		return nil
+	} else {
+		err := s.db.Model(&model.TeamModel{}).Find(&teams).Error
+		if err != nil {
+			if gorm.ErrRecordNotFound == err {
+				return nil
+			}
+			logger.Error(err.Error())
+			return nil
+		}
 	}
 
 	return teams
