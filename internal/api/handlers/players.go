@@ -5,6 +5,7 @@ import (
 	"ibercs/pkg/response"
 	pb_players "ibercs/proto/players"
 	"net/http"
+	"strings"
 
 	"github.com/gin-gonic/gin"
 )
@@ -19,18 +20,28 @@ func NewPlayersHandlers(playersClient pb_players.PlayerServiceClient) *Player_Ha
 	}
 }
 
-func (ph *Player_Handlers) GetPlayer(c *gin.Context) {
-	playerId := c.Query("id")
-	if playerId == "" {
-		logger.Error("tried to get an empty id")
-		c.JSON(http.StatusBadRequest, response.BuildError("Invalid ID"))
+func (ph *Player_Handlers) GetPlayers(c *gin.Context) {
+	// Recibe varios IDs separados por comas
+	playerIds := c.Query("ids")
+	if playerIds == "" {
+		logger.Error("tried to get empty ids")
+		c.JSON(http.StatusBadRequest, response.BuildError("Invalid IDs"))
 		return
 	}
 
-	res, err := ph.players_client.GetPlayer(c, &pb_players.GetPlayerRequest{FaceitId: playerId})
+	// Divide los IDs por comas
+	ids := strings.Split(playerIds, ",")
+	if len(ids) == 0 {
+		logger.Error("no valid ids provided")
+		c.JSON(http.StatusBadRequest, response.BuildError("No valid IDs provided"))
+		return
+	}
+
+	// Llama al servicio con la lista de IDs
+	res, err := ph.players_client.GetPlayer(c, &pb_players.GetPlayerRequest{FaceitId: ids})
 	if err != nil {
 		logger.Error(err.Error())
-		c.JSON(http.StatusBadRequest, response.BuildError("Error getting all players"))
+		c.JSON(http.StatusInternalServerError, response.BuildError("Error getting players"))
 		return
 	}
 
