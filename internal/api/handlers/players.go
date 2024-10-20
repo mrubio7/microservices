@@ -19,6 +19,24 @@ func NewPlayersHandlers(playersClient pb_players.PlayerServiceClient) *Player_Ha
 	}
 }
 
+func (ph *Player_Handlers) GetPlayer(c *gin.Context) {
+	playerId := c.Query("id")
+	if playerId == "" {
+		logger.Error("tried to get an empty id")
+		c.JSON(http.StatusBadRequest, response.BuildError("Invalid ID"))
+		return
+	}
+
+	res, err := ph.players_client.GetPlayer(c, &pb_players.GetPlayerRequest{FaceitId: playerId})
+	if err != nil {
+		logger.Error(err.Error())
+		c.JSON(http.StatusBadRequest, response.BuildError("Error getting all players"))
+		return
+	}
+
+	c.JSON(http.StatusOK, response.BuildOk("Ok", res))
+}
+
 func (ph *Player_Handlers) GetAllPlayers(c *gin.Context) {
 	res, err := ph.players_client.GetPlayers(c, nil)
 	if err != nil {

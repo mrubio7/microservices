@@ -30,6 +30,34 @@ func New() *Server {
 	}
 }
 
+func (s *Server) GetPlayer(ctx context.Context, playerReq *pb.GetPlayerRequest) (*pb.Player, error) {
+	p := s.PlayersService.GetPlayer(playerReq.FaceitId)
+	if p == nil {
+		return nil, errors.New("unable to get player")
+	}
+
+	player := &pb.Player{
+		Id:       p.ID,
+		Nickname: p.Nickname,
+		FaceitId: p.FaceitId,
+		SteamId:  p.SteamId,
+		Avatar:   p.Avatar,
+		Stats: &pb.PlayerStats{
+			PlayerId:               p.Stats.ID,
+			KdRatio:                p.Stats.KdRatio,
+			KrRatio:                p.Stats.KrRatio,
+			KillsAverage:           p.Stats.KillsAverage,
+			DeathsAverage:          p.Stats.DeathsAverage,
+			HeadshotPercentAverage: p.Stats.HeadshotPercentAverage,
+			MVPAverage:             p.Stats.MVPAverage,
+			AssistAverage:          p.Stats.AssistAverage,
+			Elo:                    p.Stats.Elo,
+		},
+	}
+
+	return player, nil
+}
+
 func (s *Server) GetPlayers(context.Context, *pb.Empty) (*pb.PlayerList, error) {
 	playerModels := s.PlayersService.GetPlayers()
 	if playerModels == nil {
