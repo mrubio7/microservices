@@ -11,7 +11,24 @@ message Team {
     string Avatar = 5;
     bool Active = 6;
     repeated string PlayersId = 7;
+    TeamStats Stats = 8;
 }
+
+message TeamStats {
+    int32 TotalMatches = 1;
+    int32 Wins = 2;
+    float Winrate = 3;
+    repeated int32 RecentResults = 4;
+    map<string, TeamMapStats> MapStats = 5;
+}
+
+message TeamMapStats {
+    string MapName = 1;
+    int32 WinRate = 2;
+    int32 Matches = 3;
+}
+
+
 
 message Empty {}
 

@@ -24,7 +24,7 @@ func (s *Teams) GetAll(active bool) []model.TeamModel {
 	var teams []model.TeamModel
 
 	if active {
-		err := s.db.Model(&model.TeamModel{}).Where("active = ?", active).Find(&teams).Error
+		err := s.db.Model(&model.TeamModel{}).Preload("Stats").Where("active = ?", active).Find(&teams).Error
 		if err != nil {
 			if gorm.ErrRecordNotFound == err {
 				return nil
@@ -33,7 +33,7 @@ func (s *Teams) GetAll(active bool) []model.TeamModel {
 			return nil
 		}
 	} else {
-		err := s.db.Model(&model.TeamModel{}).Find(&teams).Error
+		err := s.db.Model(&model.TeamModel{}).Preload("Stats").Find(&teams).Error
 		if err != nil {
 			if gorm.ErrRecordNotFound == err {
 				return nil
@@ -49,7 +49,7 @@ func (s *Teams) GetAll(active bool) []model.TeamModel {
 func (s *Teams) GetTeam(id string) *model.TeamModel {
 	var team *model.TeamModel
 
-	err := s.db.Model(&model.TeamModel{}).First(&team, "faceit_id = ?", id).Error
+	err := s.db.Model(&model.TeamModel{}).Preload("Stats").First(&team, "faceit_id = ?", id).Error
 	if err != nil {
 		logger.Error("Team not found: %s", err.Error())
 		return nil

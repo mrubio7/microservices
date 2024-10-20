@@ -42,14 +42,31 @@ func (s *Server) NewTeam(ctx context.Context, teamRequest *pb.NewTeamRequest) (*
 	}
 
 	t := s.TeamsService.NewTeam(*team)
+
+	mapStats := make(map[string]*pb.TeamMapStats, len(t.Stats.MapStats))
+	for _, m := range t.Stats.MapStats {
+		mapStats[m.MapName] = &pb.TeamMapStats{
+			MapName: m.MapName,
+			WinRate: m.WinRate,
+			Matches: m.WinRate,
+		}
+	}
+
 	pbTeam := &pb.Team{
-		Id:        t.Id,
+		Id:        t.ID,
 		FaceitId:  t.FaceitId,
 		Name:      t.Name,
 		Nickname:  t.Nickname,
 		Avatar:    t.Avatar,
 		Active:    t.Active,
 		PlayersId: t.PlayersId,
+		Stats: &pb.TeamStats{
+			TotalMatches:  t.Stats.TotalMatches,
+			Wins:          t.Stats.Wins,
+			Winrate:       t.Stats.Winrate,
+			RecentResults: t.Stats.RecentResults,
+			MapStats:      mapStats,
+		},
 	}
 
 	return pbTeam, nil
@@ -63,14 +80,30 @@ func (s *Server) GetTeam(ctx context.Context, teamRequest *pb.NewTeamRequest) (*
 		return nil, err
 	}
 
+	mapStats := make(map[string]*pb.TeamMapStats, len(t.Stats.MapStats))
+	for _, m := range t.Stats.MapStats {
+		mapStats[m.MapName] = &pb.TeamMapStats{
+			MapName: m.MapName,
+			WinRate: m.WinRate,
+			Matches: m.WinRate,
+		}
+	}
+
 	pbTeam := &pb.Team{
-		Id:        t.Id,
+		Id:        t.ID,
 		FaceitId:  t.FaceitId,
 		Name:      t.Name,
 		Nickname:  t.Nickname,
 		Avatar:    t.Avatar,
 		Active:    t.Active,
 		PlayersId: t.PlayersId,
+		Stats: &pb.TeamStats{
+			TotalMatches:  t.Stats.TotalMatches,
+			Wins:          t.Stats.Wins,
+			Winrate:       t.Stats.Winrate,
+			RecentResults: t.Stats.RecentResults,
+			MapStats:      mapStats,
+		},
 	}
 
 	return pbTeam, nil
@@ -87,14 +120,30 @@ func (s *Server) GetTeams(ctx context.Context, teamRequest *pb.GetTeamsRequest) 
 	var pbTeams []*pb.Team
 
 	for _, t := range teams {
+		mapStats := make(map[string]*pb.TeamMapStats, len(t.Stats.MapStats))
+		for _, m := range t.Stats.MapStats {
+			mapStats[m.MapName] = &pb.TeamMapStats{
+				MapName: m.MapName,
+				WinRate: m.WinRate,
+				Matches: m.WinRate,
+			}
+		}
+
 		pbTeams = append(pbTeams, &pb.Team{
-			Id:        t.Id,
+			Id:        t.ID,
 			FaceitId:  t.FaceitId,
 			Name:      t.Name,
 			Nickname:  t.Nickname,
 			Avatar:    t.Avatar,
 			Active:    t.Active,
 			PlayersId: t.PlayersId,
+			Stats: &pb.TeamStats{
+				TotalMatches:  t.Stats.TotalMatches,
+				Wins:          t.Stats.Wins,
+				Winrate:       t.Stats.Winrate,
+				RecentResults: t.Stats.RecentResults,
+				MapStats:      mapStats,
+			},
 		})
 	}
 

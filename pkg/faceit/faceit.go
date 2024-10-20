@@ -137,10 +137,24 @@ func (c *FaceitClient) GetTeamById(teamId string) *model.TeamModel {
 		return nil
 	}
 
+	teamStats, err := c.client.GetTeamStats(teamId, "cs2", nil)
+	if err != nil {
+		logger.Error("Error getting team in faceitservice: %s", err.Error())
+		return nil
+	}
 	var players []string
 
 	for _, t := range team.Members {
 		players = append(players, t.UserId)
+	}
+
+	mapStats := make(map[string]model.TeamMapStats, len(teamStats.Segments))
+	for _, m := range teamStats.Segments {
+		mapStats[m.Label] = model.TeamMapStats{
+			MapName: m.Label,
+			WinRate: int32(m.Stats.WinRatePercent),
+			Matches: int32(m.Stats.Matches),
+		}
 	}
 
 	return &model.TeamModel{
@@ -149,5 +163,12 @@ func (c *FaceitClient) GetTeamById(teamId string) *model.TeamModel {
 		Nickname:  team.Nickname,
 		Avatar:    team.Avatar,
 		PlayersId: players,
+		Stats: model.TeamStatsModel{
+			TotalMatches:  int32(teamStats.Lifetime.Matches),
+			Wins:          int32(teamStats.Lifetime.Wins),
+			Winrate:       float32(teamStats.Lifetime.WinRatePercent),
+			RecentResults: []int32(teamStats.Lifetime.RecentResults),
+			MapStats:      mapStats,
+		},
 	}
 }
