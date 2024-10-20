@@ -29,7 +29,7 @@ const (
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type PlayerServiceClient interface {
-	GetPlayer(ctx context.Context, in *GetPlayerRequest, opts ...grpc.CallOption) (*Player, error)
+	GetPlayer(ctx context.Context, in *GetPlayerRequest, opts ...grpc.CallOption) (*PlayerList, error)
 	GetPlayers(ctx context.Context, in *Empty, opts ...grpc.CallOption) (*PlayerList, error)
 	GetProminentPlayers(ctx context.Context, in *Empty, opts ...grpc.CallOption) (*ProminentPlayerList, error)
 	NewPlayer(ctx context.Context, in *NewPlayerRequest, opts ...grpc.CallOption) (*PlayerResponse, error)
@@ -43,9 +43,9 @@ func NewPlayerServiceClient(cc grpc.ClientConnInterface) PlayerServiceClient {
 	return &playerServiceClient{cc}
 }
 
-func (c *playerServiceClient) GetPlayer(ctx context.Context, in *GetPlayerRequest, opts ...grpc.CallOption) (*Player, error) {
+func (c *playerServiceClient) GetPlayer(ctx context.Context, in *GetPlayerRequest, opts ...grpc.CallOption) (*PlayerList, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(Player)
+	out := new(PlayerList)
 	err := c.cc.Invoke(ctx, PlayerService_GetPlayer_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
@@ -87,7 +87,7 @@ func (c *playerServiceClient) NewPlayer(ctx context.Context, in *NewPlayerReques
 // All implementations must embed UnimplementedPlayerServiceServer
 // for forward compatibility.
 type PlayerServiceServer interface {
-	GetPlayer(context.Context, *GetPlayerRequest) (*Player, error)
+	GetPlayer(context.Context, *GetPlayerRequest) (*PlayerList, error)
 	GetPlayers(context.Context, *Empty) (*PlayerList, error)
 	GetProminentPlayers(context.Context, *Empty) (*ProminentPlayerList, error)
 	NewPlayer(context.Context, *NewPlayerRequest) (*PlayerResponse, error)
@@ -101,7 +101,7 @@ type PlayerServiceServer interface {
 // pointer dereference when methods are called.
 type UnimplementedPlayerServiceServer struct{}
 
-func (UnimplementedPlayerServiceServer) GetPlayer(context.Context, *GetPlayerRequest) (*Player, error) {
+func (UnimplementedPlayerServiceServer) GetPlayer(context.Context, *GetPlayerRequest) (*PlayerList, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetPlayer not implemented")
 }
 func (UnimplementedPlayerServiceServer) GetPlayers(context.Context, *Empty) (*PlayerList, error) {
