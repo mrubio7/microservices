@@ -7,14 +7,18 @@ import (
 )
 
 type TeamModel struct {
-	ID        int32           `gorm:"primaryKey;autoIncrement"`
-	FaceitId  string          `gorm:"unique;index"`
-	Name      string          `gorm:"not null"`
-	Nickname  string          `gorm:"not null"`
-	Avatar    string          `gorm:"null"`
-	Active    bool            `gorm:"not null; default:true"`
-	Stats     TeamStatsModel  `gorm:"foreignKey:ID;references:ID"`
-	PlayersId JSONStringArray `gorm:"type:json;not null"`
+	ID          int32           `gorm:"primaryKey;autoIncrement"`
+	FaceitId    string          `gorm:"unique;index"`
+	Name        string          `gorm:"not null"`
+	Nickname    string          `gorm:"not null"`
+	Avatar      string          `gorm:"null"`
+	Active      bool            `gorm:"not null; default:true"`
+	Stats       TeamStatsModel  `gorm:"foreignKey:ID;references:ID"`
+	PlayersId   JSONStringArray `gorm:"type:json;not null"`
+	Twitter     string          `gorm:"null"`
+	Instagram   string          `gorm:"null"`
+	Web         string          `gorm:"null"`
+	Tournaments JSONStringArray `gorm:"type:json;null"`
 }
 
 // Define a custom type

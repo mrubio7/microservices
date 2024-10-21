@@ -12,6 +12,10 @@ message Team {
     bool Active = 6;
     repeated string PlayersId = 7;
     TeamStats Stats = 8;
+    string Twitter = 9;
+    string Instagram = 10;
+    string Web = 11;
+    repeated string Tournaments = 12;
 }
 
 message TeamStats {
