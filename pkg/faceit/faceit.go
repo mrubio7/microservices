@@ -139,28 +139,56 @@ func (c *FaceitClient) GetTeamById(teamId string) *model.TeamModel {
 
 	teamStats, err := c.client.GetTeamStats(teamId, "cs2", nil)
 	if err != nil {
-		logger.Error("Error getting team in faceitservice: %s", err.Error())
+		logger.Error("Error getting team stats in faceitservice: %s", err.Error())
 		return nil
 	}
-	var players []string
 
+	var players []string
 	for _, t := range team.Members {
 		players = append(players, t.UserId)
 	}
 
-	mapStats := make(map[string]model.TeamMapStats, len(teamStats["Segments"].([]interface{})))
+	// Validamos la existencia de "segments"
+	teamStatsSegments, ok := teamStats["segments"].([]interface{})
+	if !ok || teamStatsSegments == nil {
+		logger.Error("Error: 'segments' is nil or not found")
+		return nil
+	}
 
-	for _, m := range teamStats["Segments"].([]interface{}) {
+	mapStats := make(map[string]model.TeamMapStats, len(teamStatsSegments))
+
+	for _, m := range teamStatsSegments {
 		// Aseguramos que 'm' sea un map[string]interface{}
-		mapItem := m.(map[string]interface{})
+		mapItem, ok := m.(map[string]interface{})
+		if !ok {
+			logger.Error("Error: 'segment' item is not a map")
+			continue
+		}
 
-		// Accedemos al Label y Stats de manera dinámica
-		mapLabel := mapItem["Label"].(string)
-		mapStatsItem := mapItem["Stats"].(map[string]interface{})
+		mapLabel, ok := mapItem["label"].(string)
+		if !ok {
+			logger.Error("Error: 'label' is missing or not a string")
+			continue
+		}
 
-		// Convertimos los valores correspondientes
-		winRate := int32(mapStatsItem["WinRatePercent"].(float64)) // asumiendo que es float64
-		matches := int32(mapStatsItem["Matches"].(float64))        // asumiendo que es float64
+		mapStatsItem, ok := mapItem["stats"].(map[string]interface{})
+		if !ok {
+			logger.Error("Error: 'stats' is missing or not a map")
+			continue
+		}
+
+		winratepercent, err := strconv.ParseFloat(mapStatsItem["Win Rate %"].(string), 32)
+		if err != nil {
+			logger.Error(err.Error())
+		}
+
+		mat, err := strconv.ParseFloat(mapStatsItem["Matches"].(string), 32)
+		if err != nil {
+			logger.Error(err.Error())
+		}
+
+		winRate := int32(winratepercent) // asumiendo que es float64
+		matches := int32(mat)            // asumiendo que es float64
 
 		mapStats[mapLabel] = model.TeamMapStats{
 			MapName: mapLabel,
@@ -169,10 +197,27 @@ func (c *FaceitClient) GetTeamById(teamId string) *model.TeamModel {
 		}
 	}
 
-	convertInterfaceSliceToInt32Slice := func(slice []interface{}) []int32 {
+	// Validamos la existencia de "Lifetime"
+	lifetimeStats, ok := teamStats["lifetime"].(map[string]interface{})
+	if !ok || lifetimeStats == nil {
+		logger.Error("Error: 'Lifetime' stats are nil or not found")
+		return nil
+	}
+
+	matchesStr := lifetimeStats["Matches"].(string)
+	winsStr := lifetimeStats["Wins"].(string)
+	winRatePercentStr := lifetimeStats["Win Rate %"].(string)
+	recentResultsStr := lifetimeStats["Recent Results"].([]any)
+
+	matches, _ := strconv.ParseFloat(matchesStr, 32)
+	wins, _ := strconv.ParseFloat(winsStr, 32)
+	winRatePercent, _ := strconv.ParseFloat(winRatePercentStr, 32)
+
+	convertInterfaceSliceToInt32Slice := func(slice []any) []int32 {
 		result := make([]int32, len(slice))
 		for i, v := range slice {
-			result[i] = int32(v.(float64)) // Asumiendo que los valores son float64
+			res, _ := strconv.ParseFloat(v.(string), 32)
+			result[i] = int32(res) // Asumiendo que los valores son float64
 		}
 		return result
 	}
@@ -184,10 +229,10 @@ func (c *FaceitClient) GetTeamById(teamId string) *model.TeamModel {
 		Avatar:    team.Avatar,
 		PlayersId: players,
 		Stats: model.TeamStatsModel{
-			TotalMatches:  int32(teamStats["Lifetime"].(map[string]interface{})["Matches"].(float64)),
-			Wins:          int32(teamStats["Lifetime"].(map[string]interface{})["Wins"].(float64)),
-			Winrate:       float32(teamStats["Lifetime"].(map[string]interface{})["WinRatePercent"].(float64)),
-			RecentResults: convertInterfaceSliceToInt32Slice(teamStats["Lifetime"].(map[string]interface{})["RecentResults"].([]interface{})),
+			TotalMatches:  int32(matches),
+			Wins:          int32(wins),
+			Winrate:       float32(winRatePercent),
+			RecentResults: convertInterfaceSliceToInt32Slice(recentResultsStr),
 			MapStats:      mapStats,
 		},
 	}
