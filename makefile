@@ -14,11 +14,9 @@ run:
 clean:
 	del /s /q *.exe
 	if exist logs rmdir /s /q logs & mkdir logs
-
-workers:
+	
+w-players:
 	go build -o cmd/workers/players/worker-players.exe cmd/workers/players/worker-players.go
-
-w-players: 
 	./cmd/workers/players/worker-players.exe
 
 microservices:

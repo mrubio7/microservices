@@ -42,6 +42,10 @@ func Start() {
 	for _, p := range playersList {
 		player := client.GetPlayerAverageDetails(p.FaceitId, consts.LAST_MATCHES_NUMBER)
 
+		if player == nil {
+			logger.Warning("User %s doesnt update", p.FaceitId)
+			continue
+		}
 		svcPlayers.UpdatePlayer(*player)
 		bar.Add(1)
 	}
