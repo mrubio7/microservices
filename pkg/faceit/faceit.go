@@ -148,27 +148,71 @@ func (c *FaceitClient) GetTeamById(teamId string) *model.TeamModel {
 		players = append(players, t.UserId)
 	}
 
-	mapStats := make(map[string]model.TeamMapStats, len(teamStats.Segments))
-	for _, m := range teamStats.Segments {
-		mapStats[m.Label] = model.TeamMapStats{
-			MapName: m.Label,
-			WinRate: int32(m.Stats.WinRatePercent),
-			Matches: int32(m.Stats.Matches),
+	mapStats := make(map[string]model.TeamMapStats, len(teamStats["Segments"].([]interface{})))
+
+	for _, m := range teamStats["Segments"].([]interface{}) {
+		// Aseguramos que 'm' sea un map[string]interface{}
+		mapItem := m.(map[string]interface{})
+
+		// Accedemos al Label y Stats de manera dinámica
+		mapLabel := mapItem["Label"].(string)
+		mapStatsItem := mapItem["Stats"].(map[string]interface{})
+
+		// Convertimos los valores correspondientes
+		winRate := int32(mapStatsItem["WinRatePercent"].(float64)) // asumiendo que es float64
+		matches := int32(mapStatsItem["Matches"].(float64))        // asumiendo que es float64
+
+		mapStats[mapLabel] = model.TeamMapStats{
+			MapName: mapLabel,
+			WinRate: winRate,
+			Matches: matches,
 		}
 	}
 
+	convertInterfaceSliceToInt32Slice := func(slice []interface{}) []int32 {
+		result := make([]int32, len(slice))
+		for i, v := range slice {
+			result[i] = int32(v.(float64)) // Asumiendo que los valores son float64
+		}
+		return result
+	}
+
 	return &model.TeamModel{
-		FaceitId:  team.TeamId,
+		FaceitId:  team.Nickname,
 		Name:      team.Name,
 		Nickname:  team.Nickname,
 		Avatar:    team.Avatar,
 		PlayersId: players,
 		Stats: model.TeamStatsModel{
-			TotalMatches:  int32(teamStats.Lifetime.Matches),
-			Wins:          int32(teamStats.Lifetime.Wins),
-			Winrate:       float32(teamStats.Lifetime.WinRatePercent),
-			RecentResults: []int32(teamStats.Lifetime.RecentResults),
+			TotalMatches:  int32(teamStats["Lifetime"].(map[string]interface{})["Matches"].(float64)),
+			Wins:          int32(teamStats["Lifetime"].(map[string]interface{})["Wins"].(float64)),
+			Winrate:       float32(teamStats["Lifetime"].(map[string]interface{})["WinRatePercent"].(float64)),
+			RecentResults: convertInterfaceSliceToInt32Slice(teamStats["Lifetime"].(map[string]interface{})["RecentResults"].([]interface{})),
 			MapStats:      mapStats,
 		},
 	}
+
+	// mapStats := make(map[string]model.TeamMapStats, len(teamStats.Segments))
+	// for _, m := range teamStats.Segments {
+	// 	mapStats[m.Label] = model.TeamMapStats{
+	// 		MapName: m.Label,
+	// 		WinRate: int32(m.Stats.WinRatePercent),
+	// 		Matches: int32(m.Stats.Matches),
+	// 	}
+	// }
+
+	// return &model.TeamModel{
+	// 	FaceitId:  team.TeamId,
+	// 	Name:      team.Name,
+	// 	Nickname:  team.Nickname,
+	// 	Avatar:    team.Avatar,
+	// 	PlayersId: players,
+	// 	Stats: model.TeamStatsModel{
+	// 		TotalMatches:  int32(teamStats.Lifetime.Matches),
+	// 		Wins:          int32(teamStats.Lifetime.Wins),
+	// 		Winrate:       float32(teamStats.Lifetime.WinRatePercent),
+	// 		RecentResults: []int32(teamStats.Lifetime.RecentResults),
+	// 		MapStats:      mapStats,
+	// 	},
+	// }
 }
