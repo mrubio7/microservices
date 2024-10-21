@@ -53,14 +53,17 @@ func (s *Server) NewTeam(ctx context.Context, teamRequest *pb.NewTeamRequest) (*
 	}
 
 	pbTeam := &pb.Team{
-		Id:        t.ID,
-		FaceitId:  t.FaceitId,
-		Name:      t.Name,
-		Nickname:  t.Nickname,
-		Avatar:    t.Avatar,
-		Active:    t.Active,
-		PlayersId: t.PlayersId,
-		Stats: &pb.TeamStats{
+		Id:          t.ID,
+		FaceitId:    t.FaceitId,
+		Name:        t.Name,
+		Nickname:    t.Nickname,
+		Avatar:      t.Avatar,
+		Active:      t.Active,
+		PlayersId:   t.PlayersId,
+		Twitter:     t.Twitter,
+		Instagram:   t.Instagram,
+		Web:         t.Web,
+		Tournaments: t.Tournaments, Stats: &pb.TeamStats{
 			TotalMatches:  t.Stats.TotalMatches,
 			Wins:          t.Stats.Wins,
 			Winrate:       t.Stats.Winrate,
@@ -90,13 +93,17 @@ func (s *Server) GetTeamById(ctx context.Context, teamRequest *pb.NewTeamRequest
 	}
 
 	pbTeam := &pb.Team{
-		Id:        t.ID,
-		FaceitId:  t.FaceitId,
-		Name:      t.Name,
-		Nickname:  t.Nickname,
-		Avatar:    t.Avatar,
-		Active:    t.Active,
-		PlayersId: t.PlayersId,
+		Id:          t.ID,
+		FaceitId:    t.FaceitId,
+		Name:        t.Name,
+		Nickname:    t.Nickname,
+		Avatar:      t.Avatar,
+		Active:      t.Active,
+		PlayersId:   t.PlayersId,
+		Twitter:     t.Twitter,
+		Instagram:   t.Instagram,
+		Web:         t.Web,
+		Tournaments: t.Tournaments,
 		Stats: &pb.TeamStats{
 			TotalMatches:  t.Stats.TotalMatches,
 			Wins:          t.Stats.Wins,
@@ -127,13 +134,17 @@ func (s *Server) GetTeamByNickname(ctx context.Context, teamRequest *pb.NewTeamR
 	}
 
 	pbTeam := &pb.Team{
-		Id:        t.ID,
-		FaceitId:  t.FaceitId,
-		Name:      t.Name,
-		Nickname:  t.Nickname,
-		Avatar:    t.Avatar,
-		Active:    t.Active,
-		PlayersId: t.PlayersId,
+		Id:          t.ID,
+		FaceitId:    t.FaceitId,
+		Name:        t.Name,
+		Nickname:    t.Nickname,
+		Avatar:      t.Avatar,
+		Active:      t.Active,
+		PlayersId:   t.PlayersId,
+		Twitter:     t.Twitter,
+		Instagram:   t.Instagram,
+		Web:         t.Web,
+		Tournaments: t.Tournaments,
 		Stats: &pb.TeamStats{
 			TotalMatches:  t.Stats.TotalMatches,
 			Wins:          t.Stats.Wins,
@@ -167,13 +178,17 @@ func (s *Server) GetTeams(ctx context.Context, teamRequest *pb.GetTeamsRequest) 
 		}
 
 		pbTeams = append(pbTeams, &pb.Team{
-			Id:        t.ID,
-			FaceitId:  t.FaceitId,
-			Name:      t.Name,
-			Nickname:  t.Nickname,
-			Avatar:    t.Avatar,
-			Active:    t.Active,
-			PlayersId: t.PlayersId,
+			Id:          t.ID,
+			FaceitId:    t.FaceitId,
+			Name:        t.Name,
+			Nickname:    t.Nickname,
+			Avatar:      t.Avatar,
+			Active:      t.Active,
+			PlayersId:   t.PlayersId,
+			Twitter:     t.Twitter,
+			Instagram:   t.Instagram,
+			Web:         t.Web,
+			Tournaments: t.Tournaments,
 			Stats: &pb.TeamStats{
 				TotalMatches:  t.Stats.TotalMatches,
 				Wins:          t.Stats.Wins,
