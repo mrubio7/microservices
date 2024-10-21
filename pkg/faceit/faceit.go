@@ -223,7 +223,7 @@ func (c *FaceitClient) GetTeamById(teamId string) *model.TeamModel {
 	}
 
 	return &model.TeamModel{
-		FaceitId:  team.Nickname,
+		FaceitId:  team.TeamId,
 		Name:      team.Name,
 		Nickname:  team.Nickname,
 		Avatar:    team.Avatar,
