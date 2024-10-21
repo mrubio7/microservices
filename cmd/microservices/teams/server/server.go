@@ -72,8 +72,45 @@ func (s *Server) NewTeam(ctx context.Context, teamRequest *pb.NewTeamRequest) (*
 	return pbTeam, nil
 }
 
-func (s *Server) GetTeam(ctx context.Context, teamRequest *pb.NewTeamRequest) (*pb.Team, error) {
+func (s *Server) GetTeamById(ctx context.Context, teamRequest *pb.NewTeamRequest) (*pb.Team, error) {
 	t := s.TeamsService.GetTeam(teamRequest.FaceitId)
+	if t == nil {
+		err := errors.New("team not found")
+		logger.Error(err.Error())
+		return nil, err
+	}
+
+	mapStats := make(map[string]*pb.TeamMapStats, len(t.Stats.MapStats))
+	for _, m := range t.Stats.MapStats {
+		mapStats[m.MapName] = &pb.TeamMapStats{
+			MapName: m.MapName,
+			Winrate: m.WinRate,
+			Matches: m.Matches,
+		}
+	}
+
+	pbTeam := &pb.Team{
+		Id:        t.ID,
+		FaceitId:  t.FaceitId,
+		Name:      t.Name,
+		Nickname:  t.Nickname,
+		Avatar:    t.Avatar,
+		Active:    t.Active,
+		PlayersId: t.PlayersId,
+		Stats: &pb.TeamStats{
+			TotalMatches:  t.Stats.TotalMatches,
+			Wins:          t.Stats.Wins,
+			Winrate:       t.Stats.Winrate,
+			RecentResults: t.Stats.RecentResults,
+			MapStats:      mapStats,
+		},
+	}
+
+	return pbTeam, nil
+}
+
+func (s *Server) GetTeamByNickname(ctx context.Context, teamRequest *pb.NewTeamRequest) (*pb.Team, error) {
+	t := s.TeamsService.GetTeamByNickname(teamRequest.FaceitId)
 	if t == nil {
 		err := errors.New("team not found")
 		logger.Error(err.Error())

@@ -45,17 +45,33 @@ func (th *Team_Handlers) GetAll(c *gin.Context) {
 
 func (th *Team_Handlers) Get(c *gin.Context) {
 	teamId := c.Query("id")
-	if teamId == "" {
-		logger.Error("tried to get an empty id")
-		c.JSON(http.StatusBadRequest, response.BuildError("Invalid ID"))
+	nickname := c.Query("nickname")
+
+	if teamId == "" && nickname == "" {
+		logger.Error("tried to get an empty id and nickname")
+		c.JSON(http.StatusBadRequest, response.BuildError("Invalid ID or Nickname"))
 		return
 	}
 
-	res, err := th.teams_client.GetTeam(c, &pb_teams.NewTeamRequest{FaceitId: teamId})
-	if err != nil {
-		logger.Error(err.Error())
-		c.JSON(http.StatusBadRequest, response.BuildError("Error getting team"))
-		return
+	var request *pb_teams.NewTeamRequest
+	var res *pb_teams.Team
+	var err error
+	if teamId != "" {
+		request = &pb_teams.NewTeamRequest{FaceitId: teamId}
+		res, err = th.teams_client.GetTeamById(c, request)
+		if err != nil {
+			logger.Error(err.Error())
+			c.JSON(http.StatusBadRequest, response.BuildError("Error getting team"))
+			return
+		}
+	} else {
+		request = &pb_teams.NewTeamRequest{FaceitId: nickname}
+		res, err = th.teams_client.GetTeamByNickname(c, request)
+		if err != nil {
+			logger.Error(err.Error())
+			c.JSON(http.StatusBadRequest, response.BuildError("Error getting team"))
+			return
+		}
 	}
 
 	c.JSON(http.StatusOK, response.BuildOk("Ok", res))

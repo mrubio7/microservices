@@ -58,6 +58,18 @@ func (s *Teams) GetTeam(id string) *model.TeamModel {
 	return team
 }
 
+func (s *Teams) GetTeamByNickname(nickname string) *model.TeamModel {
+	var team *model.TeamModel
+
+	err := s.db.Model(&model.TeamModel{}).Preload("Stats").First(&team, "nickname = ?", nickname).Error
+	if err != nil {
+		logger.Error("Team not found: %s", err.Error())
+		return nil
+	}
+
+	return team
+}
+
 func (s *Teams) NewTeam(team model.TeamModel) *model.TeamModel {
 	var existingTeam model.TeamModel
 

@@ -34,7 +34,8 @@ message Empty {}
 
 service TeamService {
     rpc GetTeams (GetTeamsRequest) returns (TeamList);
-    rpc GetTeam (NewTeamRequest) returns (Team);
+    rpc GetTeamById (NewTeamRequest) returns (Team);
+    rpc GetTeamByNickname (NewTeamRequest) returns (Team);
     rpc NewTeam (NewTeamRequest) returns (Team);
 }
 
