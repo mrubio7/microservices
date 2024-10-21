@@ -19,9 +19,10 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	TeamService_GetTeams_FullMethodName = "/teams.TeamService/GetTeams"
-	TeamService_GetTeam_FullMethodName  = "/teams.TeamService/GetTeam"
-	TeamService_NewTeam_FullMethodName  = "/teams.TeamService/NewTeam"
+	TeamService_GetTeams_FullMethodName          = "/teams.TeamService/GetTeams"
+	TeamService_GetTeamById_FullMethodName       = "/teams.TeamService/GetTeamById"
+	TeamService_GetTeamByNickname_FullMethodName = "/teams.TeamService/GetTeamByNickname"
+	TeamService_NewTeam_FullMethodName           = "/teams.TeamService/NewTeam"
 )
 
 // TeamServiceClient is the client API for TeamService service.
@@ -29,7 +30,8 @@ const (
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type TeamServiceClient interface {
 	GetTeams(ctx context.Context, in *GetTeamsRequest, opts ...grpc.CallOption) (*TeamList, error)
-	GetTeam(ctx context.Context, in *NewTeamRequest, opts ...grpc.CallOption) (*Team, error)
+	GetTeamById(ctx context.Context, in *NewTeamRequest, opts ...grpc.CallOption) (*Team, error)
+	GetTeamByNickname(ctx context.Context, in *NewTeamRequest, opts ...grpc.CallOption) (*Team, error)
 	NewTeam(ctx context.Context, in *NewTeamRequest, opts ...grpc.CallOption) (*Team, error)
 }
 
@@ -51,10 +53,20 @@ func (c *teamServiceClient) GetTeams(ctx context.Context, in *GetTeamsRequest, o
 	return out, nil
 }
 
-func (c *teamServiceClient) GetTeam(ctx context.Context, in *NewTeamRequest, opts ...grpc.CallOption) (*Team, error) {
+func (c *teamServiceClient) GetTeamById(ctx context.Context, in *NewTeamRequest, opts ...grpc.CallOption) (*Team, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(Team)
-	err := c.cc.Invoke(ctx, TeamService_GetTeam_FullMethodName, in, out, cOpts...)
+	err := c.cc.Invoke(ctx, TeamService_GetTeamById_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *teamServiceClient) GetTeamByNickname(ctx context.Context, in *NewTeamRequest, opts ...grpc.CallOption) (*Team, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(Team)
+	err := c.cc.Invoke(ctx, TeamService_GetTeamByNickname_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -76,7 +88,8 @@ func (c *teamServiceClient) NewTeam(ctx context.Context, in *NewTeamRequest, opt
 // for forward compatibility.
 type TeamServiceServer interface {
 	GetTeams(context.Context, *GetTeamsRequest) (*TeamList, error)
-	GetTeam(context.Context, *NewTeamRequest) (*Team, error)
+	GetTeamById(context.Context, *NewTeamRequest) (*Team, error)
+	GetTeamByNickname(context.Context, *NewTeamRequest) (*Team, error)
 	NewTeam(context.Context, *NewTeamRequest) (*Team, error)
 	mustEmbedUnimplementedTeamServiceServer()
 }
@@ -91,8 +104,11 @@ type UnimplementedTeamServiceServer struct{}
 func (UnimplementedTeamServiceServer) GetTeams(context.Context, *GetTeamsRequest) (*TeamList, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetTeams not implemented")
 }
-func (UnimplementedTeamServiceServer) GetTeam(context.Context, *NewTeamRequest) (*Team, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method GetTeam not implemented")
+func (UnimplementedTeamServiceServer) GetTeamById(context.Context, *NewTeamRequest) (*Team, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetTeamById not implemented")
+}
+func (UnimplementedTeamServiceServer) GetTeamByNickname(context.Context, *NewTeamRequest) (*Team, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetTeamByNickname not implemented")
 }
 func (UnimplementedTeamServiceServer) NewTeam(context.Context, *NewTeamRequest) (*Team, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method NewTeam not implemented")
@@ -136,20 +152,38 @@ func _TeamService_GetTeams_Handler(srv interface{}, ctx context.Context, dec fun
 	return interceptor(ctx, in, info, handler)
 }
 
-func _TeamService_GetTeam_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _TeamService_GetTeamById_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(NewTeamRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(TeamServiceServer).GetTeam(ctx, in)
+		return srv.(TeamServiceServer).GetTeamById(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: TeamService_GetTeam_FullMethodName,
+		FullMethod: TeamService_GetTeamById_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(TeamServiceServer).GetTeam(ctx, req.(*NewTeamRequest))
+		return srv.(TeamServiceServer).GetTeamById(ctx, req.(*NewTeamRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _TeamService_GetTeamByNickname_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(NewTeamRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(TeamServiceServer).GetTeamByNickname(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: TeamService_GetTeamByNickname_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(TeamServiceServer).GetTeamByNickname(ctx, req.(*NewTeamRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -184,8 +218,12 @@ var TeamService_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _TeamService_GetTeams_Handler,
 		},
 		{
-			MethodName: "GetTeam",
-			Handler:    _TeamService_GetTeam_Handler,
+			MethodName: "GetTeamById",
+			Handler:    _TeamService_GetTeamById_Handler,
+		},
+		{
+			MethodName: "GetTeamByNickname",
+			Handler:    _TeamService_GetTeamByNickname_Handler,
 		},
 		{
 			MethodName: "NewTeam",
