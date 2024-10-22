@@ -3,12 +3,14 @@ package microservice_players
 import (
 	"context"
 	"errors"
+	"ibercs/internal/model"
 	"ibercs/pkg/config"
 	"ibercs/pkg/database"
 	"ibercs/pkg/faceit"
 	"ibercs/pkg/logger"
 	"ibercs/pkg/service"
 	pb "ibercs/proto/teams"
+	"reflect"
 )
 
 type Server struct {
@@ -117,11 +119,27 @@ func (s *Server) GetTeamById(ctx context.Context, teamRequest *pb.NewTeamRequest
 }
 
 func (s *Server) GetTeamByNickname(ctx context.Context, teamRequest *pb.NewTeamRequest) (*pb.Team, error) {
-	t := s.TeamsService.GetTeamByNickname(teamRequest.FaceitId)
+	var t *model.TeamModel
+
+	teamUpdated := s.FaceitService.GetTeamById(teamRequest.FaceitId)
+	if teamUpdated == nil {
+		err := errors.New("team is empty")
+		logger.Error(err.Error())
+	}
+
+	t = s.TeamsService.GetTeamByNickname(teamRequest.FaceitId)
 	if t == nil {
 		err := errors.New("team not found")
 		logger.Error(err.Error())
 		return nil, err
+	}
+
+	if !reflect.DeepEqual(t, teamUpdated) {
+		t = teamUpdated
+		res := s.TeamsService.UpdateTeam(*teamUpdated)
+		if res == nil {
+			logger.Error("Unable to update the team")
+		}
 	}
 
 	mapStats := make(map[string]*pb.TeamMapStats, len(t.Stats.MapStats))

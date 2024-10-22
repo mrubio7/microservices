@@ -89,3 +89,24 @@ func (s *Teams) NewTeam(team model.TeamModel) *model.TeamModel {
 
 	return nil
 }
+
+func (s *Teams) UpdateTeam(team model.TeamModel) *model.TeamModel {
+	var existingTeam model.TeamModel
+
+	err := s.db.Where("faceit_id = ?", team.FaceitId).First(&existingTeam).Error
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			logger.Warning("Team %s does not exist", team.Name)
+			return nil
+		}
+		logger.Error("Error finding team: %s", err.Error())
+		return nil
+	}
+
+	if err := s.db.Model(&existingTeam).Updates(team).Error; err != nil {
+		logger.Error("Error updating team: %s", err.Error())
+		return nil
+	}
+
+	return &existingTeam
+}
