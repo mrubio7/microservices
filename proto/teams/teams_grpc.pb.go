@@ -2,9 +2,9 @@
 // versions:
 // - protoc-gen-go-grpc v1.5.1
 // - protoc             v5.28.2
-// source: teams.proto
+// source: proto/teams.proto
 
-package proto
+package teams
 
 import (
 	context "context"
@@ -231,5 +231,5 @@ var TeamService_ServiceDesc = grpc.ServiceDesc{
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
-	Metadata: "teams.proto",
+	Metadata: "proto/teams.proto",
 }

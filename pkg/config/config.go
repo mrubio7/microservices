@@ -13,6 +13,7 @@ type (
 		Database       DatabaseConfig
 		FaceitApiToken string
 		Workers        WorkersConfig
+		Microservices  MicroservicesConfig
 	}
 
 	DatabaseConfig struct {
@@ -25,6 +26,12 @@ type (
 
 	WorkersConfig struct {
 		PlayersHost string
+	}
+
+	MicroservicesConfig struct {
+		PlayersHost string
+		TeamsHost   string
+		UserHost    string
 	}
 )
 
@@ -50,6 +57,11 @@ func Load() (Config, error) {
 		FaceitApiToken: os.Getenv("FACEIT_API_TOKEN"),
 		Workers: WorkersConfig{
 			PlayersHost: os.Getenv("WORKER_PLAYERS_HOST"),
+		},
+		Microservices: MicroservicesConfig{
+			PlayersHost: os.Getenv("MICROSERVICE_PLAYERS_HOST"),
+			TeamsHost:   os.Getenv("MICROSERVICE_TEAMS_HOST"),
+			UserHost:    os.Getenv("MICROSERVICE_USERS_HOST"),
 		},
 	}
 

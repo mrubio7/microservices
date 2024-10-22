@@ -2,9 +2,9 @@
 // versions:
 // - protoc-gen-go-grpc v1.5.1
 // - protoc             v5.28.2
-// source: players.proto
+// source: proto/players.proto
 
-package proto
+package players
 
 import (
 	context "context"
@@ -32,7 +32,7 @@ type PlayerServiceClient interface {
 	GetPlayer(ctx context.Context, in *GetPlayerRequest, opts ...grpc.CallOption) (*PlayerList, error)
 	GetPlayers(ctx context.Context, in *Empty, opts ...grpc.CallOption) (*PlayerList, error)
 	GetProminentPlayers(ctx context.Context, in *Empty, opts ...grpc.CallOption) (*ProminentPlayerList, error)
-	NewPlayer(ctx context.Context, in *NewPlayerRequest, opts ...grpc.CallOption) (*PlayerResponse, error)
+	NewPlayer(ctx context.Context, in *NewPlayerRequest, opts ...grpc.CallOption) (*Player, error)
 }
 
 type playerServiceClient struct {
@@ -73,9 +73,9 @@ func (c *playerServiceClient) GetProminentPlayers(ctx context.Context, in *Empty
 	return out, nil
 }
 
-func (c *playerServiceClient) NewPlayer(ctx context.Context, in *NewPlayerRequest, opts ...grpc.CallOption) (*PlayerResponse, error) {
+func (c *playerServiceClient) NewPlayer(ctx context.Context, in *NewPlayerRequest, opts ...grpc.CallOption) (*Player, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(PlayerResponse)
+	out := new(Player)
 	err := c.cc.Invoke(ctx, PlayerService_NewPlayer_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
@@ -90,7 +90,7 @@ type PlayerServiceServer interface {
 	GetPlayer(context.Context, *GetPlayerRequest) (*PlayerList, error)
 	GetPlayers(context.Context, *Empty) (*PlayerList, error)
 	GetProminentPlayers(context.Context, *Empty) (*ProminentPlayerList, error)
-	NewPlayer(context.Context, *NewPlayerRequest) (*PlayerResponse, error)
+	NewPlayer(context.Context, *NewPlayerRequest) (*Player, error)
 	mustEmbedUnimplementedPlayerServiceServer()
 }
 
@@ -110,7 +110,7 @@ func (UnimplementedPlayerServiceServer) GetPlayers(context.Context, *Empty) (*Pl
 func (UnimplementedPlayerServiceServer) GetProminentPlayers(context.Context, *Empty) (*ProminentPlayerList, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetProminentPlayers not implemented")
 }
-func (UnimplementedPlayerServiceServer) NewPlayer(context.Context, *NewPlayerRequest) (*PlayerResponse, error) {
+func (UnimplementedPlayerServiceServer) NewPlayer(context.Context, *NewPlayerRequest) (*Player, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method NewPlayer not implemented")
 }
 func (UnimplementedPlayerServiceServer) mustEmbedUnimplementedPlayerServiceServer() {}
@@ -231,5 +231,5 @@ var PlayerService_ServiceDesc = grpc.ServiceDesc{
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
-	Metadata: "players.proto",
+	Metadata: "proto/players.proto",
 }

@@ -111,7 +111,7 @@ func (s *Server) GetProminentPlayers(ctx context.Context, req *pb.Empty) (*pb.Pr
 	latestWeek := s.PlayersService.GetProminentPlayers()
 	currentYear, currentWeek := time.Now().ISOWeek()
 
-	if latestWeek == nil || latestWeek.Year < int16(currentYear) || latestWeek.Week < int16(currentWeek-1) {
+	if latestWeek == nil || latestWeek.Year < int16(currentYear) || latestWeek.Week < int16(currentWeek) {
 		logger.Info("Generating a new prominent week since no valid week was found or the week is outdated.")
 		latestWeek = s.PlayersService.GetNewProminentPlayers()
 	}
@@ -135,9 +135,40 @@ func (s *Server) GetProminentPlayers(ctx context.Context, req *pb.Empty) (*pb.Pr
 		players = append(players, player)
 	}
 
-	return &pb.ProminentPlayerList{Players: players}, nil
+	return &pb.ProminentPlayerList{
+		Week:    int32(currentWeek),
+		Year:    int32(currentYear),
+		Players: players,
+	}, nil
 }
 
-func (s *Server) NewPlayer(context.Context, *pb.NewPlayerRequest) (*pb.PlayerResponse, error) {
-	return nil, nil
+func (s *Server) NewPlayer(ctx context.Context, req *pb.NewPlayerRequest) (*pb.Player, error) {
+	player := s.FaceitService.GetPlayerAverageDetails(req.FaceitId, consts.LAST_MATCHES_NUMBER)
+
+	err := s.PlayersService.UpdatePlayer(*player)
+	if err != nil {
+		logger.Error(err.Error())
+		return nil, err
+	}
+
+	res := &pb.Player{
+		Id:       player.ID,
+		Nickname: player.Nickname,
+		FaceitId: player.FaceitId,
+		SteamId:  player.SteamId,
+		Avatar:   player.Avatar,
+		Stats: &pb.PlayerStats{
+			PlayerId:               player.Stats.ID,
+			KdRatio:                player.Stats.KdRatio,
+			KrRatio:                player.Stats.KrRatio,
+			KillsAverage:           player.Stats.KillsAverage,
+			DeathsAverage:          player.Stats.DeathsAverage,
+			HeadshotPercentAverage: player.Stats.HeadshotPercentAverage,
+			MVPAverage:             player.Stats.MVPAverage,
+			AssistAverage:          player.Stats.AssistAverage,
+			Elo:                    player.Stats.Elo,
+		},
+	}
+
+	return res, nil
 }
