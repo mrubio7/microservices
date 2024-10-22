@@ -2,11 +2,10 @@
 
 proto:
 	protoc --go_out=. --go-grpc_out=. proto/*.proto
-
+	
 clean:
-	del /s /q *.exe
-	if exist logs rmdir /s /q logs & mkdir logs
-
+	del /s /q *.exe || exit 0
+	powershell -Command "Get-ChildItem -Recurse -Directory -Filter logs | Remove-Item -Recurse -Force"
 
 # API GATEWAY
 run:

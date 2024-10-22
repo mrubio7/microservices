@@ -5,6 +5,7 @@ import (
 	"ibercs/pkg/microservices"
 	pb_players "ibercs/proto/players"
 	pb_teams "ibercs/proto/teams"
+	pb_users "ibercs/proto/users"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -14,6 +15,7 @@ type Router struct {
 	gin           *gin.Engine
 	PlayersServer *pb_players.PlayerServiceClient
 	TeamsServer   *pb_teams.TeamServiceClient
+	UsersServer   *pb_users.UserServiceClient
 }
 
 func NewRouter(cfg config.Config) *Router {
@@ -23,6 +25,7 @@ func NewRouter(cfg config.Config) *Router {
 
 	r.registerPlayersServer(cfg.Microservices)
 	r.registerTeamsServer(cfg.Microservices)
+	r.registerUsersServer(cfg.Microservices)
 
 	return r
 }
@@ -39,4 +42,8 @@ func (r *Router) registerPlayersServer(cfg config.MicroservicesConfig) {
 
 func (r *Router) registerTeamsServer(cfg config.MicroservicesConfig) {
 	r.TeamsServer = microservices.New(cfg.TeamsHost, pb_teams.NewTeamServiceClient)
+}
+
+func (r *Router) registerUsersServer(cfg config.MicroservicesConfig) {
+	r.UsersServer = microservices.New(cfg.UserHost, pb_users.NewUserServiceClient)
 }

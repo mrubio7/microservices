@@ -37,9 +37,13 @@ func (api *Api) Start() {
 
 	players_handlers := handlers.NewPlayersHandlers(*api.router.PlayersServer)
 	teams_handlers := handlers.NewTeamsHandlers(*api.router.TeamsServer)
+	users_handlers := handlers.NewUsersHandlers(*api.router.UsersServer)
 	workers_handlers := handlers.NewWorkersHandlers(api.cfg.Workers)
 
 	api.router.gin.Use(middlewares.CORSMiddleware())
+
+	api.router.gin.POST("/api/v1/users/new", users_handlers.NewUser)
+
 	api.router.gin.GET("/api/v1/players/get", players_handlers.GetPlayers)
 	api.router.gin.GET("/api/v1/players/get-all", players_handlers.GetAllPlayers)
 	api.router.gin.GET("/api/v1/players/get-prominent-players", players_handlers.GetProminentPlayers)

@@ -13,12 +13,12 @@ import (
 func main() {
 	logger.Initialize()
 
-	listener, err := net.Listen("tcp", ":50051")
+	listener, err := net.Listen("tcp", ":50052")
 	if err != nil {
 		logger.Error("Cannot create tcp connection: %s", err.Error())
 		return
 	} else {
-		logger.Info("gRPC server started on port 50051")
+		logger.Info("gRPC server started on port 50052")
 	}
 
 	grpcServer := grpc.NewServer()
