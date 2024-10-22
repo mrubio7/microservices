@@ -148,78 +148,13 @@ func (c *FaceitClient) GetTeamById(teamId string) *model.TeamModel {
 		players = append(players, t.UserId)
 	}
 
-	// Validamos la existencia de "segments"
-	teamStatsSegments, ok := teamStats["segments"].([]interface{})
-	if !ok || teamStatsSegments == nil {
-		logger.Error("Error: 'segments' is nil or not found")
-		return nil
-	}
-
-	mapStats := make(map[string]model.TeamMapStats, len(teamStatsSegments))
-
-	for _, m := range teamStatsSegments {
-		// Aseguramos que 'm' sea un map[string]interface{}
-		mapItem, ok := m.(map[string]interface{})
-		if !ok {
-			logger.Error("Error: 'segment' item is not a map")
-			continue
+	mapStats := make(map[string]model.TeamMapStats, len(teamStats.Segments))
+	for _, m := range teamStats.Segments {
+		mapStats[m.Label] = model.TeamMapStats{
+			MapName: m.Label,
+			WinRate: int32(m.Stats.WinRatePercent),
+			Matches: int32(m.Stats.Matches),
 		}
-
-		mapLabel, ok := mapItem["label"].(string)
-		if !ok {
-			logger.Error("Error: 'label' is missing or not a string")
-			continue
-		}
-
-		mapStatsItem, ok := mapItem["stats"].(map[string]interface{})
-		if !ok {
-			logger.Error("Error: 'stats' is missing or not a map")
-			continue
-		}
-
-		winratepercent, err := strconv.ParseFloat(mapStatsItem["Win Rate %"].(string), 32)
-		if err != nil {
-			logger.Error(err.Error())
-		}
-
-		mat, err := strconv.ParseFloat(mapStatsItem["Matches"].(string), 32)
-		if err != nil {
-			logger.Error(err.Error())
-		}
-
-		winRate := int32(winratepercent) // asumiendo que es float64
-		matches := int32(mat)            // asumiendo que es float64
-
-		mapStats[mapLabel] = model.TeamMapStats{
-			MapName: mapLabel,
-			WinRate: winRate,
-			Matches: matches,
-		}
-	}
-
-	// Validamos la existencia de "Lifetime"
-	lifetimeStats, ok := teamStats["lifetime"].(map[string]interface{})
-	if !ok || lifetimeStats == nil {
-		logger.Error("Error: 'Lifetime' stats are nil or not found")
-		return nil
-	}
-
-	matchesStr := lifetimeStats["Matches"].(string)
-	winsStr := lifetimeStats["Wins"].(string)
-	winRatePercentStr := lifetimeStats["Win Rate %"].(string)
-	recentResultsStr := lifetimeStats["Recent Results"].([]any)
-
-	matches, _ := strconv.ParseFloat(matchesStr, 32)
-	wins, _ := strconv.ParseFloat(winsStr, 32)
-	winRatePercent, _ := strconv.ParseFloat(winRatePercentStr, 32)
-
-	convertInterfaceSliceToInt32Slice := func(slice []any) []int32 {
-		result := make([]int32, len(slice))
-		for i, v := range slice {
-			res, _ := strconv.ParseFloat(v.(string), 32)
-			result[i] = int32(res) // Asumiendo que los valores son float64
-		}
-		return result
 	}
 
 	return &model.TeamModel{
@@ -229,35 +164,11 @@ func (c *FaceitClient) GetTeamById(teamId string) *model.TeamModel {
 		Avatar:    team.Avatar,
 		PlayersId: players,
 		Stats: model.TeamStatsModel{
-			TotalMatches:  int32(matches),
-			Wins:          int32(wins),
-			Winrate:       float32(winRatePercent),
-			RecentResults: convertInterfaceSliceToInt32Slice(recentResultsStr),
+			TotalMatches:  int32(teamStats.Lifetime.Matches),
+			Wins:          int32(teamStats.Lifetime.Wins),
+			Winrate:       float32(teamStats.Lifetime.WinRatePercent),
+			RecentResults: []int32(teamStats.Lifetime.RecentResults),
 			MapStats:      mapStats,
 		},
 	}
-
-	// mapStats := make(map[string]model.TeamMapStats, len(teamStats.Segments))
-	// for _, m := range teamStats.Segments {
-	// 	mapStats[m.Label] = model.TeamMapStats{
-	// 		MapName: m.Label,
-	// 		WinRate: int32(m.Stats.WinRatePercent),
-	// 		Matches: int32(m.Stats.Matches),
-	// 	}
-	// }
-
-	// return &model.TeamModel{
-	// 	FaceitId:  team.TeamId,
-	// 	Name:      team.Name,
-	// 	Nickname:  team.Nickname,
-	// 	Avatar:    team.Avatar,
-	// 	PlayersId: players,
-	// 	Stats: model.TeamStatsModel{
-	// 		TotalMatches:  int32(teamStats.Lifetime.Matches),
-	// 		Wins:          int32(teamStats.Lifetime.Wins),
-	// 		Winrate:       float32(teamStats.Lifetime.WinRatePercent),
-	// 		RecentResults: []int32(teamStats.Lifetime.RecentResults),
-	// 		MapStats:      mapStats,
-	// 	},
-	// }
 }

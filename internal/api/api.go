@@ -33,10 +33,10 @@ func New() *Api {
 func (api *Api) Start() {
 	logger.Debug("Initializing API...")
 
-	api.router = NewRouter()
+	api.router = NewRouter(api.cfg)
 
-	players_handlers := handlers.NewPlayersHandlers(api.router.PlayersServer)
-	teams_handlers := handlers.NewTeamsHandlers(api.router.TeamsServer)
+	players_handlers := handlers.NewPlayersHandlers(*api.router.PlayersServer)
+	teams_handlers := handlers.NewTeamsHandlers(*api.router.TeamsServer)
 	workers_handlers := handlers.NewWorkersHandlers(api.cfg.Workers)
 
 	api.router.gin.Use(middlewares.CORSMiddleware())

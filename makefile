@@ -1,27 +1,26 @@
-.PHONY: proto clean build run workers microservices w-players
+.PHONY: proto clean run w-players ms-players ms-teams ms-users
 
 proto:
-	protoc --proto_path=proto --go_out=. --go-grpc_out=. players.proto
-	protoc --proto_path=proto --go_out=. --go-grpc_out=. teams.proto
+	protoc --go_out=. --go-grpc_out=. proto/*.proto
 
-build:
-	go build -o cmd/api_gateway/api-gateway.exe cmd/api_gateway/main.go
+clean:
+	del /s /q *.exe
+	if exist logs rmdir /s /q logs & mkdir logs
 
+
+# API GATEWAY
 run:
 	go build -o cmd/api_gateway/api-gateway.exe cmd/api_gateway/main.go
 	./cmd/api_gateway/api-gateway.exe
 	
-clean:
-	del /s /q *.exe
-	if exist logs rmdir /s /q logs & mkdir logs
-	
+
+# WORKERS
 w-players:
 	go build -o cmd/workers/players/worker-players.exe cmd/workers/players/worker-players.go
 	./cmd/workers/players/worker-players.exe
 
-microservices:
-	go build -o cmd/microservices/players/microservice-players.exe cmd/microservices/players/main.go
 
+# MICROSERVICES
 ms-players:
 	go build -o cmd/microservices/players/microservice-players.exe cmd/microservices/players/main.go
 	./cmd/microservices/players/microservice-players.exe
@@ -29,3 +28,7 @@ ms-players:
 ms-teams:
 	go build -o cmd/microservices/teams/microservice-teams.exe cmd/microservices/teams/main.go
 	./cmd/microservices/teams/microservice-teams.exe
+
+ms-users:
+	go build -o cmd/microservices/users/microservice-users.exe cmd/microservices/users/main.go
+	./cmd/microservices/users/microservice-users.exe

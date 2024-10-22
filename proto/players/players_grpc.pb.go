@@ -2,9 +2,9 @@
 // versions:
 // - protoc-gen-go-grpc v1.5.1
 // - protoc             v5.28.2
-// source: players.proto
+// source: proto/players.proto
 
-package proto
+package players
 
 import (
 	context "context"
@@ -231,5 +231,5 @@ var PlayerService_ServiceDesc = grpc.ServiceDesc{
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
-	Metadata: "players.proto",
+	Metadata: "proto/players.proto",
 }

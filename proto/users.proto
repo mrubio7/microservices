@@ -1,0 +1,48 @@
+syntax = "proto3";
+
+package users;
+option go_package = "proto/users;users";
+
+message Player {
+    int32 Id = 1;
+    string Nickname = 2;
+    string FaceitId = 3;
+    string SteamId = 4;
+    string Avatar = 5;
+    PlayerStats Stats = 6;
+}
+
+message PlayerStats {
+    int32 PlayerId = 1;
+    float KdRatio = 2;
+    float KrRatio = 3;
+	float KillsAverage = 4;
+	float DeathsAverage = 5;
+	float HeadshotPercentAverage = 6;
+	float MVPAverage = 7;
+	float AssistAverage = 8;
+    int32 Elo = 9;
+}
+
+message User {
+    int32 ID = 1;
+    string Name = 2;
+    string Description = 3;
+    string Twitter = 4;
+    string Twitch = 5;
+    int32 Role = 6; 
+    Player Player = 7;
+}
+
+service UserService {
+    rpc GetUser (GetUserRequest) returns (UserList);
+    rpc UpdateUser (User) returns (User);
+}
+
+message UserList {
+    repeated User players = 1;
+}
+
+message GetUserRequest {
+    repeated string Ids = 1;
+}
