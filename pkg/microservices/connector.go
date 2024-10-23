@@ -18,13 +18,13 @@ func New[T any](cfgHost, cfgPort string, newClientFunc func(conn grpc.ClientConn
 		creds = credentials.NewTLS(nil)
 	}
 
-	conn, err := grpc.NewClient(cfgHost+cfgPort, grpc.WithTransportCredentials(creds))
+	conn, err := grpc.NewClient(cfgHost, grpc.WithTransportCredentials(creds))
 	if err != nil {
 		logger.Error("Cannot connect to gRPC server at %s: %s", cfgHost, err.Error())
 		return nil
 	}
 
 	grpcClient := newClientFunc(conn)
-	logger.Trace("gRPC server at %s connected successfully", cfgHost)
+	logger.Trace("gRPC server at %s%s connected successfully", cfgHost, cfgPort)
 	return &grpcClient
 }
