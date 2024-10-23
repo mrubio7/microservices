@@ -10,7 +10,6 @@ import (
 	"ibercs/pkg/logger"
 	"ibercs/pkg/service"
 	pb "ibercs/proto/teams"
-	"reflect"
 )
 
 type Server struct {
@@ -134,13 +133,13 @@ func (s *Server) GetTeamByNickname(ctx context.Context, teamRequest *pb.NewTeamR
 		return nil, err
 	}
 
-	if !reflect.DeepEqual(t, teamUpdated) {
-		t = teamUpdated
-		res := s.TeamsService.UpdateTeam(*teamUpdated)
-		if res == nil {
-			logger.Error("Unable to update the team")
-		}
-	}
+	// if !reflect.DeepEqual(t, teamUpdated) {
+	// 	t = teamUpdated
+	// 	res := s.TeamsService.UpdateTeam(*teamUpdated)
+	// 	if res == nil {
+	// 		logger.Error("Unable to update the team")
+	// 	}
+	// }
 
 	mapStats := make(map[string]*pb.TeamMapStats, len(t.Stats.MapStats))
 	for _, m := range t.Stats.MapStats {
