@@ -14,6 +14,7 @@ func New[T any](cfgHost, cfgPort string, newClientFunc func(conn grpc.ClientConn
 
 	if env := os.Getenv("ENV"); env == "" {
 		creds = insecure.NewCredentials()
+		cfgHost += cfgPort
 	} else {
 		creds = credentials.NewTLS(nil)
 	}
