@@ -10,6 +10,7 @@ import (
 	"ibercs/pkg/logger"
 	"ibercs/pkg/service"
 	pb "ibercs/proto/teams"
+	"reflect"
 )
 
 type Server struct {
@@ -120,12 +121,6 @@ func (s *Server) GetTeamById(ctx context.Context, teamRequest *pb.NewTeamRequest
 func (s *Server) GetTeamByNickname(ctx context.Context, teamRequest *pb.NewTeamRequest) (*pb.Team, error) {
 	var t *model.TeamModel
 
-	teamUpdated := s.FaceitService.GetTeamById(teamRequest.FaceitId)
-	if teamUpdated == nil {
-		err := errors.New("team is empty")
-		logger.Error(err.Error())
-	}
-
 	t = s.TeamsService.GetTeamByNickname(teamRequest.FaceitId)
 	if t == nil {
 		err := errors.New("team not found")
@@ -133,13 +128,20 @@ func (s *Server) GetTeamByNickname(ctx context.Context, teamRequest *pb.NewTeamR
 		return nil, err
 	}
 
-	// if !reflect.DeepEqual(t, teamUpdated) {
-	// 	t = teamUpdated
-	// 	res := s.TeamsService.UpdateTeam(*teamUpdated)
-	// 	if res == nil {
-	// 		logger.Error("Unable to update the team")
-	// 	}
-	// }
+	teamUpdated := s.FaceitService.GetTeamById(t.FaceitId)
+	if teamUpdated == nil {
+		err := errors.New("team is empty")
+		logger.Error(err.Error())
+	}
+
+	teamUpdated.ID = t.ID
+	if !reflect.DeepEqual(t, teamUpdated) {
+		t = teamUpdated
+		res := s.TeamsService.UpdateTeam(*teamUpdated)
+		if res == nil {
+			logger.Error("Unable to update the team")
+		}
+	}
 
 	mapStats := make(map[string]*pb.TeamMapStats, len(t.Stats.MapStats))
 	for _, m := range t.Stats.MapStats {
