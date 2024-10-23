@@ -8,7 +8,6 @@ import (
 	"ibercs/pkg/response"
 	pb_users "ibercs/proto/users"
 	"io"
-	"io/ioutil"
 	"net/http"
 	"net/url"
 	"os"
@@ -82,7 +81,6 @@ type UserInfo struct {
 }
 
 func (h *Users_Handlers) FaceitAuthCallback(c *gin.Context) {
-	// Obtener el código de autorización y el code_verifier del frontend
 	var jsonBody struct {
 		Code         string `json:"code"`
 		CodeVerifier string `json:"code_verifier"`
@@ -101,38 +99,31 @@ func (h *Users_Handlers) FaceitAuthCallback(c *gin.Context) {
 		return
 	}
 
-	// Obtener client_id, client_secret y redirect_uri de variables de entorno
 	clientID := os.Getenv("FACEIT_CLIENT_ID")
 	clientSecret := os.Getenv("FACEIT_CLIENT_SECRET")
-	redirectURI := os.Getenv("FACEIT_REDIRECT_URI")
 
-	if clientID == "" || clientSecret == "" || redirectURI == "" {
+	if clientID == "" || clientSecret == "" {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Configuración del servidor incompleta"})
 		return
 	}
 
-	// Construir los datos para la solicitud de token, incluyendo el code_verifier
 	data := url.Values{}
 	data.Set("grant_type", "authorization_code")
 	data.Set("code", code)
-	data.Set("redirect_uri", redirectURI)
-	data.Set("code_verifier", codeVerifier) // Asegúrate de incluir el code_verifier
+	data.Set("redirect_uri", "https://www.ibercs.com/my-profile")
+	data.Set("code_verifier", codeVerifier)
 
-	// Codificar las credenciales en Base64
 	credentials := base64.StdEncoding.EncodeToString([]byte(clientID + ":" + clientSecret))
 
-	// Crear la solicitud HTTP POST al token endpoint de Faceit
 	req, err := http.NewRequest("POST", "https://api.faceit.com/auth/v1/oauth/token", strings.NewReader(data.Encode()))
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Error al crear la solicitud HTTP"})
 		return
 	}
 
-	// Configurar los encabezados
 	req.Header.Add("Content-Type", "application/x-www-form-urlencoded")
 	req.Header.Add("Authorization", "Basic "+credentials)
 
-	// Realizar la solicitud HTTP
 	client := &http.Client{}
 	resp, err := client.Do(req)
 	if err != nil {
@@ -141,50 +132,42 @@ func (h *Users_Handlers) FaceitAuthCallback(c *gin.Context) {
 	}
 	defer resp.Body.Close()
 
-	// Leer el cuerpo de la respuesta
-	body, err := ioutil.ReadAll(resp.Body)
+	body, err := io.ReadAll(resp.Body)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Error al leer la respuesta del servidor"})
 		return
 	}
 
-	// Verificar el código de estado HTTP
+	logger.Info("Respuesta de FACEIT: %s", string(body))
 	if resp.StatusCode != http.StatusOK {
+		logger.Error("Error en la solicitud a FACEIT: %d, body: %s", resp.StatusCode, string(body))
 		c.JSON(resp.StatusCode, gin.H{"error": "Error al obtener tokens", "details": string(body)})
 		return
 	}
 
-	// Decodificar la respuesta JSON
 	var tokenResponse TokenResponse
 	if err := json.Unmarshal(body, &tokenResponse); err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Error al decodificar la respuesta de tokens"})
 		return
 	}
 
-	// Obtener información del usuario utilizando el access_token
 	userInfo, err := getUserInfo(tokenResponse.AccessToken)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Error al obtener información del usuario"})
 		return
 	}
 
-	// Manejar la autenticación del usuario (crear sesión, etc.)
-
-	// Como ejemplo, devolvemos la información del usuario
 	c.JSON(http.StatusOK, gin.H{"user": userInfo})
 }
 
 func getUserInfo(accessToken string) (*UserInfo, error) {
-	// Crear la solicitud HTTP GET al userinfo endpoint de Faceit
 	req, err := http.NewRequest("GET", "https://api.faceit.com/auth/v1/resources/userinfo", nil)
 	if err != nil {
 		return nil, err
 	}
 
-	// Configurar los encabezados
 	req.Header.Add("Authorization", "Bearer "+accessToken)
 
-	// Realizar la solicitud HTTP
 	client := &http.Client{}
 	resp, err := client.Do(req)
 	if err != nil {
@@ -192,18 +175,15 @@ func getUserInfo(accessToken string) (*UserInfo, error) {
 	}
 	defer resp.Body.Close()
 
-	// Leer el cuerpo de la respuesta
 	body, err := io.ReadAll(resp.Body)
 	if err != nil {
 		return nil, err
 	}
 
-	// Verificar el código de estado HTTP
 	if resp.StatusCode != http.StatusOK {
 		return nil, fmt.Errorf("error al obtener información del usuario: %s", string(body))
 	}
 
-	// Decodificar la respuesta JSON
 	var userInfo UserInfo
 	if err := json.Unmarshal(body, &userInfo); err != nil {
 		return nil, err
