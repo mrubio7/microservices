@@ -138,7 +138,9 @@ func (h *Users_Handlers) FaceitAuthCallback(c *gin.Context) {
 		return
 	}
 
+	logger.Info("Respuesta de FACEIT: %s", string(body))
 	if resp.StatusCode != http.StatusOK {
+		logger.Error("Error en la solicitud a FACEIT: %d, body: %s", resp.StatusCode, string(body))
 		c.JSON(resp.StatusCode, gin.H{"error": "Error al obtener tokens", "details": string(body)})
 		return
 	}
