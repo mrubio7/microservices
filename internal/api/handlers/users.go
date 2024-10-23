@@ -38,3 +38,19 @@ func (h *Users_Handlers) NewUser(c *gin.Context) {
 
 	c.JSON(http.StatusOK, response.BuildOk("Ok", res))
 }
+
+func (h *Users_Handlers) GetUser(c *gin.Context) {
+	id := c.Query("id")
+	if id == "" {
+		c.JSON(http.StatusBadRequest, response.BuildError("Invalid ID"))
+		return
+	}
+
+	res, err := h.users_client.GetUser(c, &pb_users.GetUserRequest{Id: id})
+	if err != nil {
+		c.JSON(http.StatusBadRequest, response.BuildError("Error getting user"))
+		return
+	}
+
+	c.JSON(http.StatusOK, response.BuildOk("Ok", res))
+}

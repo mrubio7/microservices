@@ -23,7 +23,7 @@ type Server struct {
 }
 
 func registerPlayersClient(cfg config.MicroservicesConfig) *pb_players.PlayerServiceClient {
-	return microservices.New(cfg.PlayersHost, pb_players.NewPlayerServiceClient)
+	return microservices.New(cfg.PlayersHost, cfg.PlayersPort, pb_players.NewPlayerServiceClient)
 }
 
 func New() *Server {

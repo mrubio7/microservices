@@ -2,6 +2,7 @@ package main
 
 import (
 	microservice_players "ibercs/cmd/microservices/players/server"
+	"ibercs/pkg/config"
 	"ibercs/pkg/logger"
 	"net"
 
@@ -12,13 +13,18 @@ import (
 
 func main() {
 	logger.Initialize()
+	cfg, err := config.Load()
+	if err != nil {
+		panic(err)
+	}
 
-	listener, err := net.Listen("tcp", ":50051")
+	port := cfg.Microservices.PlayersPort
+	listener, err := net.Listen("tcp", port)
 	if err != nil {
 		logger.Error("Cannot create tcp connection: %s", err.Error())
 		return
 	} else {
-		logger.Info("gRPC server started on port 50051")
+		logger.Info("gRPC server started on port %s", port)
 	}
 
 	grpcServer := grpc.NewServer()

@@ -37,13 +37,13 @@ func (r *Router) Listen() {
 }
 
 func (r *Router) registerPlayersServer(cfg config.MicroservicesConfig) {
-	r.PlayersServer = microservices.New(cfg.PlayersHost, pb_players.NewPlayerServiceClient)
+	r.PlayersServer = microservices.New(cfg.PlayersHost, cfg.PlayersPort, pb_players.NewPlayerServiceClient)
 }
 
 func (r *Router) registerTeamsServer(cfg config.MicroservicesConfig) {
-	r.TeamsServer = microservices.New(cfg.TeamsHost, pb_teams.NewTeamServiceClient)
+	r.TeamsServer = microservices.New(cfg.TeamsHost, cfg.TeamsPort, pb_teams.NewTeamServiceClient)
 }
 
 func (r *Router) registerUsersServer(cfg config.MicroservicesConfig) {
-	r.UsersServer = microservices.New(cfg.UserHost, pb_users.NewUserServiceClient)
+	r.UsersServer = microservices.New(cfg.UserHost, cfg.UserPort, pb_users.NewUserServiceClient)
 }

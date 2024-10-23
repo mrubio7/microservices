@@ -30,8 +30,11 @@ type (
 
 	MicroservicesConfig struct {
 		PlayersHost string
+		PlayersPort string
 		TeamsHost   string
+		TeamsPort   string
 		UserHost    string
+		UserPort    string
 	}
 )
 
@@ -60,8 +63,11 @@ func Load() (Config, error) {
 		},
 		Microservices: MicroservicesConfig{
 			PlayersHost: os.Getenv("MICROSERVICE_PLAYERS_HOST"),
+			PlayersPort: os.Getenv("MICROSERVICE_PLAYERS_PORT"),
 			TeamsHost:   os.Getenv("MICROSERVICE_TEAMS_HOST"),
+			TeamsPort:   os.Getenv("MICROSERVICE_TEAMS_PORT"),
 			UserHost:    os.Getenv("MICROSERVICE_USERS_HOST"),
+			UserPort:    os.Getenv("MICROSERVICE_USERS_PORT"),
 		},
 	}
 
