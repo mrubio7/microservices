@@ -110,10 +110,11 @@ func (h *Users_Handlers) FaceitAuthCallback(c *gin.Context) {
 	data := url.Values{}
 	data.Set("grant_type", "authorization_code")
 	data.Set("code", code)
-	data.Set("redirect_uri", "https://www.ibercs.com/my-profile")
 	data.Set("code_verifier", codeVerifier)
 
+	logger.Info("%s - %s", clientID, clientSecret)
 	credentials := base64.StdEncoding.EncodeToString([]byte(clientID + ":" + clientSecret))
+	logger.Info("%s", credentials)
 
 	req, err := http.NewRequest("POST", "https://api.faceit.com/auth/v1/oauth/token", strings.NewReader(data.Encode()))
 	if err != nil {
