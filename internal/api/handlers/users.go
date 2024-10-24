@@ -57,8 +57,8 @@ func (h *Users_Handlers) FaceitAuthCallback(c *gin.Context) {
 	}
 
 	var res *pb_users.User
-	u, err := h.users_client.GetUserByFaceitId(c, &pb_users.GetUserRequest{Id: user.FaceitID})
-	if u == nil {
+	res, err = h.users_client.GetUserByFaceitId(c, &pb_users.GetUserRequest{Id: user.FaceitID})
+	if res == nil {
 		if st, ok := status.FromError(err); ok && st.Code() == codes.NotFound {
 			res, err = h.users_client.NewUser(c, &pb_users.NewUserRequest{FaceitId: user.FaceitID})
 			if err != nil {
