@@ -13,6 +13,8 @@ import (
 	"ibercs/pkg/service"
 	pb_players "ibercs/proto/players"
 	pb "ibercs/proto/users"
+
+	"gorm.io/gorm"
 )
 
 type Server struct {
@@ -45,6 +47,32 @@ func (s *Server) GetUser(ctx context.Context, req *pb.GetUserRequest) (*pb.User,
 	user := s.UsersService.GetUserById(req.Id)
 	if user == nil {
 		return nil, errors.New("unable to get user")
+	}
+
+	player, err := s.PlayersClient.GetPlayer(ctx, &pb_players.GetPlayerRequest{FaceitId: []string{user.FaceitID}})
+	if err != nil {
+		logger.Error(err.Error())
+		return nil, err
+	}
+
+	result := &pb.User{
+		ID:          int32(user.ID),
+		PlayerID:    user.FaceitID,
+		Name:        user.Name,
+		Description: user.Description,
+		Twitter:     user.Twitter,
+		Twitch:      user.Twitch,
+		Role:        int32(user.Role),
+		Player:      player.Players[0],
+	}
+
+	return result, nil
+}
+
+func (s *Server) GetUserByFaceitId(ctx context.Context, req *pb.GetUserRequest) (*pb.User, error) {
+	user := s.UsersService.GetUserByFaceitId(req.Id)
+	if user == nil {
+		return nil, gorm.ErrRecordNotFound
 	}
 
 	player, err := s.PlayersClient.GetPlayer(ctx, &pb_players.GetPlayerRequest{FaceitId: []string{user.FaceitID}})

@@ -8,6 +8,7 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+	"gorm.io/gorm"
 )
 
 type Users_Handlers struct {
@@ -18,26 +19,6 @@ func NewUsersHandlers(usersClient pb_users.UserServiceClient) *Users_Handlers {
 	return &Users_Handlers{
 		users_client: usersClient,
 	}
-}
-
-func (h *Users_Handlers) NewUser(c *gin.Context) {
-	var input struct {
-		FaceitId string `json:"faceit_id"`
-	}
-
-	if err := c.ShouldBindJSON(&input); err != nil {
-		logger.Error(err.Error())
-		c.JSON(http.StatusBadRequest, response.BuildError("Error creating user"))
-		return
-	}
-
-	res, err := h.users_client.NewUser(c, &pb_users.NewUserRequest{FaceitId: input.FaceitId})
-	if err != nil {
-		c.JSON(http.StatusBadRequest, response.BuildError("Error creating user"))
-		return
-	}
-
-	c.JSON(http.StatusOK, response.BuildOk("Ok", res))
 }
 
 func (h *Users_Handlers) GetUser(c *gin.Context) {
@@ -70,8 +51,22 @@ func (h *Users_Handlers) FaceitAuthCallback(c *gin.Context) {
 	user, err := faceit.Auth(jsonBody.Code, jsonBody.CodeVerifier)
 	if err != nil {
 		logger.Error("Error authenticating user: %s", err)
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Datos de solicitud inválidos"})
+		return
 	}
-	logger.Debug("%s", user)
 
-	c.JSON(http.StatusOK, user)
+	var res *pb_users.User
+	u, err := h.users_client.GetUserByFaceitId(c, &pb_users.GetUserRequest{Id: user.FaceitID})
+	if u == nil {
+		if err == gorm.ErrRecordNotFound {
+			res, err = h.users_client.NewUser(c, &pb_users.NewUserRequest{FaceitId: user.FaceitID})
+			if err != nil {
+				c.JSON(http.StatusBadRequest, response.BuildError("Error creating user"))
+				return
+			}
+		}
+
+	}
+
+	c.JSON(http.StatusOK, res)
 }
