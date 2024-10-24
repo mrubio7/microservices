@@ -8,7 +8,8 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
-	"gorm.io/gorm"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 )
 
 type Users_Handlers struct {
@@ -58,14 +59,16 @@ func (h *Users_Handlers) FaceitAuthCallback(c *gin.Context) {
 	var res *pb_users.User
 	u, err := h.users_client.GetUserByFaceitId(c, &pb_users.GetUserRequest{Id: user.FaceitID})
 	if u == nil {
-		if err == gorm.ErrRecordNotFound {
+		if st, ok := status.FromError(err); ok && st.Code() == codes.NotFound {
 			res, err = h.users_client.NewUser(c, &pb_users.NewUserRequest{FaceitId: user.FaceitID})
 			if err != nil {
 				c.JSON(http.StatusBadRequest, response.BuildError("Error creating user"))
 				return
 			}
+		} else {
+			c.JSON(http.StatusInternalServerError, response.BuildError("Unexpected error"))
+			return
 		}
-
 	}
 
 	c.JSON(http.StatusOK, res)

@@ -14,7 +14,8 @@ import (
 	pb_players "ibercs/proto/players"
 	pb "ibercs/proto/users"
 
-	"gorm.io/gorm"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 )
 
 type Server struct {
@@ -72,7 +73,7 @@ func (s *Server) GetUser(ctx context.Context, req *pb.GetUserRequest) (*pb.User,
 func (s *Server) GetUserByFaceitId(ctx context.Context, req *pb.GetUserRequest) (*pb.User, error) {
 	user := s.UsersService.GetUserByFaceitId(req.Id)
 	if user == nil {
-		return nil, gorm.ErrRecordNotFound
+		return nil, status.Errorf(codes.NotFound, "user with FaceitID %s not found", req.Id)
 	}
 
 	player, err := s.PlayersClient.GetPlayer(ctx, &pb_players.GetPlayerRequest{FaceitId: []string{user.FaceitID}})
