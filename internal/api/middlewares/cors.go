@@ -7,7 +7,7 @@ import (
 )
 
 func CORSMiddleware() gin.HandlerFunc {
-	allowedOrigins := []string{"https://pre.ibercs.com", "https://www.ibercs.com"}
+	allowedOrigins := []string{"https://pre.ibercs.com", "https://www.ibercs.com", "http://localhost:5173"}
 	return func(c *gin.Context) {
 		origin := c.Request.Header.Get("Origin")
 
