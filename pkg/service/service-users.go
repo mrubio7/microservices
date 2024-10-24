@@ -30,6 +30,16 @@ func (svc *Users) GetUserById(id string) *model.UserModel {
 	return &user
 }
 
+func (svc *Users) GetUserByFaceitId(id string) *model.UserModel {
+	var user model.UserModel
+	err := svc.db.Where("faceit_id = ?", id).First(&user).Error
+	if err != nil {
+		logger.Error(err.Error())
+		return nil
+	}
+	return &user
+}
+
 func (svc *Users) UpdateUser(user model.UserModel) *model.UserModel {
 	err := svc.db.Save(&user).Error
 	if err != nil {

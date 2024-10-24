@@ -18,6 +18,7 @@ message User {
 
 service UserService {
     rpc GetUser (GetUserRequest) returns (User);
+    rpc GetUserByFaceitId (GetUserRequest) returns (User);
     rpc UpdateUser (User) returns (User);
     rpc NewUser (NewUserRequest) returns (User);
 }

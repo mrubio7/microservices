@@ -42,7 +42,6 @@ func (api *Api) Start() {
 
 	api.router.gin.Use(middlewares.CORSMiddleware())
 
-	api.router.gin.POST("/api/v1/users/new", users_handlers.NewUser)
 	api.router.gin.GET("/api/v1/users/get", users_handlers.GetUser)
 	api.router.gin.POST("/api/v1/auth/callback", users_handlers.FaceitAuthCallback)
 
