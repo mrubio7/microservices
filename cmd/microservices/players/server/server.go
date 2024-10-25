@@ -11,6 +11,9 @@ import (
 	"ibercs/pkg/service"
 	pb "ibercs/proto/players"
 	"time"
+
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 )
 
 type Server struct {
@@ -73,6 +76,45 @@ func (s *Server) GetPlayer(ctx context.Context, playerReq *pb.GetPlayerRequest) 
 	}
 
 	return &pb.PlayerList{Players: playersRes}, nil
+}
+
+func (s *Server) GetPlayerByNickname(ctx context.Context, playerReq *pb.GetPlayerByNicknameRequest) (*pb.Player, error) {
+	p := s.PlayersService.GetPlayerByNickname(playerReq.Nickname)
+	if p == nil {
+		return nil, status.Errorf(codes.NotFound, "user with nickname %s not found", playerReq.Nickname)
+	}
+
+	playerUpdated := s.FaceitService.GetPlayerAverageDetails(p.FaceitId, consts.LAST_MATCHES_NUMBER)
+	err := s.PlayersService.UpdatePlayer(*playerUpdated)
+	if err != nil {
+		logger.Warning("Error updating player: %s", err.Error())
+	}
+
+	p = s.PlayersService.GetPlayer(p.FaceitId)
+	if p == nil {
+		return nil, errors.New("unable to get player")
+	}
+
+	player := &pb.Player{
+		Id:       p.ID,
+		Nickname: p.Nickname,
+		FaceitId: p.FaceitId,
+		SteamId:  p.SteamId,
+		Avatar:   p.Avatar,
+		Stats: &pb.PlayerStats{
+			PlayerId:               p.Stats.ID,
+			KdRatio:                p.Stats.KdRatio,
+			KrRatio:                p.Stats.KrRatio,
+			KillsAverage:           p.Stats.KillsAverage,
+			DeathsAverage:          p.Stats.DeathsAverage,
+			HeadshotPercentAverage: p.Stats.HeadshotPercentAverage,
+			MVPAverage:             p.Stats.MVPAverage,
+			AssistAverage:          p.Stats.AssistAverage,
+			Elo:                    p.Stats.Elo,
+		},
+	}
+
+	return player, nil
 }
 
 func (s *Server) GetPlayers(context.Context, *pb.Empty) (*pb.PlayerList, error) {
