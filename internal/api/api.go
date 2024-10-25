@@ -58,7 +58,7 @@ func (api *Api) Start() {
 
 	api.router.gin.Use(middlewares.Auth(api.db))
 	api.router.gin.POST("/api/v1/users/update", users_handlers.UpdateProfile)
-	api.router.gin.POST("/api/v1/auth/logout", users_handlers.UpdateProfile)
+	api.router.gin.POST("/api/v1/auth/logout", users_handlers.Logout)
 
 	api.router.Listen()
 }
