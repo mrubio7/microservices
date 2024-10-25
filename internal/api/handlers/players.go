@@ -56,7 +56,6 @@ func (ph *Player_Handlers) GetPlayers(c *gin.Context) {
 
 		c.JSON(http.StatusOK, response.BuildOk("Ok", res))
 	}
-
 }
 
 func (ph *Player_Handlers) GetAllPlayers(c *gin.Context) {

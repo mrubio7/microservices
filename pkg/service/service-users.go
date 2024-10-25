@@ -6,6 +6,7 @@ import (
 	"ibercs/internal/model"
 	"ibercs/pkg/logger"
 
+	"github.com/google/uuid"
 	"gorm.io/gorm"
 )
 
@@ -40,6 +41,24 @@ func (svc *Users) GetUserByFaceitId(id string) *model.UserModel {
 	return &user
 }
 
+func (svc *Users) GetUserByPlayerNickname(nickname string) *model.UserModel {
+	var player model.PlayerModel
+	if err := svc.db.Preload("Stats").Where("nickname = ?", nickname).First(&player).Error; err != nil {
+		logger.Error("Player not found: %v", err)
+		return nil
+	}
+
+	var user model.UserModel
+	if err := svc.db.Where("faceit_id = ?", player.FaceitId).First(&user).Error; err != nil {
+		logger.Error("User not found: %v", err)
+		return nil
+	}
+
+	user.Player = player
+
+	return &user
+}
+
 func (svc *Users) UpdateUser(user model.UserModel) *model.UserModel {
 	err := svc.db.Save(&user).Error
 	if err != nil {
@@ -57,4 +76,19 @@ func (svc *Users) NewUser(user model.UserModel) *model.UserModel {
 	}
 
 	return &user
+}
+
+func (svc *Users) NewSession(id int) string {
+	session := model.UserSessionModel{
+		UserID:    id,
+		SessionID: uuid.New().String(),
+	}
+
+	err := svc.db.Save(&session).Error
+	if err != nil {
+		logger.Error(err.Error())
+		return ""
+	}
+
+	return session.SessionID
 }

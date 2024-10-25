@@ -54,6 +54,7 @@ require (
 
 require (
 	github.com/fatih/color v1.17.0
+	github.com/google/uuid v1.6.0
 	github.com/jinzhu/inflection v1.0.0 // indirect
 	github.com/jinzhu/now v1.1.5 // indirect
 	github.com/schollz/progressbar/v3 v3.16.1
