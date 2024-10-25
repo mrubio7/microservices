@@ -32,6 +32,7 @@ message Empty {}
 
 service PlayerService {
     rpc GetPlayer (GetPlayerRequest) returns (PlayerList);
+    rpc GetPlayerByNickname (GetPlayerByNicknameRequest) returns (Player);
     rpc GetPlayers (Empty) returns (PlayerList);
     rpc GetProminentPlayers (Empty) returns (ProminentPlayerList);
     rpc NewPlayer (NewPlayerRequest) returns (Player);
@@ -39,6 +40,10 @@ service PlayerService {
 
 message GetPlayerRequest {
     repeated string FaceitId = 1;
+}
+
+message GetPlayerByNicknameRequest {
+    string Nickname = 1;
 }
 
 message NewPlayerRequest {

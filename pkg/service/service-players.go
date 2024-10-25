@@ -76,6 +76,21 @@ func (svc *Players) GetPlayer(id string) *model.PlayerModel {
 	return player
 }
 
+func (svc *Players) GetPlayerByNickname(nickname string) *model.PlayerModel {
+	var player *model.PlayerModel
+
+	err := svc.db.Model(&model.PlayerModel{}).Preload("Stats").First(&player, "nickname = ?", nickname).Error
+	if err != nil {
+		if gorm.ErrRecordNotFound == err {
+			return nil
+		}
+		logger.Error(err.Error())
+		return nil
+	}
+
+	return player
+}
+
 func (svc *Players) GetPlayers() []model.PlayerModel {
 	var players []model.PlayerModel
 

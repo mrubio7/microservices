@@ -20,6 +20,7 @@ const _ = grpc.SupportPackageIsVersion9
 
 const (
 	PlayerService_GetPlayer_FullMethodName           = "/players.PlayerService/GetPlayer"
+	PlayerService_GetPlayerByNickname_FullMethodName = "/players.PlayerService/GetPlayerByNickname"
 	PlayerService_GetPlayers_FullMethodName          = "/players.PlayerService/GetPlayers"
 	PlayerService_GetProminentPlayers_FullMethodName = "/players.PlayerService/GetProminentPlayers"
 	PlayerService_NewPlayer_FullMethodName           = "/players.PlayerService/NewPlayer"
@@ -30,6 +31,7 @@ const (
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type PlayerServiceClient interface {
 	GetPlayer(ctx context.Context, in *GetPlayerRequest, opts ...grpc.CallOption) (*PlayerList, error)
+	GetPlayerByNickname(ctx context.Context, in *GetPlayerByNicknameRequest, opts ...grpc.CallOption) (*Player, error)
 	GetPlayers(ctx context.Context, in *Empty, opts ...grpc.CallOption) (*PlayerList, error)
 	GetProminentPlayers(ctx context.Context, in *Empty, opts ...grpc.CallOption) (*ProminentPlayerList, error)
 	NewPlayer(ctx context.Context, in *NewPlayerRequest, opts ...grpc.CallOption) (*Player, error)
@@ -47,6 +49,16 @@ func (c *playerServiceClient) GetPlayer(ctx context.Context, in *GetPlayerReques
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(PlayerList)
 	err := c.cc.Invoke(ctx, PlayerService_GetPlayer_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *playerServiceClient) GetPlayerByNickname(ctx context.Context, in *GetPlayerByNicknameRequest, opts ...grpc.CallOption) (*Player, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(Player)
+	err := c.cc.Invoke(ctx, PlayerService_GetPlayerByNickname_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -88,6 +100,7 @@ func (c *playerServiceClient) NewPlayer(ctx context.Context, in *NewPlayerReques
 // for forward compatibility.
 type PlayerServiceServer interface {
 	GetPlayer(context.Context, *GetPlayerRequest) (*PlayerList, error)
+	GetPlayerByNickname(context.Context, *GetPlayerByNicknameRequest) (*Player, error)
 	GetPlayers(context.Context, *Empty) (*PlayerList, error)
 	GetProminentPlayers(context.Context, *Empty) (*ProminentPlayerList, error)
 	NewPlayer(context.Context, *NewPlayerRequest) (*Player, error)
@@ -103,6 +116,9 @@ type UnimplementedPlayerServiceServer struct{}
 
 func (UnimplementedPlayerServiceServer) GetPlayer(context.Context, *GetPlayerRequest) (*PlayerList, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetPlayer not implemented")
+}
+func (UnimplementedPlayerServiceServer) GetPlayerByNickname(context.Context, *GetPlayerByNicknameRequest) (*Player, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetPlayerByNickname not implemented")
 }
 func (UnimplementedPlayerServiceServer) GetPlayers(context.Context, *Empty) (*PlayerList, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetPlayers not implemented")
@@ -148,6 +164,24 @@ func _PlayerService_GetPlayer_Handler(srv interface{}, ctx context.Context, dec 
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(PlayerServiceServer).GetPlayer(ctx, req.(*GetPlayerRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _PlayerService_GetPlayerByNickname_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetPlayerByNicknameRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(PlayerServiceServer).GetPlayerByNickname(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: PlayerService_GetPlayerByNickname_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(PlayerServiceServer).GetPlayerByNickname(ctx, req.(*GetPlayerByNicknameRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -216,6 +250,10 @@ var PlayerService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GetPlayer",
 			Handler:    _PlayerService_GetPlayer_Handler,
+		},
+		{
+			MethodName: "GetPlayerByNickname",
+			Handler:    _PlayerService_GetPlayerByNickname_Handler,
 		},
 		{
 			MethodName: "GetPlayers",

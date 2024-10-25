@@ -21,31 +21,42 @@ func NewPlayersHandlers(playersClient pb_players.PlayerServiceClient) *Player_Ha
 }
 
 func (ph *Player_Handlers) GetPlayers(c *gin.Context) {
-	// Recibe varios IDs separados por comas
 	playerIds := c.Query("ids")
-	if playerIds == "" {
-		logger.Error("tried to get empty ids")
-		c.JSON(http.StatusBadRequest, response.BuildError("Invalid IDs"))
+	nickname := c.Query("nickname")
+
+	if playerIds == "" && nickname == "" {
+		logger.Error("tried to get an empty id and nickname")
+		c.JSON(http.StatusBadRequest, response.BuildError("Invalid ID or Nickname"))
 		return
 	}
 
-	// Divide los IDs por comas
-	ids := strings.Split(playerIds, ",")
-	if len(ids) == 0 {
-		logger.Error("no valid ids provided")
-		c.JSON(http.StatusBadRequest, response.BuildError("No valid IDs provided"))
-		return
+	if playerIds != "" {
+		ids := strings.Split(playerIds, ",")
+		if len(ids) == 0 {
+			logger.Error("no valid ids provided")
+			c.JSON(http.StatusBadRequest, response.BuildError("No valid IDs provided"))
+			return
+		}
+
+		res, err := ph.players_client.GetPlayer(c, &pb_players.GetPlayerRequest{FaceitId: ids})
+		if err != nil {
+			logger.Error(err.Error())
+			c.JSON(http.StatusInternalServerError, response.BuildError("Error getting players"))
+			return
+		}
+
+		c.JSON(http.StatusOK, response.BuildOk("Ok", res))
+	} else {
+		res, err := ph.players_client.GetPlayerByNickname(c, &pb_players.GetPlayerByNicknameRequest{Nickname: nickname})
+		if err != nil {
+			logger.Error(err.Error())
+			c.JSON(http.StatusInternalServerError, response.BuildError("Error getting players"))
+			return
+		}
+
+		c.JSON(http.StatusOK, response.BuildOk("Ok", res))
 	}
 
-	// Llama al servicio con la lista de IDs
-	res, err := ph.players_client.GetPlayer(c, &pb_players.GetPlayerRequest{FaceitId: ids})
-	if err != nil {
-		logger.Error(err.Error())
-		c.JSON(http.StatusInternalServerError, response.BuildError("Error getting players"))
-		return
-	}
-
-	c.JSON(http.StatusOK, response.BuildOk("Ok", res))
 }
 
 func (ph *Player_Handlers) GetAllPlayers(c *gin.Context) {
