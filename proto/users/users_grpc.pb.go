@@ -25,6 +25,7 @@ const (
 	UserService_UpdateUser_FullMethodName              = "/users.UserService/UpdateUser"
 	UserService_NewUser_FullMethodName                 = "/users.UserService/NewUser"
 	UserService_NewSession_FullMethodName              = "/users.UserService/NewSession"
+	UserService_DeleteSession_FullMethodName           = "/users.UserService/DeleteSession"
 )
 
 // UserServiceClient is the client API for UserService service.
@@ -37,6 +38,7 @@ type UserServiceClient interface {
 	UpdateUser(ctx context.Context, in *User, opts ...grpc.CallOption) (*User, error)
 	NewUser(ctx context.Context, in *NewUserRequest, opts ...grpc.CallOption) (*User, error)
 	NewSession(ctx context.Context, in *NewSessionRequest, opts ...grpc.CallOption) (*NewSessionResponse, error)
+	DeleteSession(ctx context.Context, in *NewSessionRequest, opts ...grpc.CallOption) (*NewSessionResponse, error)
 }
 
 type userServiceClient struct {
@@ -107,6 +109,16 @@ func (c *userServiceClient) NewSession(ctx context.Context, in *NewSessionReques
 	return out, nil
 }
 
+func (c *userServiceClient) DeleteSession(ctx context.Context, in *NewSessionRequest, opts ...grpc.CallOption) (*NewSessionResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(NewSessionResponse)
+	err := c.cc.Invoke(ctx, UserService_DeleteSession_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // UserServiceServer is the server API for UserService service.
 // All implementations must embed UnimplementedUserServiceServer
 // for forward compatibility.
@@ -117,6 +129,7 @@ type UserServiceServer interface {
 	UpdateUser(context.Context, *User) (*User, error)
 	NewUser(context.Context, *NewUserRequest) (*User, error)
 	NewSession(context.Context, *NewSessionRequest) (*NewSessionResponse, error)
+	DeleteSession(context.Context, *NewSessionRequest) (*NewSessionResponse, error)
 	mustEmbedUnimplementedUserServiceServer()
 }
 
@@ -144,6 +157,9 @@ func (UnimplementedUserServiceServer) NewUser(context.Context, *NewUserRequest) 
 }
 func (UnimplementedUserServiceServer) NewSession(context.Context, *NewSessionRequest) (*NewSessionResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method NewSession not implemented")
+}
+func (UnimplementedUserServiceServer) DeleteSession(context.Context, *NewSessionRequest) (*NewSessionResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method DeleteSession not implemented")
 }
 func (UnimplementedUserServiceServer) mustEmbedUnimplementedUserServiceServer() {}
 func (UnimplementedUserServiceServer) testEmbeddedByValue()                     {}
@@ -274,6 +290,24 @@ func _UserService_NewSession_Handler(srv interface{}, ctx context.Context, dec f
 	return interceptor(ctx, in, info, handler)
 }
 
+func _UserService_DeleteSession_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(NewSessionRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(UserServiceServer).DeleteSession(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: UserService_DeleteSession_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(UserServiceServer).DeleteSession(ctx, req.(*NewSessionRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // UserService_ServiceDesc is the grpc.ServiceDesc for UserService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -304,6 +338,10 @@ var UserService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "NewSession",
 			Handler:    _UserService_NewSession_Handler,
+		},
+		{
+			MethodName: "DeleteSession",
+			Handler:    _UserService_DeleteSession_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

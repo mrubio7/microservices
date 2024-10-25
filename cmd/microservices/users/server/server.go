@@ -201,3 +201,12 @@ func (s *Server) NewSession(ctx context.Context, req *pb.NewSessionRequest) (*pb
 	}
 	return &pb.NewSessionResponse{Response: token}, nil
 }
+
+func (s *Server) DeleteSession(ctx context.Context, req *pb.NewSessionRequest) (*pb.NewSessionResponse, error) {
+	token := s.UsersService.DeleteSession(int(req.Id))
+
+	if token == "" {
+		return &pb.NewSessionResponse{Response: ""}, nil
+	}
+	return &pb.NewSessionResponse{Response: token}, nil
+}

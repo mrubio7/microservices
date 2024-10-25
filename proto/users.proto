@@ -23,6 +23,7 @@ service UserService {
     rpc UpdateUser (User) returns (User);
     rpc NewUser (NewUserRequest) returns (User);
     rpc NewSession (NewSessionRequest) returns (NewSessionResponse);
+    rpc DeleteSession (NewSessionRequest) returns (NewSessionResponse);
 }
 
 message NewSessionRequest{
