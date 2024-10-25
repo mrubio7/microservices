@@ -56,5 +56,8 @@ func (api *Api) Start() {
 	api.router.gin.GET("/api/v1/workers/players/find", workers_handlers.Find)
 	api.router.gin.GET("/api/v1/workers/players/update", workers_handlers.Update)
 
+	api.router.gin.Use(middlewares.Auth(api.db))
+	api.router.gin.POST("/api/v1/users/update", users_handlers.UpdateProfile)
+
 	api.router.Listen()
 }

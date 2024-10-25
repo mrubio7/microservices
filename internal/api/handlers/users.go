@@ -6,6 +6,7 @@ import (
 	"ibercs/pkg/response"
 	pb_users "ibercs/proto/users"
 	"net/http"
+	"strconv"
 
 	"github.com/gin-gonic/gin"
 	"google.golang.org/grpc/codes"
@@ -24,15 +25,27 @@ func NewUsersHandlers(usersClient pb_users.UserServiceClient) *Users_Handlers {
 
 func (h *Users_Handlers) GetUser(c *gin.Context) {
 	id := c.Query("id")
-	if id == "" {
-		c.JSON(http.StatusBadRequest, response.BuildError("Invalid ID"))
+	nickname := c.Query("nickname")
+
+	if id == "" && nickname == "" {
+		c.JSON(http.StatusBadRequest, response.BuildError("Invalid params"))
 		return
 	}
 
-	res, err := h.users_client.GetUser(c, &pb_users.GetUserRequest{Id: id})
-	if err != nil {
-		c.JSON(http.StatusBadRequest, response.BuildError("Error getting user"))
-		return
+	var res *pb_users.User
+	var err error
+	if id != "" {
+		res, err = h.users_client.GetUser(c, &pb_users.GetUserRequest{Id: id})
+		if err != nil {
+			c.JSON(http.StatusBadRequest, response.BuildError("Error getting user"))
+			return
+		}
+	} else {
+		res, err = h.users_client.GetUserByPlayerNickname(c, &pb_users.GetUserRequest{Id: nickname})
+		if err != nil {
+			c.JSON(http.StatusBadRequest, response.BuildError("Error getting user"))
+			return
+		}
 	}
 
 	c.JSON(http.StatusOK, response.BuildOk("Ok", res))
@@ -69,6 +82,58 @@ func (h *Users_Handlers) FaceitAuthCallback(c *gin.Context) {
 			c.JSON(http.StatusInternalServerError, response.BuildError("Unexpected error"))
 			return
 		}
+	}
+
+	session, err := h.users_client.NewSession(c, &pb_users.NewSessionRequest{Id: res.ID})
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, response.BuildError("Unexpected error"))
+		return
+	}
+
+	responseData := struct {
+		User    *pb_users.User
+		Session string
+	}{
+		User:    res,
+		Session: session.Response,
+	}
+
+	c.JSON(http.StatusOK, response.BuildOk("Ok", responseData))
+}
+
+func (h *Users_Handlers) UpdateProfile(c *gin.Context) {
+	identity, exist := c.Get("identity")
+	if !exist {
+		c.JSON(http.StatusUnauthorized, response.BuildError("Unauthorized"))
+		return
+	}
+
+	var req struct {
+		Twitter string `json:"twitter"`
+		Twitch  string `json:"twitch"`
+		Desc    string `json:"desc"`
+	}
+
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, response.BuildError("Invalid data"))
+		return
+	}
+
+	id := strconv.Itoa(identity.(int))
+	user, err := h.users_client.GetUser(c, &pb_users.GetUserRequest{Id: id})
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, response.BuildError("Internal error"))
+		return
+	}
+
+	user.Description = req.Desc
+	user.Twitch = req.Twitch
+	user.Twitter = req.Twitter
+
+	res, err := h.users_client.UpdateUser(c, user)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, response.BuildError("Internal error"))
+		return
 	}
 
 	c.JSON(http.StatusOK, response.BuildOk("Ok", res))

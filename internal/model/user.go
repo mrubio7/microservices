@@ -10,3 +10,8 @@ type UserModel struct {
 	Role        int         `gorm:"null"`
 	Player      PlayerModel `gorm:"-"`
 }
+
+type UserSessionModel struct {
+	UserID    int    `gorm:"primaryKey; not null"`
+	SessionID string `gorm:"not null"`
+}

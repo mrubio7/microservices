@@ -96,6 +96,43 @@ func (s *Server) GetUserByFaceitId(ctx context.Context, req *pb.GetUserRequest) 
 	return result, nil
 }
 
+func (s *Server) GetUserByPlayerNickname(ctx context.Context, req *pb.GetUserRequest) (*pb.User, error) {
+	user := s.UsersService.GetUserByPlayerNickname(req.Id)
+	if user == nil {
+		return nil, status.Errorf(codes.NotFound, "user with FaceitID %s not found", req.Id)
+	}
+
+	result := &pb.User{
+		ID:          int32(user.ID),
+		PlayerID:    user.FaceitID,
+		Name:        user.Name,
+		Description: user.Description,
+		Twitter:     user.Twitter,
+		Twitch:      user.Twitch,
+		Role:        int32(user.Role),
+		Player: &pb_players.Player{
+			Id:       user.Player.ID,
+			Nickname: user.Player.Nickname,
+			FaceitId: user.Player.FaceitId,
+			SteamId:  user.Player.SteamId,
+			Avatar:   user.Player.Avatar,
+			Stats: &pb_players.PlayerStats{
+				PlayerId:               user.Player.Stats.ID,
+				KdRatio:                user.Player.Stats.KdRatio,
+				KrRatio:                user.Player.Stats.KrRatio,
+				KillsAverage:           user.Player.Stats.KillsAverage,
+				DeathsAverage:          user.Player.Stats.DeathsAverage,
+				HeadshotPercentAverage: user.Player.Stats.HeadshotPercentAverage,
+				MVPAverage:             user.Player.Stats.MVPAverage,
+				AssistAverage:          user.Player.Stats.AssistAverage,
+				Elo:                    user.Player.Stats.Elo,
+			},
+		},
+	}
+
+	return result, nil
+}
+
 func (s *Server) UpdateUser(ctx context.Context, req *pb.User) (*pb.User, error) {
 	user := model.UserModel{
 		ID:          int(req.ID),
@@ -154,4 +191,13 @@ func (s *Server) NewUser(ctx context.Context, req *pb.NewUserRequest) (*pb.User,
 	}
 
 	return res, err
+}
+
+func (s *Server) NewSession(ctx context.Context, req *pb.NewSessionRequest) (*pb.NewSessionResponse, error) {
+	token := s.UsersService.NewSession(int(req.Id))
+
+	if token == "" {
+		return &pb.NewSessionResponse{Response: ""}, nil
+	}
+	return &pb.NewSessionResponse{Response: token}, nil
 }
