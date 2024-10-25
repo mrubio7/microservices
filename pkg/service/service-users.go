@@ -92,3 +92,20 @@ func (svc *Users) NewSession(id int) string {
 
 	return session.SessionID
 }
+
+func (svc *Users) DeleteSession(id int) string {
+	var session model.UserSessionModel
+	err := svc.db.Where("user_id = ?", id).First(&session).Error
+	if err != nil {
+		logger.Error(err.Error())
+		return ""
+	}
+
+	err = svc.db.Delete(&session).Error
+	if err != nil {
+		logger.Error(err.Error())
+		return ""
+	}
+
+	return session.SessionID
+}

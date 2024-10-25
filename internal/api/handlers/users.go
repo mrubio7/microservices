@@ -138,3 +138,19 @@ func (h *Users_Handlers) UpdateProfile(c *gin.Context) {
 
 	c.JSON(http.StatusOK, response.BuildOk("Ok", res))
 }
+
+func (h *Users_Handlers) Logout(c *gin.Context) {
+	identity, exist := c.Get("identity")
+	if !exist {
+		c.JSON(http.StatusUnauthorized, response.BuildError("Unauthorized"))
+		return
+	}
+
+	_, err := h.users_client.DeleteSession(c, &pb_users.NewSessionRequest{Id: int32(identity.(int))})
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, response.BuildError("Internal error"))
+		return
+	}
+
+	c.JSON(http.StatusOK, response.BuildOk("Ok", nil))
+}
