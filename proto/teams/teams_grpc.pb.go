@@ -19,10 +19,11 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	TeamService_GetTeams_FullMethodName          = "/teams.TeamService/GetTeams"
-	TeamService_GetTeamById_FullMethodName       = "/teams.TeamService/GetTeamById"
-	TeamService_GetTeamByNickname_FullMethodName = "/teams.TeamService/GetTeamByNickname"
-	TeamService_NewTeam_FullMethodName           = "/teams.TeamService/NewTeam"
+	TeamService_GetTeams_FullMethodName           = "/teams.TeamService/GetTeams"
+	TeamService_GetTeamById_FullMethodName        = "/teams.TeamService/GetTeamById"
+	TeamService_GetTeamByNickname_FullMethodName  = "/teams.TeamService/GetTeamByNickname"
+	TeamService_NewTeam_FullMethodName            = "/teams.TeamService/NewTeam"
+	TeamService_FindTeamByPlayerId_FullMethodName = "/teams.TeamService/FindTeamByPlayerId"
 )
 
 // TeamServiceClient is the client API for TeamService service.
@@ -33,6 +34,7 @@ type TeamServiceClient interface {
 	GetTeamById(ctx context.Context, in *NewTeamRequest, opts ...grpc.CallOption) (*Team, error)
 	GetTeamByNickname(ctx context.Context, in *NewTeamRequest, opts ...grpc.CallOption) (*Team, error)
 	NewTeam(ctx context.Context, in *NewTeamRequest, opts ...grpc.CallOption) (*Team, error)
+	FindTeamByPlayerId(ctx context.Context, in *NewTeamRequest, opts ...grpc.CallOption) (*TeamList, error)
 }
 
 type teamServiceClient struct {
@@ -83,6 +85,16 @@ func (c *teamServiceClient) NewTeam(ctx context.Context, in *NewTeamRequest, opt
 	return out, nil
 }
 
+func (c *teamServiceClient) FindTeamByPlayerId(ctx context.Context, in *NewTeamRequest, opts ...grpc.CallOption) (*TeamList, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(TeamList)
+	err := c.cc.Invoke(ctx, TeamService_FindTeamByPlayerId_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // TeamServiceServer is the server API for TeamService service.
 // All implementations must embed UnimplementedTeamServiceServer
 // for forward compatibility.
@@ -91,6 +103,7 @@ type TeamServiceServer interface {
 	GetTeamById(context.Context, *NewTeamRequest) (*Team, error)
 	GetTeamByNickname(context.Context, *NewTeamRequest) (*Team, error)
 	NewTeam(context.Context, *NewTeamRequest) (*Team, error)
+	FindTeamByPlayerId(context.Context, *NewTeamRequest) (*TeamList, error)
 	mustEmbedUnimplementedTeamServiceServer()
 }
 
@@ -112,6 +125,9 @@ func (UnimplementedTeamServiceServer) GetTeamByNickname(context.Context, *NewTea
 }
 func (UnimplementedTeamServiceServer) NewTeam(context.Context, *NewTeamRequest) (*Team, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method NewTeam not implemented")
+}
+func (UnimplementedTeamServiceServer) FindTeamByPlayerId(context.Context, *NewTeamRequest) (*TeamList, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method FindTeamByPlayerId not implemented")
 }
 func (UnimplementedTeamServiceServer) mustEmbedUnimplementedTeamServiceServer() {}
 func (UnimplementedTeamServiceServer) testEmbeddedByValue()                     {}
@@ -206,6 +222,24 @@ func _TeamService_NewTeam_Handler(srv interface{}, ctx context.Context, dec func
 	return interceptor(ctx, in, info, handler)
 }
 
+func _TeamService_FindTeamByPlayerId_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(NewTeamRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(TeamServiceServer).FindTeamByPlayerId(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: TeamService_FindTeamByPlayerId_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(TeamServiceServer).FindTeamByPlayerId(ctx, req.(*NewTeamRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // TeamService_ServiceDesc is the grpc.ServiceDesc for TeamService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -228,6 +262,10 @@ var TeamService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "NewTeam",
 			Handler:    _TeamService_NewTeam_Handler,
+		},
+		{
+			MethodName: "FindTeamByPlayerId",
+			Handler:    _TeamService_FindTeamByPlayerId_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

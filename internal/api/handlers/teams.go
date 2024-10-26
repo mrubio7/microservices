@@ -96,3 +96,21 @@ func (th *Team_Handlers) New(c *gin.Context) {
 
 	c.JSON(http.StatusOK, response.BuildOk("Ok", res))
 }
+
+func (th *Team_Handlers) FindTeamByPlayerId(c *gin.Context) {
+	Id := c.Query("id")
+	if Id == "" {
+		logger.Error("tried to get an empty id")
+		c.JSON(http.StatusBadRequest, response.BuildError("Invalid ID"))
+		return
+	}
+
+	res, err := th.teams_client.FindTeamByPlayerId(c, &pb_teams.NewTeamRequest{FaceitId: Id})
+	if err != nil {
+		logger.Error("error getting team")
+		c.JSON(http.StatusInternalServerError, response.BuildError("Internal error"))
+		return
+	}
+
+	c.JSON(http.StatusOK, response.BuildOk("Ok", res))
+}
