@@ -16,6 +16,8 @@ message User {
     players.Player Player = 8;
 }
 
+message Empty {}
+
 service UserService {
     rpc GetUser (GetUserRequest) returns (User);
     rpc GetUserByFaceitId (GetUserRequest) returns (User);
@@ -24,6 +26,11 @@ service UserService {
     rpc NewUser (NewUserRequest) returns (User);
     rpc NewSession (NewSessionRequest) returns (NewSessionResponse);
     rpc DeleteSession (NewSessionRequest) returns (NewSessionResponse);
+    rpc GetAllStreams (Empty) returns (StreamsResponse);
+}
+
+message StreamsResponse {
+    repeated string streams = 1;
 }
 
 message NewSessionRequest{

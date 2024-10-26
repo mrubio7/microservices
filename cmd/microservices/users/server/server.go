@@ -210,3 +210,13 @@ func (s *Server) DeleteSession(ctx context.Context, req *pb.NewSessionRequest) (
 	}
 	return &pb.NewSessionResponse{Response: token}, nil
 }
+
+func (s *Server) GetAllStreams(ctx context.Context, _ *pb.Empty) (*pb.StreamsResponse, error) {
+	streams := s.UsersService.GetAllStreams()
+	if streams == nil {
+		logger.Error("Error taking streams")
+		return nil, status.Errorf(codes.NotFound, "Streams not found")
+	}
+
+	return &pb.StreamsResponse{Streams: streams}, nil
+}

@@ -109,3 +109,14 @@ func (svc *Users) DeleteSession(id int) string {
 
 	return session.SessionID
 }
+
+func (svc *Users) GetAllStreams() []string {
+	var streams []string
+	err := svc.db.Model(&model.UserModel{}).Where("twitch != ''").Pluck("twitch", &streams).Error
+	if err != nil {
+		logger.Error(err.Error())
+		return nil
+	}
+
+	return streams
+}
