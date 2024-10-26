@@ -51,6 +51,16 @@ func (h *Users_Handlers) GetUser(c *gin.Context) {
 	c.JSON(http.StatusOK, response.BuildOk("Ok", res))
 }
 
+func (h *Users_Handlers) GetStreams(c *gin.Context) {
+	res, err := h.users_client.GetAllStreams(c, nil)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, response.BuildError("Error getting streams"))
+		return
+	}
+
+	c.JSON(http.StatusOK, response.BuildOk("Ok", res))
+}
+
 func (h *Users_Handlers) FaceitAuthCallback(c *gin.Context) {
 	var jsonBody struct {
 		Code         string `json:"code"`
