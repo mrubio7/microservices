@@ -2,6 +2,7 @@ package service
 
 import (
 	"errors"
+	"fmt"
 	"ibercs/internal/model"
 	"ibercs/pkg/logger"
 	"sync"
@@ -109,4 +110,15 @@ func (s *Teams) UpdateTeam(team model.TeamModel) *model.TeamModel {
 	}
 
 	return &existingTeam
+}
+
+func (s *Teams) FindTeamsByPlayerId(id string) ([]model.TeamModel, error) {
+	var teams []model.TeamModel
+
+	err := s.db.Where("players_id @> ?", fmt.Sprintf(`["%s"]`, id)).Find(&teams).Error
+	if err != nil {
+		return nil, err
+	}
+
+	return teams, nil
 }

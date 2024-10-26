@@ -220,3 +220,31 @@ func (s *Server) GetTeams(ctx context.Context, teamRequest *pb.GetTeamsRequest) 
 
 	return &pb.TeamList{Teams: pbTeams}, nil
 }
+
+func (s *Server) FindTeamByPlayerId(ctx context.Context, request *pb.NewTeamRequest) (*pb.TeamList, error) {
+	teams, err := s.TeamsService.FindTeamsByPlayerId(request.FaceitId)
+	if err != nil {
+		logger.Error(err.Error())
+		return nil, err
+	}
+
+	var pbTeams []*pb.Team
+
+	for _, t := range teams {
+		pbTeams = append(pbTeams, &pb.Team{
+			Id:          t.ID,
+			FaceitId:    t.FaceitId,
+			Name:        t.Name,
+			Nickname:    t.Nickname,
+			Avatar:      t.Avatar,
+			Active:      t.Active,
+			PlayersId:   t.PlayersId,
+			Twitter:     t.Twitter,
+			Instagram:   t.Instagram,
+			Web:         t.Web,
+			Tournaments: t.Tournaments,
+		})
+	}
+
+	return &pb.TeamList{Teams: pbTeams}, nil
+}
