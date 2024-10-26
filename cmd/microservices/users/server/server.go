@@ -212,10 +212,15 @@ func (s *Server) DeleteSession(ctx context.Context, req *pb.NewSessionRequest) (
 }
 
 func (s *Server) GetAllStreams(ctx context.Context, _ *pb.Empty) (*pb.StreamsResponse, error) {
-	streams := s.UsersService.GetAllStreams()
-	if streams == nil {
+	users := s.UsersService.GetAllStreams()
+	if users == nil {
 		logger.Error("Error taking streams")
 		return nil, status.Errorf(codes.NotFound, "Streams not found")
+	}
+
+	var streams []*pb.StreamResponse
+	for _, u := range users {
+		streams = append(streams, &pb.StreamResponse{Stream: u.Twitch, Name: u.Name})
 	}
 
 	return &pb.StreamsResponse{Streams: streams}, nil

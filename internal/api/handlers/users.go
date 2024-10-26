@@ -4,6 +4,7 @@ import (
 	"ibercs/pkg/faceit"
 	"ibercs/pkg/logger"
 	"ibercs/pkg/response"
+	"ibercs/pkg/twitch"
 	pb_users "ibercs/proto/users"
 	"net/http"
 	"strconv"
@@ -52,10 +53,18 @@ func (h *Users_Handlers) GetUser(c *gin.Context) {
 }
 
 func (h *Users_Handlers) GetStreams(c *gin.Context) {
-	res, err := h.users_client.GetAllStreams(c, nil)
+	streams, err := h.users_client.GetAllStreams(c, nil)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, response.BuildError("Error getting streams"))
 		return
+	}
+
+	var res []*twitch.Channel
+	for _, channel := range streams.Streams {
+		ch := twitch.GetStreamData(channel.Stream, channel.Name)
+		if ch != nil {
+			res = append(res, ch)
+		}
 	}
 
 	c.JSON(http.StatusOK, response.BuildOk("Ok", res))

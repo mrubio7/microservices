@@ -30,7 +30,13 @@ service UserService {
 }
 
 message StreamsResponse {
-    repeated string streams = 1;
+    repeated StreamResponse streams = 1;
+    
+}
+
+message StreamResponse {
+    string Stream = 1;
+    string Name = 2;
 }
 
 message NewSessionRequest{
