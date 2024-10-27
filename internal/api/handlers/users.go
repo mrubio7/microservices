@@ -103,6 +103,7 @@ func (h *Users_Handlers) FaceitAuthCallback(c *gin.Context) {
 		}
 	}
 
+	h.users_client.DeleteSession(c, &pb_users.NewSessionRequest{Id: res.ID})
 	session, err := h.users_client.NewSession(c, &pb_users.NewSessionRequest{Id: res.ID})
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, response.BuildError("Unexpected error"))
