@@ -3,6 +3,7 @@ package handlers
 import (
 	"fmt"
 	"ibercs/pkg/config"
+	"ibercs/pkg/response"
 	"io"
 	"net/http"
 
@@ -33,7 +34,7 @@ func (w *Workers_Handlers) Update(c *gin.Context) {
 		return
 	}
 
-	c.Data(resp.StatusCode, "application/json", body)
+	c.JSON(http.StatusOK, response.BuildOk("Ok", string(body)))
 }
 
 func (w *Workers_Handlers) Find(c *gin.Context) {
@@ -54,5 +55,5 @@ func (w *Workers_Handlers) Find(c *gin.Context) {
 		return
 	}
 
-	c.Data(resp.StatusCode, "application/json", body)
+	c.JSON(http.StatusOK, response.BuildOk("Ok", string(body)))
 }

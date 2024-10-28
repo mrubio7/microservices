@@ -14,7 +14,6 @@ import (
 
 func Start() {
 	logger.Info("Initializing players worker [UpdatePlayers]")
-	startTime := time.Now()
 
 	cfg, err := config.Load()
 	if err != nil {
@@ -25,8 +24,17 @@ func Start() {
 	psql, _ := db.DB()
 	defer psql.Close()
 
+	svcState := service.NewStateService(db)
 	svcPlayers := service.NewPlayersService(db)
 	client := faceit.New(cfg.FaceitApiToken)
+
+	state := svcState.GetState()
+
+	if !state.LastPlayerUpdate.Valid {
+		return
+	}
+
+	svcState.ClearLastUpdatePlayer()
 
 	playersList := svcPlayers.GetPlayers()
 
@@ -40,16 +48,20 @@ func Start() {
 	defer bar.Close()
 
 	for _, p := range playersList {
+
 		player := client.GetPlayerAverageDetails(p.FaceitId, consts.LAST_MATCHES_NUMBER)
 
 		if player == nil {
 			logger.Warning("User %s doesnt update", p.FaceitId)
-			continue
+			return
 		}
-		svcPlayers.UpdatePlayer(*player)
+		err := svcPlayers.UpdatePlayer(*player)
+		if err != nil {
+			logger.Error(err.Error())
+		}
 		bar.Add(1)
+
 	}
 
-	logger.Info("All the players were found and updated successfully")
-	logger.Info("[Update players] ended in %s", time.Since(startTime).String())
+	svcState.SetLastUpdatePlayer(time.Now())
 }
