@@ -3,6 +3,7 @@ package middlewares
 import (
 	"bytes"
 	"net/http"
+	"net/url"
 	"time"
 
 	"ibercs/pkg/cache" // Ajusta el import al path correcto
@@ -23,7 +24,7 @@ func (w *cachedWriter) Write(b []byte) (int, error) {
 
 func CacheMiddleware(c *cache.Cache, ttl time.Duration) gin.HandlerFunc {
 	return func(ctx *gin.Context) {
-		cacheKey := ctx.Request.URL.Path
+		cacheKey := buildCacheKey(ctx.Request.URL)
 
 		if cachedData, found := c.Get(cacheKey); found {
 			ctx.Data(http.StatusOK, "application/json", cachedData.([]byte))
@@ -43,4 +44,16 @@ func CacheMiddleware(c *cache.Cache, ttl time.Duration) gin.HandlerFunc {
 			c.Set(cacheKey, responseData, ttl)
 		}
 	}
+}
+
+func buildCacheKey(u *url.URL) string {
+	// Tomar el path y los parámetros de la URL
+	path := u.Path
+	query := u.RawQuery
+
+	// Concatenar el path con los parámetros (si existen) para formar la clave de caché
+	if query != "" {
+		return path + "?" + query
+	}
+	return path
 }
