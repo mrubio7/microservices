@@ -31,9 +31,9 @@ func Start() {
 	state := svcState.GetState()
 
 	if !state.LastPlayerUpdate.Valid {
+		logger.Warning("It's already updating")
 		return
 	}
-
 	svcState.ClearLastUpdatePlayer()
 
 	playersList := svcPlayers.GetPlayers()
@@ -53,6 +53,7 @@ func Start() {
 
 		if player == nil {
 			logger.Warning("User %s doesnt update\n", p.FaceitId)
+			continue
 		}
 		err := svcPlayers.UpdatePlayer(*player)
 		if err != nil {

@@ -20,7 +20,14 @@ func main() {
 }
 
 func updateHandler(w http.ResponseWriter, r *http.Request) {
-	go update_players.Start()
+	// Configuramos el header para SSE
+	w.Header().Set("Content-Type", "text/event-stream")
+	w.Header().Set("Cache-Control", "no-cache")
+	w.Header().Set("Connection", "keep-alive")
+	w.Header().Set("Access-Control-Allow-Origin", "*")
+
+	// Inicia la rutina para el procesamiento de jugadores
+	update_players.Start(w)
 }
 
 func findHandler(w http.ResponseWriter, r *http.Request) {
