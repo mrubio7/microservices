@@ -20,15 +20,7 @@ func main() {
 }
 
 func updateHandler(w http.ResponseWriter, r *http.Request) {
-	startTime := time.Now()
-
-	update_players.Start()
-
-	elapsedTime := time.Since(startTime)
-
-	w.Header().Set("Content-Type", "application/json")
-	response := fmt.Sprintf(`{"start_time": "%s", "elapsed_time": "%s"}`, startTime.Format(time.RFC3339), elapsedTime)
-	w.Write([]byte(response))
+	go update_players.Start()
 }
 
 func findHandler(w http.ResponseWriter, r *http.Request) {
