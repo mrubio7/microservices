@@ -1,0 +1,32 @@
+syntax = "proto3";
+
+package tournaments;
+option go_package = "ibercs/proto/tournaments;tournaments";
+
+
+message Tournament {
+    int32 Id = 1;
+    string FaceitId = 2;
+    string OrganizerId = 3;
+    string Name = 4;
+    uint32 RegisterDate = 5;
+    uint32 StartDate = 6;
+    uint32 CurrentTeams = 7;
+    uint32 Slots = 8;
+}
+
+message Empty {}
+
+service TournamentService {
+    rpc NewTournament (NewTournamentRequest) returns (Tournament);
+    rpc GetAllTorunaments (Empty) returns (TournamentList);
+}
+
+message NewTournamentRequest {
+    string FaceitId = 1;
+    string Type = 2;
+}
+
+message TournamentList {
+    repeated Tournament Tournaments = 1;
+}
