@@ -1,15 +1,15 @@
 syntax = "proto3";
 
 package players;
-option go_package = "./proto/players;proto";
-
+option go_package = "proto/players;players";
 
 message Player {
     int32 Id = 1;
     string Nickname = 2;
     string FaceitId = 3;
     string SteamId = 4;
-    PlayerStats Stats = 5;
+    string Avatar = 5;
+    PlayerStats Stats = 6;
 }
 
 message PlayerStats {
@@ -31,8 +31,19 @@ message PlayerList {
 message Empty {}
 
 service PlayerService {
+    rpc GetPlayer (GetPlayerRequest) returns (PlayerList);
+    rpc GetPlayerByNickname (GetPlayerByNicknameRequest) returns (Player);
     rpc GetPlayers (Empty) returns (PlayerList);
-    rpc NewPlayer (NewPlayerRequest) returns (PlayerResponse);
+    rpc GetProminentPlayers (Empty) returns (ProminentPlayerList);
+    rpc NewPlayer (NewPlayerRequest) returns (Player);
+}
+
+message GetPlayerRequest {
+    repeated string FaceitId = 1;
+}
+
+message GetPlayerByNicknameRequest {
+    string Nickname = 1;
 }
 
 message NewPlayerRequest {
@@ -42,7 +53,17 @@ message NewPlayerRequest {
     PlayerStats Stats = 4;
 }
 
-message PlayerResponse {
-    string message = 1;
-    int32 playerId = 2;
+message ProminentPlayer {
+    int32 Id = 1;
+    float Score = 2;
+    string Nickname = 3;
+    string Faceit_id = 4;
+    string Steam_id = 5;
+    string Avatar = 6; 
+}
+
+message ProminentPlayerList {
+    repeated ProminentPlayer players = 1;
+    int32 Week = 2;    
+    int32 Year = 3;   
 }

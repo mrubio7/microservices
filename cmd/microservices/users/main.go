@@ -1,12 +1,12 @@
 package main
 
 import (
-	microservice_players "ibercs/cmd/microservices/players/server"
+	microservice_users "ibercs/cmd/microservices/users/server"
 	"ibercs/pkg/config"
 	"ibercs/pkg/logger"
 	"net"
 
-	pb "ibercs/proto/players"
+	pb "ibercs/proto/users"
 
 	"google.golang.org/grpc"
 )
@@ -18,7 +18,7 @@ func main() {
 		panic(err)
 	}
 
-	port := cfg.Microservices.PlayersPort
+	port := cfg.Microservices.UserPort
 	listener, err := net.Listen("tcp", port)
 	if err != nil {
 		logger.Error("Cannot create tcp connection: %s", err.Error())
@@ -28,9 +28,9 @@ func main() {
 	}
 
 	grpcServer := grpc.NewServer()
-	microservicePlayers := microservice_players.New()
+	microserviceUsers := microservice_users.New()
 
-	pb.RegisterPlayerServiceServer(grpcServer, microservicePlayers)
+	pb.RegisterUserServiceServer(grpcServer, microserviceUsers)
 
 	if err := grpcServer.Serve(listener); err != nil {
 		logger.Error("Cannot initialize the server: %s", err.Error())

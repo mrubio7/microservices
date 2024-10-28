@@ -2,9 +2,9 @@
 // versions:
 // - protoc-gen-go-grpc v1.5.1
 // - protoc             v5.28.2
-// source: players.proto
+// source: proto/players.proto
 
-package proto
+package players
 
 import (
 	context "context"
@@ -19,16 +19,22 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	PlayerService_GetPlayers_FullMethodName = "/players.PlayerService/GetPlayers"
-	PlayerService_NewPlayer_FullMethodName  = "/players.PlayerService/NewPlayer"
+	PlayerService_GetPlayer_FullMethodName           = "/players.PlayerService/GetPlayer"
+	PlayerService_GetPlayerByNickname_FullMethodName = "/players.PlayerService/GetPlayerByNickname"
+	PlayerService_GetPlayers_FullMethodName          = "/players.PlayerService/GetPlayers"
+	PlayerService_GetProminentPlayers_FullMethodName = "/players.PlayerService/GetProminentPlayers"
+	PlayerService_NewPlayer_FullMethodName           = "/players.PlayerService/NewPlayer"
 )
 
 // PlayerServiceClient is the client API for PlayerService service.
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type PlayerServiceClient interface {
+	GetPlayer(ctx context.Context, in *GetPlayerRequest, opts ...grpc.CallOption) (*PlayerList, error)
+	GetPlayerByNickname(ctx context.Context, in *GetPlayerByNicknameRequest, opts ...grpc.CallOption) (*Player, error)
 	GetPlayers(ctx context.Context, in *Empty, opts ...grpc.CallOption) (*PlayerList, error)
-	NewPlayer(ctx context.Context, in *NewPlayerRequest, opts ...grpc.CallOption) (*PlayerResponse, error)
+	GetProminentPlayers(ctx context.Context, in *Empty, opts ...grpc.CallOption) (*ProminentPlayerList, error)
+	NewPlayer(ctx context.Context, in *NewPlayerRequest, opts ...grpc.CallOption) (*Player, error)
 }
 
 type playerServiceClient struct {
@@ -37,6 +43,26 @@ type playerServiceClient struct {
 
 func NewPlayerServiceClient(cc grpc.ClientConnInterface) PlayerServiceClient {
 	return &playerServiceClient{cc}
+}
+
+func (c *playerServiceClient) GetPlayer(ctx context.Context, in *GetPlayerRequest, opts ...grpc.CallOption) (*PlayerList, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(PlayerList)
+	err := c.cc.Invoke(ctx, PlayerService_GetPlayer_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *playerServiceClient) GetPlayerByNickname(ctx context.Context, in *GetPlayerByNicknameRequest, opts ...grpc.CallOption) (*Player, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(Player)
+	err := c.cc.Invoke(ctx, PlayerService_GetPlayerByNickname_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
 }
 
 func (c *playerServiceClient) GetPlayers(ctx context.Context, in *Empty, opts ...grpc.CallOption) (*PlayerList, error) {
@@ -49,9 +75,19 @@ func (c *playerServiceClient) GetPlayers(ctx context.Context, in *Empty, opts ..
 	return out, nil
 }
 
-func (c *playerServiceClient) NewPlayer(ctx context.Context, in *NewPlayerRequest, opts ...grpc.CallOption) (*PlayerResponse, error) {
+func (c *playerServiceClient) GetProminentPlayers(ctx context.Context, in *Empty, opts ...grpc.CallOption) (*ProminentPlayerList, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(PlayerResponse)
+	out := new(ProminentPlayerList)
+	err := c.cc.Invoke(ctx, PlayerService_GetProminentPlayers_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *playerServiceClient) NewPlayer(ctx context.Context, in *NewPlayerRequest, opts ...grpc.CallOption) (*Player, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(Player)
 	err := c.cc.Invoke(ctx, PlayerService_NewPlayer_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
@@ -63,8 +99,11 @@ func (c *playerServiceClient) NewPlayer(ctx context.Context, in *NewPlayerReques
 // All implementations must embed UnimplementedPlayerServiceServer
 // for forward compatibility.
 type PlayerServiceServer interface {
+	GetPlayer(context.Context, *GetPlayerRequest) (*PlayerList, error)
+	GetPlayerByNickname(context.Context, *GetPlayerByNicknameRequest) (*Player, error)
 	GetPlayers(context.Context, *Empty) (*PlayerList, error)
-	NewPlayer(context.Context, *NewPlayerRequest) (*PlayerResponse, error)
+	GetProminentPlayers(context.Context, *Empty) (*ProminentPlayerList, error)
+	NewPlayer(context.Context, *NewPlayerRequest) (*Player, error)
 	mustEmbedUnimplementedPlayerServiceServer()
 }
 
@@ -75,10 +114,19 @@ type PlayerServiceServer interface {
 // pointer dereference when methods are called.
 type UnimplementedPlayerServiceServer struct{}
 
+func (UnimplementedPlayerServiceServer) GetPlayer(context.Context, *GetPlayerRequest) (*PlayerList, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetPlayer not implemented")
+}
+func (UnimplementedPlayerServiceServer) GetPlayerByNickname(context.Context, *GetPlayerByNicknameRequest) (*Player, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetPlayerByNickname not implemented")
+}
 func (UnimplementedPlayerServiceServer) GetPlayers(context.Context, *Empty) (*PlayerList, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetPlayers not implemented")
 }
-func (UnimplementedPlayerServiceServer) NewPlayer(context.Context, *NewPlayerRequest) (*PlayerResponse, error) {
+func (UnimplementedPlayerServiceServer) GetProminentPlayers(context.Context, *Empty) (*ProminentPlayerList, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetProminentPlayers not implemented")
+}
+func (UnimplementedPlayerServiceServer) NewPlayer(context.Context, *NewPlayerRequest) (*Player, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method NewPlayer not implemented")
 }
 func (UnimplementedPlayerServiceServer) mustEmbedUnimplementedPlayerServiceServer() {}
@@ -102,6 +150,42 @@ func RegisterPlayerServiceServer(s grpc.ServiceRegistrar, srv PlayerServiceServe
 	s.RegisterService(&PlayerService_ServiceDesc, srv)
 }
 
+func _PlayerService_GetPlayer_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetPlayerRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(PlayerServiceServer).GetPlayer(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: PlayerService_GetPlayer_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(PlayerServiceServer).GetPlayer(ctx, req.(*GetPlayerRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _PlayerService_GetPlayerByNickname_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetPlayerByNicknameRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(PlayerServiceServer).GetPlayerByNickname(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: PlayerService_GetPlayerByNickname_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(PlayerServiceServer).GetPlayerByNickname(ctx, req.(*GetPlayerByNicknameRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _PlayerService_GetPlayers_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(Empty)
 	if err := dec(in); err != nil {
@@ -116,6 +200,24 @@ func _PlayerService_GetPlayers_Handler(srv interface{}, ctx context.Context, dec
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(PlayerServiceServer).GetPlayers(ctx, req.(*Empty))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _PlayerService_GetProminentPlayers_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(Empty)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(PlayerServiceServer).GetProminentPlayers(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: PlayerService_GetProminentPlayers_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(PlayerServiceServer).GetProminentPlayers(ctx, req.(*Empty))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -146,8 +248,20 @@ var PlayerService_ServiceDesc = grpc.ServiceDesc{
 	HandlerType: (*PlayerServiceServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
+			MethodName: "GetPlayer",
+			Handler:    _PlayerService_GetPlayer_Handler,
+		},
+		{
+			MethodName: "GetPlayerByNickname",
+			Handler:    _PlayerService_GetPlayerByNickname_Handler,
+		},
+		{
 			MethodName: "GetPlayers",
 			Handler:    _PlayerService_GetPlayers_Handler,
+		},
+		{
+			MethodName: "GetProminentPlayers",
+			Handler:    _PlayerService_GetProminentPlayers_Handler,
 		},
 		{
 			MethodName: "NewPlayer",
@@ -155,5 +269,5 @@ var PlayerService_ServiceDesc = grpc.ServiceDesc{
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
-	Metadata: "players.proto",
+	Metadata: "proto/players.proto",
 }

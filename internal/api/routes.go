@@ -1,27 +1,31 @@
 package api
 
 import (
-	"ibercs/pkg/logger"
+	"ibercs/pkg/config"
+	"ibercs/pkg/microservices"
 	pb_players "ibercs/proto/players"
+	pb_teams "ibercs/proto/teams"
+	pb_users "ibercs/proto/users"
 	"net/http"
-	"os"
 
 	"github.com/gin-gonic/gin"
-	"google.golang.org/grpc"
-	"google.golang.org/grpc/credentials"
 )
 
 type Router struct {
 	gin           *gin.Engine
-	PlayersServer pb_players.PlayerServiceClient
+	PlayersServer *pb_players.PlayerServiceClient
+	TeamsServer   *pb_teams.TeamServiceClient
+	UsersServer   *pb_users.UserServiceClient
 }
 
-func NewRouter() *Router {
+func NewRouter(cfg config.Config) *Router {
 	r := &Router{
 		gin: gin.Default(),
 	}
 
-	r.registerPlayersServer()
+	r.registerPlayersServer(cfg.Microservices)
+	r.registerTeamsServer(cfg.Microservices)
+	r.registerUsersServer(cfg.Microservices)
 
 	return r
 }
@@ -32,16 +36,14 @@ func (r *Router) Listen() {
 	}
 }
 
-func (r *Router) registerPlayersServer() {
-	creds := credentials.NewTLS(nil)
-	conn, err := grpc.NewClient(os.Getenv("MICROSERVICE_PLAYERS_HOST"), grpc.WithTransportCredentials(creds))
-	if err != nil {
-		logger.Error("Cannot connect to players grpc server: %s", err.Error())
-		return
-	}
+func (r *Router) registerPlayersServer(cfg config.MicroservicesConfig) {
+	r.PlayersServer = microservices.New(cfg.PlayersHost, cfg.PlayersPort, pb_players.NewPlayerServiceClient)
+}
 
-	playersGrpc := pb_players.NewPlayerServiceClient(conn)
+func (r *Router) registerTeamsServer(cfg config.MicroservicesConfig) {
+	r.TeamsServer = microservices.New(cfg.TeamsHost, cfg.TeamsPort, pb_teams.NewTeamServiceClient)
+}
 
-	r.PlayersServer = playersGrpc
-	logger.Trace("Players grpc server connected succesfully")
+func (r *Router) registerUsersServer(cfg config.MicroservicesConfig) {
+	r.UsersServer = microservices.New(cfg.UserHost, cfg.UserPort, pb_users.NewUserServiceClient)
 }

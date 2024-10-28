@@ -5,6 +5,7 @@ type PlayerModel struct {
 	Nickname string           `gorm:"not null"`
 	FaceitId string           `gorm:"unique;index"`
 	SteamId  string           `gorm:"null"`
+	Avatar   string           `gorm:"null"`
 	Stats    PlayerStatsModel `gorm:"foreignKey:ID;references:ID"`
 }
 
@@ -21,4 +22,21 @@ type PlayerStatsModel struct {
 	QuadroKillsAverage     float32 `gorm:"type:numeric(8,2)"`
 	PentaKillsAverage      float32 `gorm:"type:numeric(8,2)"`
 	Elo                    int32
+}
+
+type PlayerProminentModel struct {
+	ID              int32   `gorm:"primaryKey;autoIncrement"`
+	Avatar          string  `gorm:"null"`
+	Nickname        string  `gorm:"not null"`
+	FaceitId        string  `gorm:"not null"`
+	SteamId         string  `gorm:"not null"`
+	Score           float32 `gorm:"not null"`
+	ProminentWeekID int32   `gorm:"index"`
+}
+
+type ProminentWeekModel struct {
+	ID      int32                  `gorm:"primaryKey;autoIncrement"`
+	Week    int16                  `gorm:"not null;uniqueIndex:unique_week_year"`
+	Year    int16                  `gorm:"not null;uniqueIndex:unique_week_year"`
+	Players []PlayerProminentModel `gorm:"foreignKey:ProminentWeekID;references:ID"`
 }

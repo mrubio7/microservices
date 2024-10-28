@@ -2,9 +2,10 @@ package service
 
 import (
 	"errors"
-	"fmt"
 	"ibercs/internal/model"
+	"ibercs/pkg/logger"
 	"sync"
+	"time"
 
 	"gorm.io/gorm"
 )
@@ -25,6 +26,7 @@ func (svc *Players) UpdatePlayer(player model.PlayerModel) error {
 
 	svc.mutex.Lock()
 	defer svc.mutex.Unlock()
+
 	// Busca al jugador existente por FaceitId
 	err := svc.db.Preload("Stats").First(&existingPlayer, "faceit_id = ?", player.FaceitId).Error
 	if err != nil {
@@ -35,8 +37,8 @@ func (svc *Players) UpdatePlayer(player model.PlayerModel) error {
 		return err
 	}
 
-	// Actualiza el jugador si hay cambios
-	if existingPlayer.Nickname != player.Nickname || existingPlayer.SteamId != player.SteamId {
+	// Actualiza el jugador si hay cambios en el Nickname, SteamId o Avatar
+	if existingPlayer.Nickname != player.Nickname || existingPlayer.SteamId != player.SteamId || existingPlayer.Avatar != player.Avatar {
 		if err := svc.db.Model(&existingPlayer).Updates(player).Error; err != nil {
 			return err
 		}
@@ -59,6 +61,36 @@ func (svc *Players) UpdatePlayer(player model.PlayerModel) error {
 	return nil
 }
 
+func (svc *Players) GetPlayer(id string) *model.PlayerModel {
+	var player *model.PlayerModel
+
+	err := svc.db.Model(&model.PlayerModel{}).Preload("Stats").First(&player, "faceit_id = ?", id).Error
+	if err != nil {
+		if gorm.ErrRecordNotFound == err {
+			return nil
+		}
+		logger.Error(err.Error())
+		return nil
+	}
+
+	return player
+}
+
+func (svc *Players) GetPlayerByNickname(nickname string) *model.PlayerModel {
+	var player *model.PlayerModel
+
+	err := svc.db.Model(&model.PlayerModel{}).Preload("Stats").First(&player, "nickname = ?", nickname).Error
+	if err != nil {
+		if gorm.ErrRecordNotFound == err {
+			return nil
+		}
+		logger.Error(err.Error())
+		return nil
+	}
+
+	return player
+}
+
 func (svc *Players) GetPlayers() []model.PlayerModel {
 	var players []model.PlayerModel
 
@@ -67,9 +99,70 @@ func (svc *Players) GetPlayers() []model.PlayerModel {
 		if gorm.ErrRecordNotFound == err {
 			return nil
 		}
-		fmt.Println(err)
+		logger.Error(err.Error())
 		return nil
 	}
 
 	return players
+}
+
+func (svc *Players) GetNewProminentPlayers() *model.ProminentWeekModel {
+	year, week := time.Now().ISOWeek()
+
+	var existingWeek model.ProminentWeekModel
+	err := svc.db.Where("year = ? AND week = ?", int16(year), int16(week)).First(&existingWeek).Error
+	if err == nil {
+		logger.Info("Prominent week already exists for the current week and year.")
+		return &existingWeek
+	} else if err != gorm.ErrRecordNotFound {
+		logger.Error("Error checking for existing prominent week:", err)
+		return nil
+	}
+
+	query := `
+		SELECT ps.id, p.nickname, p.faceit_id, p.steam_id, p.avatar, 
+			((ps.kills_average - ps.deaths_average + (ps.assist_average * 0.3)) * ps.kr_ratio * ps.mvp_average) as Score
+		FROM player_stats_models ps
+		INNER JOIN player_models p ON p.id = ps.id
+		ORDER BY Score DESC
+		LIMIT 5;
+	`
+
+	var results []model.PlayerProminentModel
+
+	err = svc.db.Raw(query).Scan(&results).Error
+	if err != nil {
+		logger.Error("Error fetching prominent players:", err)
+		return nil
+	}
+
+	prominentWeek := model.ProminentWeekModel{
+		Week:    int16(week),
+		Year:    int16(year),
+		Players: results,
+	}
+
+	err = svc.db.Create(&prominentWeek).Error
+	if err != nil {
+		logger.Error("Error saving new prominent week:", err)
+		return nil
+	}
+
+	return &prominentWeek
+}
+
+func (svc *Players) GetProminentPlayers() *model.ProminentWeekModel {
+	var week model.ProminentWeekModel
+
+	err := svc.db.Preload("Players").Order("year DESC, week DESC").First(&week).Error
+	if err != nil {
+		if err == gorm.ErrRecordNotFound {
+			logger.Error("No prominent week found.")
+			return nil
+		}
+		logger.Error("Error fetching prominent week:", err)
+		return nil
+	}
+
+	return &week
 }

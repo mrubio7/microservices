@@ -1,0 +1,56 @@
+syntax = "proto3";
+
+package users;
+option go_package = "proto/users;users";
+
+import "proto/players.proto";
+
+message User {
+    int32 ID = 1;
+    string PlayerID = 2;
+    string Name = 3;
+    string Description = 4;
+    string Twitter = 5;
+    string Twitch = 6;
+    int32 Role = 7;
+    players.Player Player = 8;
+}
+
+message Empty {}
+
+service UserService {
+    rpc GetUser (GetUserRequest) returns (User);
+    rpc GetUserByFaceitId (GetUserRequest) returns (User);
+    rpc GetUserByPlayerNickname (GetUserRequest) returns (User);
+    rpc UpdateUser (User) returns (User);
+    rpc NewUser (NewUserRequest) returns (User);
+    rpc NewSession (NewSessionRequest) returns (NewSessionResponse);
+    rpc DeleteSession (NewSessionRequest) returns (NewSessionResponse);
+    rpc GetAllStreams (Empty) returns (StreamsResponse);
+}
+
+message StreamsResponse {
+    repeated StreamResponse streams = 1;
+    
+}
+
+message StreamResponse {
+    string Stream = 1;
+    string Name = 2;
+}
+
+message NewSessionRequest{
+    int32 id = 1;
+}
+
+message NewSessionResponse {
+    string response = 1;
+}
+
+message NewUserRequest {
+    string FaceitId = 1;
+}
+
+message GetUserRequest {
+    string Id = 1;
+}

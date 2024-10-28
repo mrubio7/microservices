@@ -10,7 +10,39 @@
             "request": "launch",
             "mode": "auto",
             "program": "${workspaceFolder}/cmd/workers/players/worker-players.go",
-            "args": ["-flag", "update"],
+            "cwd": "${workspaceFolder}"
+        },
+        {
+            "name": "Teams microservice",
+            "type": "go",
+            "request": "launch",
+            "mode": "auto",
+            "program": "${workspaceFolder}/cmd/microservices/teams/main.go",
+            "cwd": "${workspaceFolder}"
+        },
+        {
+            "name": "Players microservice",
+            "type": "go",
+            "request": "launch",
+            "mode": "auto",
+            "program": "${workspaceFolder}/cmd/microservices/players/main.go",
+            "cwd": "${workspaceFolder}"
+        },
+        {
+            "name": "Users microservice",
+            "type": "go",
+            "request": "launch",
+            "mode": "auto",
+            "program": "${workspaceFolder}/cmd/microservices/users/main.go",
+            "cwd": "${workspaceFolder}"
+        },
+        {
+            "name": "API_GATEWAY",
+            "type": "go",
+            "request": "launch",
+            "mode": "auto",
+            "program": "${workspaceFolder}/cmd/api_gateway/main.go",
+            "cwd": "${workspaceFolder}"
         }
     ]
 }
