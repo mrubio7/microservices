@@ -3,6 +3,7 @@ package twitch
 import (
 	"encoding/json"
 	"fmt"
+	"ibercs/pkg/logger"
 	"net/http"
 	"net/url"
 	"os"
@@ -90,7 +91,7 @@ func GetStreamData(channel, name string) *Channel {
 
 	token, err := getAccessToken(clientID, clientSecret)
 	if err != nil {
-		fmt.Println("Error obtaining access token:", err)
+		logger.Error("Error obtaining access token:", err)
 		return nil
 	}
 
@@ -98,7 +99,7 @@ func GetStreamData(channel, name string) *Channel {
 
 	req, err := http.NewRequest("GET", url, nil)
 	if err != nil {
-		fmt.Println("Error creating request:", err)
+		logger.Error("Error creating request:", err)
 		return nil
 	}
 
@@ -108,7 +109,7 @@ func GetStreamData(channel, name string) *Channel {
 	client := &http.Client{}
 	resp, err := client.Do(req)
 	if err != nil {
-		fmt.Println("Error making API request:", err)
+		logger.Error("Error making API request:", err)
 		return nil
 	}
 	defer resp.Body.Close()
@@ -120,12 +121,11 @@ func GetStreamData(channel, name string) *Channel {
 
 	var twitchResp twitchResponse
 	if err := json.NewDecoder(resp.Body).Decode(&twitchResp); err != nil {
-		fmt.Println("Error decoding response:", err)
+		logger.Error("Error decoding response:", err)
 		return nil
 	}
 
 	if len(twitchResp.Data) == 0 {
-		fmt.Println("El canal no está en directo.")
 		return nil
 	}
 

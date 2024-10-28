@@ -3,7 +3,9 @@ package api
 import (
 	"ibercs/internal/api/handlers"
 	"ibercs/internal/api/middlewares"
+	"ibercs/pkg/cache"
 	"ibercs/pkg/config"
+	"ibercs/pkg/consts"
 	"ibercs/pkg/database"
 	"ibercs/pkg/logger"
 	"os"
@@ -34,6 +36,7 @@ func (api *Api) Start() {
 	logger.Debug("Initializing API...")
 
 	api.router = NewRouter(api.cfg)
+	cache := cache.NewCache()
 
 	players_handlers := handlers.NewPlayersHandlers(*api.router.PlayersServer)
 	teams_handlers := handlers.NewTeamsHandlers(*api.router.TeamsServer)
@@ -42,6 +45,7 @@ func (api *Api) Start() {
 	state_handlers := handlers.NewStateHandlers(api.db)
 
 	api.router.gin.Use(middlewares.CORSMiddleware())
+	api.router.gin.Use(middlewares.CacheMiddleware(cache, consts.CACHE_DURATION))
 
 	api.router.gin.GET("/api/v1/state/last-players-update", state_handlers.GetLastPlayerUpdate)
 
