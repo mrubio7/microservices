@@ -57,3 +57,13 @@ func (w *Workers_Handlers) Update(c *gin.Context) {
 		c.Writer.Flush()
 	}
 }
+
+func (w *Workers_Handlers) TournamentsFind(c *gin.Context) {
+	// Realizar la solicitud al servicio de actualización
+	resp, err := http.Get(fmt.Sprintf("%s/tournaments", w.playersWorkerHost))
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to call update service"})
+		return
+	}
+	defer resp.Body.Close()
+}
