@@ -74,7 +74,7 @@ func Update(w http.ResponseWriter) {
 		w.(http.Flusher).Flush()
 	}
 
-	svcState.SetLastUpdatePlayer(time.Now())
+	svcState.SetLastUpdatePlayer(time.Now().Local())
 
 	// Notificamos que el proceso ha terminado
 	fmt.Fprintf(w, "data: %s\n\n", `{"message": "Update completed"}`)

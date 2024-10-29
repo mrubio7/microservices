@@ -1,6 +1,8 @@
 package model
 
-import "time"
+import (
+	"time"
+)
 
 type TournamentModel struct {
 	ID              uint32          `gorm:"primaryKey; autoIncrement"`
@@ -17,7 +19,7 @@ type TournamentModel struct {
 	GeoCountries    JSONStringArray `gorm:"null"`
 	MinLevel        int             `gorm:"not null"`
 	MaxLevel        int             `gorm:"not null"`
-	CurrentTeams    int             `gorm:"not null"`
-	Slots           int             `gorm:"not null"`
-	TeamIds         JSONStringArray `gorm:"null"`
+	CurrentTeams    int             `gorm:"-"`
+	Slots           int             `gorm:"-"`
+	Teams           []TeamModel     `gorm:"-"`
 }

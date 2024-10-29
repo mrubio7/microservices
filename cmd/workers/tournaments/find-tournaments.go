@@ -29,7 +29,7 @@ func Find() {
 
 	var availabeTournaments []*model.TournamentModel
 	for _, org := range organizers {
-		
+
 		tournaments := faceit.GetAllChampionshipFromOrganizer(org.FaceitId, 0, 40)
 
 		for _, t := range tournaments {
@@ -50,7 +50,7 @@ func Find() {
 	for _, tournament := range availabeTournaments {
 		t := svcTournaments.NewTournament(tournament)
 		if t == nil {
-			logger.Error("Unable to create tournament: %s", t.Name)
+			logger.Error("Unable to create tournament: %s", tournament.Name)
 		}
 	}
 }
