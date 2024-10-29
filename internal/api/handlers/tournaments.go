@@ -76,9 +76,9 @@ func (h *Tournament_Handlers) GetAllTournaments(c *gin.Context) {
 	res, err := h.tournaments_client.GetAllTorunaments(c, &pb_tournaments.Empty{})
 	if err != nil {
 		logger.Error(err.Error())
-		c.JSON(http.StatusBadRequest, response.BuildError("Error creating tournament"))
+		c.JSON(http.StatusBadRequest, response.BuildError("Error getting tournaments"))
 		return
 	}
 
-	c.JSON(http.StatusCreated, response.BuildOk("Ok", res))
+	c.JSON(http.StatusOK, response.BuildOk("Ok", res))
 }
