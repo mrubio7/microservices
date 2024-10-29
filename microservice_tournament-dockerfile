@@ -10,7 +10,7 @@ RUN go mod download
 COPY . .
 
 # Build
-RUN go build -o /microservice-tournament cmd/microservices/tournament/main.go
+RUN go build -o /microservice-tournament cmd/microservices/tournaments/main.go
 
 # Expose ports
 EXPOSE 50051/tcp
