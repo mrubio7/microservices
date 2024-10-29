@@ -29,6 +29,7 @@ func (svc *Tournaments) NewOrganizer(organizer *model.OrganizerModel) *model.Org
 
 func (svc *Tournaments) NewTournament(tournament *model.TournamentModel) *model.TournamentModel {
 	if err := svc.db.Model(&model.TournamentModel{}).Create(&tournament).Error; err != nil {
+		logger.Error(err.Error())
 		return nil
 	}
 

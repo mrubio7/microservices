@@ -14,9 +14,9 @@ run:
 	
 
 # WORKERS
-w-players:
-	go build -o cmd/workers/players/worker-players.exe cmd/workers/players/worker-players.go
-	./cmd/workers/players/worker-players.exe
+worker:
+	go build -o cmd/workers/worker.exe cmd/workers/worker.go
+	./cmd/workers/worker.exe
 
 
 # MICROSERVICES
