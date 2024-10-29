@@ -29,12 +29,14 @@ type (
 	}
 
 	MicroservicesConfig struct {
-		PlayersHost string
-		PlayersPort string
-		TeamsHost   string
-		TeamsPort   string
-		UserHost    string
-		UserPort    string
+		PlayersHost     string
+		PlayersPort     string
+		TeamsHost       string
+		TeamsPort       string
+		UserHost        string
+		UserPort        string
+		TournamentsHost string
+		TournamentsPort string
 	}
 )
 
@@ -62,12 +64,14 @@ func Load() (Config, error) {
 			PlayersHost: os.Getenv("WORKER_PLAYERS_HOST"),
 		},
 		Microservices: MicroservicesConfig{
-			PlayersHost: os.Getenv("MICROSERVICE_PLAYERS_HOST"),
-			PlayersPort: os.Getenv("MICROSERVICE_PLAYERS_PORT"),
-			TeamsHost:   os.Getenv("MICROSERVICE_TEAMS_HOST"),
-			TeamsPort:   os.Getenv("MICROSERVICE_TEAMS_PORT"),
-			UserHost:    os.Getenv("MICROSERVICE_USERS_HOST"),
-			UserPort:    os.Getenv("MICROSERVICE_USERS_PORT"),
+			PlayersHost:     os.Getenv("MICROSERVICE_PLAYERS_HOST"),
+			PlayersPort:     os.Getenv("MICROSERVICE_PLAYERS_PORT"),
+			TeamsHost:       os.Getenv("MICROSERVICE_TEAMS_HOST"),
+			TeamsPort:       os.Getenv("MICROSERVICE_TEAMS_PORT"),
+			UserHost:        os.Getenv("MICROSERVICE_USERS_HOST"),
+			UserPort:        os.Getenv("MICROSERVICE_USERS_PORT"),
+			TournamentsHost: os.Getenv("MICROSERVICE_TOURNAMENTS_HOST"),
+			TournamentsPort: os.Getenv("MICROSERVICE_TOURNAMENTS_PORT"),
 		},
 	}
 

@@ -41,11 +41,14 @@ func (api *Api) Start() {
 	players_handlers := handlers.NewPlayersHandlers(*api.router.PlayersServer)
 	teams_handlers := handlers.NewTeamsHandlers(*api.router.TeamsServer)
 	users_handlers := handlers.NewUsersHandlers(*api.router.UsersServer)
+	tournaments_handlers := handlers.NewTournamentsHandlers(*api.router.TournamentsServer)
 	workers_handlers := handlers.NewWorkersHandlers(api.cfg.Workers)
 	state_handlers := handlers.NewStateHandlers(api.db)
 
 	api.router.gin.Use(middlewares.CORSMiddleware())
 	api.router.gin.Use(middlewares.CacheMiddleware(cache, consts.CACHE_DURATION))
+
+	api.router.gin.GET("/api/v1/tournaments/get-all", tournaments_handlers.GetAllTournaments)
 
 	api.router.gin.GET("/api/v1/state/last-players-update", state_handlers.GetLastPlayerUpdate)
 
@@ -63,7 +66,8 @@ func (api *Api) Start() {
 	api.router.gin.GET("/api/v1/teams/find-player", teams_handlers.FindTeamByPlayerId)
 
 	api.router.gin.Use(middlewares.Auth(api.db))
-	api.router.gin.GET("/api/v1/workers/players/find", workers_handlers.Find)
+	api.router.gin.POST("/api/v1/organizers/new", tournaments_handlers.NewOrganizer)
+	api.router.gin.POST("/api/v1/tournaments/new", tournaments_handlers.NewTournament)
 	api.router.gin.GET("/api/v1/workers/players/update", workers_handlers.Update)
 	api.router.gin.POST("/api/v1/users/update", users_handlers.UpdateProfile)
 	api.router.gin.POST("/api/v1/auth/logout", users_handlers.Logout)

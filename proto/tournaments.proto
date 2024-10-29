@@ -1,7 +1,7 @@
 syntax = "proto3";
 
 package tournaments;
-option go_package = "ibercs/proto/tournaments;tournaments";
+option go_package = "proto/tournaments;tournaments";
 
 
 message Tournament {
@@ -9,17 +9,36 @@ message Tournament {
     string FaceitId = 2;
     string OrganizerId = 3;
     string Name = 4;
-    uint32 RegisterDate = 5;
-    uint32 StartDate = 6;
-    uint32 CurrentTeams = 7;
-    uint32 Slots = 8;
+    int64 RegisterDate = 5;
+    int64 StartDate = 6;
+    int32 CurrentTeams = 7;
+    int32 Slots = 8;
+    string JoinPolicy = 9;
+    repeated string GeoCountries = 10;
+    int32 MinLevel = 11;
+    int32 MaxLavel = 12;
+    string Status = 13;
+    string BackgroundImage = 14;
+    string CoverImage = 15;
+    string Avatar = 16;
+}
+
+message Organizer {
+    int32 Id = 1;
+    string FaceitId = 2;
+    string Name = 3;
 }
 
 message Empty {}
 
 service TournamentService {
+    rpc NewOrganizer (NewOrganizerRequest) returns (Organizer);
     rpc NewTournament (NewTournamentRequest) returns (Tournament);
     rpc GetAllTorunaments (Empty) returns (TournamentList);
+}
+
+message NewOrganizerRequest {
+    string FaceitId = 1;
 }
 
 message NewTournamentRequest {

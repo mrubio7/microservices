@@ -37,6 +37,14 @@
             "cwd": "${workspaceFolder}"
         },
         {
+            "name": "Tournaments microservice",
+            "type": "go",
+            "request": "launch",
+            "mode": "auto",
+            "program": "${workspaceFolder}/cmd/microservices/tournaments/main.go",
+            "cwd": "${workspaceFolder}"
+        },
+        {
             "name": "API_GATEWAY",
             "type": "go",
             "request": "launch",

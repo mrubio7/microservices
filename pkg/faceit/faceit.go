@@ -172,3 +172,44 @@ func (c *FaceitClient) GetTeamById(teamId string) *model.TeamModel {
 		},
 	}
 }
+
+func (c *FaceitClient) GetOrganizerById(organizerId string) *model.OrganizerModel {
+	organizer, err := c.client.GetOrganizerByID(organizerId, nil)
+	if err != nil {
+		return nil
+	}
+
+	return &model.OrganizerModel{
+		FaceitId: organizer.OrganizerId,
+		Name:     organizer.Name,
+		Website:  organizer.Website,
+		Twitter:  organizer.Twitter,
+		Twitch:   organizer.Twitch,
+		Avatar:   organizer.Avatar,
+	}
+}
+
+func (c *FaceitClient) GetChampionshipById(championshipId string) *model.TournamentModel {
+	champ, err := c.client.GetChampionshipByID(championshipId, nil)
+	if err != nil {
+		return nil
+	}
+
+	return &model.TournamentModel{
+		FaceitId:        champ.ChampionshipId,
+		OrganizerId:     champ.OrganizerId,
+		BackgroundImage: champ.BackgroundImage,
+		Name:            champ.Name,
+		CoverImage:      champ.CoverImage,
+		RegisterDate:    time.Unix(int64(champ.SubscriptionStart), 0),
+		StartDate:       time.Unix(int64(champ.ChampionshipStart), 0),
+		CurrentTeams:    champ.CurrentSubscriptions,
+		Slots:           champ.Slots,
+		Avatar:          champ.Avatar,
+		Status:          champ.Avatar,
+		JoinPolicy:      champ.JoinChecks.JoinPolicy,
+		GeoCountries:    champ.JoinChecks.WhitelistGeoCountries,
+		MinLevel:        champ.JoinChecks.MinSkillLevel,
+		MaxLevel:        champ.JoinChecks.MaxSkillLevel,
+	}
+}
