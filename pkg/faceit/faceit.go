@@ -213,3 +213,76 @@ func (c *FaceitClient) GetChampionshipById(championshipId string) *model.Tournam
 		MaxLevel:        champ.JoinChecks.MaxSkillLevel,
 	}
 }
+
+func (c *FaceitClient) GetAllChampionshipFromOrganizer(organizerId string, offset, limit int) []model.TournamentModel {
+	params := map[string]interface{}{
+		"offset":  strconv.Itoa(offset),
+		"limit":   strconv.Itoa(limit),
+		"country": "es",
+	}
+
+	champs, err := c.client.GetOrganizerChampionships(organizerId, params)
+	if err != nil {
+		return nil
+	}
+
+	var tournaments []model.TournamentModel
+	for _, c := range champs.Items {
+		tournaments = append(tournaments, model.TournamentModel{
+			FaceitId:        c.ChampionshipId,
+			OrganizerId:     c.OrganizerId,
+			BackgroundImage: c.BackgroundImage,
+			Name:            c.Name,
+			CoverImage:      c.CoverImage,
+			RegisterDate:    time.Unix(int64(c.SubscriptionStart), 0),
+			StartDate:       time.Unix(int64(c.ChampionshipStart), 0),
+			CurrentTeams:    c.CurrentSubscriptions,
+			Slots:           c.Slots,
+			Avatar:          c.Avatar,
+			Status:          c.Avatar,
+			JoinPolicy:      c.JoinChecks.JoinPolicy,
+			GeoCountries:    c.JoinChecks.WhitelistGeoCountries,
+			MinLevel:        c.JoinChecks.MinSkillLevel,
+			MaxLevel:        c.JoinChecks.MaxSkillLevel,
+		})
+	}
+
+	return tournaments
+}
+
+func (c *FaceitClient) GetTeamsInTournament(tournamentId string, size int) []model.TeamModel {
+	var res []model.TeamModel
+
+	var offset int = 0
+	var limit int = 50
+
+	params := map[string]interface{}{
+		"offset":  strconv.Itoa(offset),
+		"limit":   strconv.Itoa(limit),
+		"country": "es",
+	}
+
+	for offset < size {
+		teams, err := c.client.GetSubscriptionsByChampionshipID(tournamentId, params)
+		if err != nil {
+			return nil
+		}
+
+		for _, t := range teams.Items {
+			team := model.TeamModel{
+				FaceitId:  t.Team.TeamId,
+				Name:      t.Team.Name,
+				Nickname:  t.Team.Nickname,
+				Avatar:    t.Team.Avatar,
+				PlayersId: t.Roster,
+				Stats:     model.TeamStatsModel{},
+			}
+
+			res = append(res, team)
+		}
+
+		offset += limit
+	}
+
+	return res
+}

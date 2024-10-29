@@ -5,11 +5,11 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "Worker Update",
+            "name": "Worker",
             "type": "go",
             "request": "launch",
             "mode": "auto",
-            "program": "${workspaceFolder}/cmd/workers/players/worker-players.go",
+            "program": "${workspaceFolder}/cmd/workers/worker.go",
             "cwd": "${workspaceFolder}"
         },
         {

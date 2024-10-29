@@ -1,4 +1,4 @@
-package find_players
+package players
 
 import (
 	"ibercs/internal/model"
@@ -12,7 +12,7 @@ import (
 	"github.com/schollz/progressbar/v3"
 )
 
-func Start(size int) {
+func Find(size int) {
 	logger.Info("Initializing players worker [FindPlayers]")
 	startTime := time.Now()
 

@@ -50,6 +50,21 @@ func (svc *Tournaments) GetAllTournaments() []model.TournamentModel {
 	return tournaments
 }
 
+func (svc *Tournaments) GetAllOrganizers() []model.OrganizerModel {
+	var organizers []model.OrganizerModel
+
+	err := svc.db.Model(&model.OrganizerModel{}).Find(&organizers).Error
+	if err != nil {
+		if gorm.ErrRecordNotFound == err {
+			return nil
+		}
+		logger.Error(err.Error())
+		return nil
+	}
+
+	return organizers
+}
+
 func (svc *Tournaments) GetOrganizer(faceitId string) *model.OrganizerModel {
 	var organizer model.OrganizerModel
 

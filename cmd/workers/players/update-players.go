@@ -1,4 +1,4 @@
-package update_players
+package players
 
 import (
 	"encoding/json"
@@ -13,7 +13,7 @@ import (
 	"time"
 )
 
-func Start(w http.ResponseWriter) {
+func Update(w http.ResponseWriter) {
 	logger.Info("Initializing players worker [UpdatePlayers]")
 
 	cfg, err := config.Load()

@@ -19,4 +19,5 @@ type TournamentModel struct {
 	MaxLevel        int             `gorm:"not null"`
 	CurrentTeams    int             `gorm:"not null"`
 	Slots           int             `gorm:"not null"`
+	TeamIds         JSONStringArray `gorm:"null"`
 }

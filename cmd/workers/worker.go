@@ -2,8 +2,8 @@ package main
 
 import (
 	"fmt"
-	"ibercs/cmd/workers/players/find_players"
-	"ibercs/cmd/workers/players/update_players"
+	"ibercs/cmd/workers/players"
+	"ibercs/cmd/workers/tournaments"
 	"ibercs/pkg/logger"
 	"log"
 	"net/http"
@@ -14,6 +14,7 @@ func main() {
 	logger.Initialize()
 	http.HandleFunc("/update", updateHandler)
 	http.HandleFunc("/find", findHandler)
+	http.HandleFunc("/tournaments", updateFindTournaments)
 
 	logger.Info("Starting server on :8080")
 	log.Fatal(http.ListenAndServe(":8080", nil))
@@ -27,7 +28,11 @@ func updateHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Access-Control-Allow-Origin", "*")
 
 	// Inicia la rutina para el procesamiento de jugadores
-	update_players.Start(w)
+	players.Update(w)
+}
+
+func updateFindTournaments(w http.ResponseWriter, r *http.Request) {
+	tournaments.Find()
 }
 
 func findHandler(w http.ResponseWriter, r *http.Request) {
@@ -47,7 +52,7 @@ func findHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Llama a la función que busca jugadores
-	find_players.Start(number)
+	players.Find(number)
 
 	// Calcular el tiempo de ejecución
 	elapsedTime := time.Since(startTime)
