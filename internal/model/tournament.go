@@ -1,5 +1,7 @@
 package model
 
+import "time"
+
 type TournamentModel struct {
 	ID              uint32          `gorm:"primaryKey; autoIncrement"`
 	FaceitId        string          `gorm:"unique; not null"`
@@ -8,8 +10,8 @@ type TournamentModel struct {
 	BackgroundImage string          `gorm:"null"`
 	CoverImage      string          `gorm:"null"`
 	Avatar          string          `gorm:"null"`
-	RegisterDate    int             `gorm:"not null"`
-	StartDate       int             `gorm:"not null"`
+	RegisterDate    time.Time       `gorm:"not null"`
+	StartDate       time.Time       `gorm:"not null"`
 	Status          string          `gorm:"null"`
 	JoinPolicy      string          `gorm:"not null"`
 	GeoCountries    JSONStringArray `gorm:"null"`
