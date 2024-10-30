@@ -174,3 +174,44 @@ func (h *Users_Handlers) Logout(c *gin.Context) {
 
 	c.JSON(http.StatusOK, response.BuildOk("Ok", nil))
 }
+
+func (h *Users_Handlers) Auth(c *gin.Context) {
+	identity, identityExist := c.Get("identity")
+	if !identityExist {
+		c.JSON(http.StatusUnauthorized, response.BuildError("Unauthorized"))
+		return
+	}
+
+	token, tokenExist := c.Get("token")
+	if !tokenExist {
+		c.JSON(http.StatusUnauthorized, response.BuildError("Unauthorized"))
+		return
+	}
+
+	if !identityExist || !tokenExist {
+		c.JSON(http.StatusUnauthorized, response.BuildError("Unauthorized"))
+		return
+	}
+
+	payload := &pb_users.GetSessionRequest{Id: int32(identity.(int)), Token: token.(string)}
+
+	session, err := h.users_client.GetSession(c, payload)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, response.BuildError("Invalid data"))
+		return
+	}
+
+	if session.Response != token.(string) {
+		c.JSON(http.StatusBadRequest, response.BuildError("Invalid user"))
+		return
+	}
+
+	idStr := strconv.Itoa(identity.(int))
+	res, err := h.users_client.GetUser(c, &pb_users.GetUserRequest{Id: idStr})
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, response.BuildError("Error getting user"))
+		return
+	}
+
+	c.JSON(http.StatusOK, response.BuildOk("Ok", res))
+}

@@ -93,6 +93,21 @@ func (svc *Users) NewSession(id int) string {
 	return session.SessionID
 }
 
+func (svc *Users) GetSession(id int) (*model.UserSessionModel, error) {
+	var session *model.UserSessionModel
+
+	err := svc.db.Model(&model.UserSessionModel{}).Where("user_id = ?", id).Find(&session).Error
+	if err != nil {
+		if err == gorm.ErrRecordNotFound {
+			return nil, gorm.ErrRecordNotFound
+		}
+		logger.Error(err.Error())
+		return nil, err
+	}
+
+	return session, nil
+}
+
 func (svc *Users) DeleteSession(id int) string {
 	var session model.UserSessionModel
 	err := svc.db.Where("user_id = ?", id).First(&session).Error

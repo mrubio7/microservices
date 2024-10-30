@@ -70,6 +70,7 @@ func (api *Api) Start() {
 	api.router.gin.POST("/api/v1/tournaments/new", tournaments_handlers.NewTournament)
 	api.router.gin.GET("/api/v1/workers/players/update", workers_handlers.Update)
 	api.router.gin.GET("/api/v1/workers/tournaments/find", workers_handlers.TournamentsFind)
+	api.router.gin.POST("/api/v1/user", users_handlers.Auth)
 	api.router.gin.POST("/api/v1/users/update", users_handlers.UpdateProfile)
 	api.router.gin.POST("/api/v1/auth/logout", users_handlers.Logout)
 	api.router.gin.GET("/api/v1/state", state_handlers.GetState)

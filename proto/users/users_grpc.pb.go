@@ -26,6 +26,7 @@ const (
 	UserService_NewUser_FullMethodName                 = "/users.UserService/NewUser"
 	UserService_NewSession_FullMethodName              = "/users.UserService/NewSession"
 	UserService_DeleteSession_FullMethodName           = "/users.UserService/DeleteSession"
+	UserService_GetSession_FullMethodName              = "/users.UserService/GetSession"
 	UserService_GetAllStreams_FullMethodName           = "/users.UserService/GetAllStreams"
 )
 
@@ -40,6 +41,7 @@ type UserServiceClient interface {
 	NewUser(ctx context.Context, in *NewUserRequest, opts ...grpc.CallOption) (*User, error)
 	NewSession(ctx context.Context, in *NewSessionRequest, opts ...grpc.CallOption) (*NewSessionResponse, error)
 	DeleteSession(ctx context.Context, in *NewSessionRequest, opts ...grpc.CallOption) (*NewSessionResponse, error)
+	GetSession(ctx context.Context, in *GetSessionRequest, opts ...grpc.CallOption) (*NewSessionResponse, error)
 	GetAllStreams(ctx context.Context, in *Empty, opts ...grpc.CallOption) (*StreamsResponse, error)
 }
 
@@ -121,6 +123,16 @@ func (c *userServiceClient) DeleteSession(ctx context.Context, in *NewSessionReq
 	return out, nil
 }
 
+func (c *userServiceClient) GetSession(ctx context.Context, in *GetSessionRequest, opts ...grpc.CallOption) (*NewSessionResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(NewSessionResponse)
+	err := c.cc.Invoke(ctx, UserService_GetSession_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 func (c *userServiceClient) GetAllStreams(ctx context.Context, in *Empty, opts ...grpc.CallOption) (*StreamsResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(StreamsResponse)
@@ -142,6 +154,7 @@ type UserServiceServer interface {
 	NewUser(context.Context, *NewUserRequest) (*User, error)
 	NewSession(context.Context, *NewSessionRequest) (*NewSessionResponse, error)
 	DeleteSession(context.Context, *NewSessionRequest) (*NewSessionResponse, error)
+	GetSession(context.Context, *GetSessionRequest) (*NewSessionResponse, error)
 	GetAllStreams(context.Context, *Empty) (*StreamsResponse, error)
 	mustEmbedUnimplementedUserServiceServer()
 }
@@ -173,6 +186,9 @@ func (UnimplementedUserServiceServer) NewSession(context.Context, *NewSessionReq
 }
 func (UnimplementedUserServiceServer) DeleteSession(context.Context, *NewSessionRequest) (*NewSessionResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method DeleteSession not implemented")
+}
+func (UnimplementedUserServiceServer) GetSession(context.Context, *GetSessionRequest) (*NewSessionResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetSession not implemented")
 }
 func (UnimplementedUserServiceServer) GetAllStreams(context.Context, *Empty) (*StreamsResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetAllStreams not implemented")
@@ -324,6 +340,24 @@ func _UserService_DeleteSession_Handler(srv interface{}, ctx context.Context, de
 	return interceptor(ctx, in, info, handler)
 }
 
+func _UserService_GetSession_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetSessionRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(UserServiceServer).GetSession(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: UserService_GetSession_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(UserServiceServer).GetSession(ctx, req.(*GetSessionRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _UserService_GetAllStreams_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(Empty)
 	if err := dec(in); err != nil {
@@ -376,6 +410,10 @@ var UserService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "DeleteSession",
 			Handler:    _UserService_DeleteSession_Handler,
+		},
+		{
+			MethodName: "GetSession",
+			Handler:    _UserService_GetSession_Handler,
 		},
 		{
 			MethodName: "GetAllStreams",

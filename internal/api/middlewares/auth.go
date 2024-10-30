@@ -31,6 +31,7 @@ func Auth(db *gorm.DB) gin.HandlerFunc {
 		ctx.Writer.Header().Set("Access-Control-Allow-Methods", "GET, POST, PUT, PATCH, DELETE, OPTIONS")
 		ctx.Writer.Header().Set("Access-Control-Allow-Headers", "Content-Type, Authorization, X-Requested-With, Cache-Control")
 		ctx.Set("identity", session.UserID)
+		ctx.Set("token", idToken)
 		ctx.Next()
 	}
 }

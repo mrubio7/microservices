@@ -16,6 +16,7 @@ import (
 
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
+	"gorm.io/gorm"
 )
 
 type Server struct {
@@ -209,6 +210,23 @@ func (s *Server) DeleteSession(ctx context.Context, req *pb.NewSessionRequest) (
 		return &pb.NewSessionResponse{Response: ""}, nil
 	}
 	return &pb.NewSessionResponse{Response: token}, nil
+}
+
+func (s *Server) GetSession(ctx context.Context, req *pb.GetSessionRequest) (*pb.NewSessionResponse, error) {
+	res := &pb.NewSessionResponse{}
+
+	session, err := s.UsersService.GetSession(int(req.Id))
+	if err != nil {
+		if err == gorm.ErrRecordNotFound {
+			res.Response = s.UsersService.NewSession(int(req.Id))
+		} else {
+			logger.Error(err.Error())
+			return nil, err
+		}
+	}
+	res.Response = session.SessionID
+
+	return res, nil
 }
 
 func (s *Server) GetAllStreams(ctx context.Context, _ *pb.Empty) (*pb.StreamsResponse, error) {
