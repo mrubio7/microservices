@@ -1,9 +1,13 @@
 package faceit
 
 import (
+	"encoding/json"
 	"fmt"
 	"ibercs/internal/model"
 	"ibercs/pkg/logger"
+	"io"
+	"log"
+	"net/http"
 	"strconv"
 	"time"
 
@@ -287,4 +291,77 @@ func (c *FaceitClient) GetTeamsInTournament(tournamentId string, size int) []mod
 	}
 
 	return res
+}
+
+func (c *FaceitClient) GetESEASeasons_PRODUCTION() []model.TournamentModel {
+	// Realiza la solicitud HTTP
+	res, err := http.Get("https://www.faceit.com/api/team-leagues/v1/get_league_seasons?league_id=a14b8616-45b9-4581-8637-4dfd0b5f6af8")
+	if err != nil {
+		log.Printf("Error getting ESEA Seasons: %s", err.Error())
+		return nil
+	}
+	defer res.Body.Close() // Asegura que el cuerpo de la respuesta se cierre al final
+
+	body, err := io.ReadAll(res.Body)
+	if err != nil {
+		log.Printf("Error reading response body: %s", err.Error())
+		return nil
+	}
+
+	var rb map[string]any
+	if err := json.Unmarshal(body, &rb); err != nil {
+		log.Printf("Error unmarshaling response body: %s", err.Error())
+		return nil
+	}
+
+	tournaments := make([]model.TournamentModel, 2)
+
+	payload := rb["payload"].(map[string]any)
+
+	currentSeason := payload["current_season"].(map[string]any)
+	tournaments[0] = *convertToTournamentModel(currentSeason)
+
+	nextSeason := payload["next_season"].(map[string]any)
+	tournaments[1] = *convertToTournamentModel(nextSeason)
+
+	return tournaments
+}
+
+func convertToTournamentModel(season map[string]any) *model.TournamentModel {
+	registerDate, err := time.Parse("2006-01-02T15:04:05Z", season["time_start"].(string))
+	if err != nil {
+		logger.Error("Error parsing register date")
+		return nil
+	}
+
+	endDate, err := time.Parse("2006-01-02T15:04:05Z", season["time_end"].(string))
+	if err != nil {
+		logger.Error("Error parsing register date")
+		return nil
+	}
+
+	var status string
+	switch {
+	case time.Now().After(endDate):
+		status = "finished"
+	case time.Now().Before(endDate) && time.Now().After(registerDate):
+		status = "live"
+	case time.Now().Before(endDate):
+		status = "join"
+	}
+
+	return &model.TournamentModel{
+		OrganizerId:     "a14b8616-45b9-4581-8637-4dfd0b5f6af8",
+		FaceitId:        season["season_id"].(string),
+		Name:            fmt.Sprintf("ESEA %s", season["season_name"]),
+		BackgroundImage: season["header_image_url"].(string),
+		CoverImage:      season["thumbnail_url"].(string),
+		RegisterDate:    registerDate,
+		StartDate:       registerDate,
+		MaxLevel:        10,
+		MinLevel:        1,
+		Status:          status,
+		JoinPolicy:      "esea pass",
+		GeoCountries:    nil,
+	}
 }

@@ -33,6 +33,7 @@ func updateHandler(w http.ResponseWriter, r *http.Request) {
 
 func updateFindTournaments(w http.ResponseWriter, r *http.Request) {
 	tournaments.Find()
+	w.WriteHeader(http.StatusOK)
 }
 
 func findHandler(w http.ResponseWriter, r *http.Request) {

@@ -27,28 +27,44 @@ func Find() {
 	organizers := svcTournaments.GetAllOrganizers()
 
 	for _, org := range organizers {
-		if org.Type == "ESEA" {
+		switch org.Type {
+		case "ESEA":
+			save_ESEA_Tournament(org.Type, faceit, svcTournaments)
+		case "ORGANIZER":
+			save_ORGANIZER_Tournament(org.FaceitId, org.Type, faceit, svcTournaments)
+		}
+
+	}
+}
+
+func save_ESEA_Tournament(orgType string, faceit *faceit.FaceitClient, svcTournaments *service.Tournaments) {
+	tournaments := faceit.GetESEASeasons_PRODUCTION()
+	for _, t := range tournaments {
+		t.Type = orgType
+		err := svcTournaments.UpdateTournament(&t)
+		if err != nil {
+			logger.Error("Unable to create tournament: %s", t.Name)
+		}
+	}
+}
+
+func save_ORGANIZER_Tournament(organizerFaceitID, orgType string, faceit *faceit.FaceitClient, svcTournaments *service.Tournaments) {
+	tournaments := faceit.GetAllChampionshipFromOrganizer(organizerFaceitID, 0, 40)
+	for _, t := range tournaments {
+		var countries []string = t.GeoCountries
+
+		if !slices.Contains(countries, "ES") {
 			continue
 		}
 
-		tournaments := faceit.GetAllChampionshipFromOrganizer(org.FaceitId, 0, 40)
-		for _, t := range tournaments {
-			var countries []string = t.GeoCountries
+		if t.JoinPolicy != "public" {
+			continue
+		}
 
-			if !slices.Contains(countries, "ES") {
-				continue
-			}
-
-			if t.JoinPolicy != "public" {
-				continue
-			}
-
-			t.Type = org.Type
-			name := t.Name
-			t := svcTournaments.NewTournament(&t)
-			if t == nil {
-				logger.Error("Unable to create tournament: %s", name)
-			}
+		t.Type = orgType
+		err := svcTournaments.UpdateTournament(&t)
+		if err != nil {
+			logger.Error("Unable to create tournament: %s", t.Name)
 		}
 	}
 }
