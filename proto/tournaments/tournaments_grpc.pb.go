@@ -22,6 +22,7 @@ const (
 	TournamentService_NewOrganizer_FullMethodName      = "/tournaments.TournamentService/NewOrganizer"
 	TournamentService_NewTournament_FullMethodName     = "/tournaments.TournamentService/NewTournament"
 	TournamentService_GetAllTorunaments_FullMethodName = "/tournaments.TournamentService/GetAllTorunaments"
+	TournamentService_GetTournament_FullMethodName     = "/tournaments.TournamentService/GetTournament"
 )
 
 // TournamentServiceClient is the client API for TournamentService service.
@@ -31,6 +32,7 @@ type TournamentServiceClient interface {
 	NewOrganizer(ctx context.Context, in *NewOrganizerRequest, opts ...grpc.CallOption) (*Organizer, error)
 	NewTournament(ctx context.Context, in *NewTournamentRequest, opts ...grpc.CallOption) (*Tournament, error)
 	GetAllTorunaments(ctx context.Context, in *Empty, opts ...grpc.CallOption) (*TournamentList, error)
+	GetTournament(ctx context.Context, in *GetTournamentByIdRequest, opts ...grpc.CallOption) (*Tournament, error)
 }
 
 type tournamentServiceClient struct {
@@ -71,6 +73,16 @@ func (c *tournamentServiceClient) GetAllTorunaments(ctx context.Context, in *Emp
 	return out, nil
 }
 
+func (c *tournamentServiceClient) GetTournament(ctx context.Context, in *GetTournamentByIdRequest, opts ...grpc.CallOption) (*Tournament, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(Tournament)
+	err := c.cc.Invoke(ctx, TournamentService_GetTournament_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // TournamentServiceServer is the server API for TournamentService service.
 // All implementations must embed UnimplementedTournamentServiceServer
 // for forward compatibility.
@@ -78,6 +90,7 @@ type TournamentServiceServer interface {
 	NewOrganizer(context.Context, *NewOrganizerRequest) (*Organizer, error)
 	NewTournament(context.Context, *NewTournamentRequest) (*Tournament, error)
 	GetAllTorunaments(context.Context, *Empty) (*TournamentList, error)
+	GetTournament(context.Context, *GetTournamentByIdRequest) (*Tournament, error)
 	mustEmbedUnimplementedTournamentServiceServer()
 }
 
@@ -96,6 +109,9 @@ func (UnimplementedTournamentServiceServer) NewTournament(context.Context, *NewT
 }
 func (UnimplementedTournamentServiceServer) GetAllTorunaments(context.Context, *Empty) (*TournamentList, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetAllTorunaments not implemented")
+}
+func (UnimplementedTournamentServiceServer) GetTournament(context.Context, *GetTournamentByIdRequest) (*Tournament, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetTournament not implemented")
 }
 func (UnimplementedTournamentServiceServer) mustEmbedUnimplementedTournamentServiceServer() {}
 func (UnimplementedTournamentServiceServer) testEmbeddedByValue()                           {}
@@ -172,6 +188,24 @@ func _TournamentService_GetAllTorunaments_Handler(srv interface{}, ctx context.C
 	return interceptor(ctx, in, info, handler)
 }
 
+func _TournamentService_GetTournament_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetTournamentByIdRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(TournamentServiceServer).GetTournament(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: TournamentService_GetTournament_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(TournamentServiceServer).GetTournament(ctx, req.(*GetTournamentByIdRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // TournamentService_ServiceDesc is the grpc.ServiceDesc for TournamentService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -190,6 +224,10 @@ var TournamentService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GetAllTorunaments",
 			Handler:    _TournamentService_GetAllTorunaments_Handler,
+		},
+		{
+			MethodName: "GetTournament",
+			Handler:    _TournamentService_GetTournament_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

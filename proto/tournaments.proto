@@ -21,6 +21,7 @@ message Tournament {
     string BackgroundImage = 14;
     string CoverImage = 15;
     string Avatar = 16;
+    repeated string TeamsId = 17;
 }
 
 message Organizer {
@@ -35,6 +36,11 @@ service TournamentService {
     rpc NewOrganizer (NewOrganizerRequest) returns (Organizer);
     rpc NewTournament (NewTournamentRequest) returns (Tournament);
     rpc GetAllTorunaments (Empty) returns (TournamentList);
+    rpc GetTournament (GetTournamentByIdRequest) returns (Tournament);
+}
+
+message GetTournamentByIdRequest {
+    string FaceitId = 1;
 }
 
 message NewOrganizerRequest {

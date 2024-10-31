@@ -133,3 +133,37 @@ func (s *Server) GetAllTorunaments(ctx context.Context, _ *pb.Empty) (*pb.Tourna
 
 	return &pb.TournamentList{Tournaments: res}, nil
 }
+
+func (s *Server) GetTournamentById(ctx context.Context, req *pb.GetTournamentByIdRequest) (*pb.Tournament, error) {
+	t := s.TournamentsService.GetTournament(req.FaceitId)
+	if t == nil {
+		err := status.Errorf(codes.NotFound, "tournament with FaceitID %s not found", req.FaceitId)
+		return nil, err
+	}
+
+	err := s.TournamentsService.UpdateTournament(t)
+	if err != nil {
+		return nil, err
+	}
+
+	res := &pb.Tournament{
+		Id:              int32(t.ID),
+		FaceitId:        t.FaceitId,
+		OrganizerId:     t.OrganizerId,
+		Name:            t.Name,
+		RegisterDate:    t.RegisterDate.Unix(),
+		StartDate:       t.RegisterDate.Unix(),
+		CurrentTeams:    int32(t.CurrentTeams),
+		Slots:           int32(t.Slots),
+		JoinPolicy:      t.JoinPolicy,
+		GeoCountries:    t.GeoCountries,
+		MinLevel:        int32(t.MinLevel),
+		MaxLavel:        int32(t.MaxLevel),
+		Status:          t.Status,
+		BackgroundImage: t.BackgroundImage,
+		CoverImage:      t.CoverImage,
+		Avatar:          t.Avatar,
+	}
+
+	return res, nil
+}

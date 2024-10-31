@@ -3,6 +3,7 @@ package service
 import (
 	"ibercs/internal/model"
 	"ibercs/pkg/logger"
+	"reflect"
 	"sync"
 
 	"gorm.io/gorm"
@@ -94,4 +95,25 @@ func (svc *Tournaments) GetTournament(faceitId string) *model.TournamentModel {
 	}
 
 	return &tournament
+}
+
+func (svc *Tournaments) UpdateTournament(tournament *model.TournamentModel) error {
+	var existingTournament model.TournamentModel
+
+	svc.mutex.Lock()
+	defer svc.mutex.Unlock()
+
+	err := svc.db.First(&existingTournament, "faceit_id = ?", tournament.FaceitId).Error
+	if err != nil {
+		logger.Error(err.Error())
+		return err
+	}
+
+	if !reflect.DeepEqual(existingTournament, tournament) {
+		if err := svc.db.Model(&existingTournament).Updates(tournament).Error; err != nil {
+			return err
+		}
+	}
+
+	return nil
 }

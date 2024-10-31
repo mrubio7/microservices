@@ -18,6 +18,6 @@ type TournamentModel struct {
 	MinLevel        int             `gorm:"not null"`
 	MaxLevel        int             `gorm:"not null"`
 	CurrentTeams    int             `gorm:"-"`
+	TeamsId         []string        `gorm:"-"`
 	Slots           int             `gorm:"-"`
-	Teams           []TeamModel     `gorm:"-"`
 }
