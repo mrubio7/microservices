@@ -63,6 +63,7 @@ func (c *FaceitClient) GetAllPlayers(chPlayers chan model.PlayerModel, size int)
 func (c *FaceitClient) GetPlayerAverageDetails(userId string, matchesNumber int) *model.PlayerModel {
 	p, err := c.client.GetPlayerByID(userId, nil)
 	if err != nil {
+		logger.Error("Error getting player details: %s", err.Error())
 		return nil
 	}
 
@@ -71,6 +72,7 @@ func (c *FaceitClient) GetPlayerAverageDetails(userId string, matchesNumber int)
 	}
 	pstats, err := c.client.GetPlayersLastMatchesStats(userId, "cs2", params)
 	if err != nil {
+		logger.Error("Error getting last matches: %s", err.Error())
 		return nil
 	}
 

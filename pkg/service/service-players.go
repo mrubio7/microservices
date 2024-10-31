@@ -4,7 +4,6 @@ import (
 	"errors"
 	"ibercs/internal/model"
 	"ibercs/pkg/logger"
-	"reflect"
 	"sync"
 	"time"
 
@@ -168,65 +167,40 @@ func (svc *Players) GetProminentPlayers() *model.ProminentWeekModel {
 	return &week
 }
 
-func (svc *Players) UpdatePlayersInBatch(players []model.PlayerModel) error {
-	// Usa un lock para asegurar la operación en concurrencia
+func (svc *Players) BatchUpdatePlayers(players []model.PlayerModel) error {
 	svc.mutex.Lock()
 	defer svc.mutex.Unlock()
+	return svc.db.Transaction(func(tx *gorm.DB) error {
+		for _, player := range players {
+			var existingPlayer model.PlayerModel
+			err := tx.Preload("Stats").First(&existingPlayer, "faceit_id = ?", player.FaceitId).Error
+			if err != nil {
+				if errors.Is(err, gorm.ErrRecordNotFound) {
+					if err := tx.Create(&player).Error; err != nil {
+						return err
+					}
+					continue
+				}
+				return err
+			}
 
-	// Inicia una transacción
-	tx := svc.db.Begin()
-	defer func() {
-		if r := recover(); r != nil {
-			tx.Rollback()
-			panic(r)
-		}
-	}()
-
-	for _, player := range players {
-		var existingPlayer model.PlayerModel
-
-		// Busca al jugador existente por FaceitId y carga sus Stats
-		err := tx.Preload("Stats").First(&existingPlayer, "faceit_id = ?", player.FaceitId).Error
-		if err != nil {
-			if errors.Is(err, gorm.ErrRecordNotFound) {
-				// Inserta el jugador junto con las estadísticas si no existe
-				if err := tx.Create(&player).Error; err != nil {
-					tx.Rollback()
+			// Actualiza los datos del jugador si han cambiado
+			if existingPlayer.Nickname != player.Nickname || existingPlayer.SteamId != player.SteamId || existingPlayer.Avatar != player.Avatar {
+				if err := tx.Model(&existingPlayer).Updates(player).Error; err != nil {
 					return err
 				}
-				continue
-			} else {
-				tx.Rollback()
+			}
+
+			// Inserta o actualiza estadísticas
+			if existingPlayer.Stats.ID == 0 {
+				player.Stats.ID = existingPlayer.ID
+				if err := tx.Create(&player.Stats).Error; err != nil {
+					return err
+				}
+			} else if err := tx.Model(&existingPlayer.Stats).Updates(player.Stats).Error; err != nil {
 				return err
 			}
 		}
-
-		// Compara el jugador existente con el nuevo para ver si hay cambios
-		if !reflect.DeepEqual(existingPlayer, player) {
-			// Actualiza solo los campos de PlayerModel
-			if err := tx.Model(&existingPlayer).Updates(player).Error; err != nil {
-				tx.Rollback()
-				return err
-			}
-		}
-
-		// Compara las estadísticas actuales con las nuevas para ver si hay cambios
-		if existingPlayer.Stats.ID == 0 {
-			// Inserta las estadísticas si no existen
-			player.Stats.ID = existingPlayer.ID // Asegura que la clave foránea sea la correcta
-			if err := tx.Create(&player.Stats).Error; err != nil {
-				tx.Rollback()
-				return err
-			}
-		} else if !reflect.DeepEqual(existingPlayer.Stats, player.Stats) {
-			// Actualiza las estadísticas si ya existen y han cambiado
-			if err := tx.Model(&existingPlayer.Stats).Updates(player.Stats).Error; err != nil {
-				tx.Rollback()
-				return err
-			}
-		}
-	}
-
-	// Finaliza la transacción
-	return tx.Commit().Error
+		return nil
+	})
 }
