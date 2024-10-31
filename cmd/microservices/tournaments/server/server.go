@@ -49,6 +49,8 @@ func (s *Server) NewOrganizer(ctx context.Context, organizerReq *pb.NewOrganizer
 		return nil, err
 	}
 
+	organizer.Type = organizerReq.Type
+
 	res := s.TournamentsService.NewOrganizer(organizer)
 	if res == nil {
 		err := status.Errorf(codes.Internal, "unable to create organizer with FaceitID %s", organizerReq.FaceitId)

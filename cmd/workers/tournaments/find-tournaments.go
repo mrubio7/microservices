@@ -1,7 +1,6 @@
 package tournaments
 
 import (
-	"ibercs/internal/model"
 	"ibercs/pkg/config"
 	"ibercs/pkg/database"
 	"ibercs/pkg/faceit"
@@ -27,11 +26,12 @@ func Find() {
 
 	organizers := svcTournaments.GetAllOrganizers()
 
-	var availabeTournaments []*model.TournamentModel
 	for _, org := range organizers {
+		if org.Type == "ESEA" {
+			continue
+		}
 
 		tournaments := faceit.GetAllChampionshipFromOrganizer(org.FaceitId, 0, 40)
-
 		for _, t := range tournaments {
 			var countries []string = t.GeoCountries
 
@@ -43,14 +43,12 @@ func Find() {
 				continue
 			}
 
-			availabeTournaments = append(availabeTournaments, &t)
-		}
-	}
-
-	for _, tournament := range availabeTournaments {
-		t := svcTournaments.NewTournament(tournament)
-		if t == nil {
-			logger.Error("Unable to create tournament: %s", tournament.Name)
+			t.Type = org.Type
+			name := t.Name
+			t := svcTournaments.NewTournament(&t)
+			if t == nil {
+				logger.Error("Unable to create tournament: %s", name)
+			}
 		}
 	}
 }

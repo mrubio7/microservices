@@ -241,7 +241,7 @@ func (c *FaceitClient) GetAllChampionshipFromOrganizer(organizerId string, offse
 			CurrentTeams:    c.CurrentSubscriptions,
 			Slots:           c.Slots,
 			Avatar:          c.Avatar,
-			Status:          c.Avatar,
+			Status:          c.Status,
 			JoinPolicy:      c.JoinChecks.JoinPolicy,
 			GeoCountries:    c.JoinChecks.WhitelistGeoCountries,
 			MinLevel:        c.JoinChecks.MinSkillLevel,

@@ -24,6 +24,7 @@ func NewTournamentsHandlers(tournamentsClient pb_tournaments.TournamentServiceCl
 func (h *Tournament_Handlers) NewOrganizer(c *gin.Context) {
 	var req struct {
 		FaceitId string `json:"faceit_id"`
+		Type     string `json:"type"`
 	}
 
 	if err := c.ShouldBindJSON(&req); err != nil {
@@ -32,7 +33,7 @@ func (h *Tournament_Handlers) NewOrganizer(c *gin.Context) {
 		return
 	}
 
-	res, err := h.tournaments_client.NewOrganizer(c, &pb_tournaments.NewOrganizerRequest{FaceitId: req.FaceitId})
+	res, err := h.tournaments_client.NewOrganizer(c, &pb_tournaments.NewOrganizerRequest{FaceitId: req.FaceitId, Type: req.Type})
 	if err != nil {
 		if st, ok := status.FromError(err); ok && st.Code() == codes.AlreadyExists {
 			c.JSON(http.StatusOK, response.BuildOk("Already exist", nil))

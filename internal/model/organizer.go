@@ -8,4 +8,10 @@ type OrganizerModel struct {
 	Twitter  string `gorm:"null"`
 	Twitch   string `gorm:"null"`
 	Avatar   string `gorm:"null"`
+	Type     string `gorm:"not null"`
 }
+
+const (
+	ORGANIZER_TYPE_ESEA      = "ESEA"
+	ORGANIZER_TYPE_ORGANIZER = "ORGANIZER"
+)
