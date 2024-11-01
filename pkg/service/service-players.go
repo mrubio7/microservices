@@ -126,7 +126,7 @@ func (svc *Players) GetNewProminentPlayers() *model.ProminentWeekModel {
 		)
 
 		SELECT ps.id, p.avatar, p.nickname, 
-			((kills_average - deaths_average + (assist_average * 0.3)) * kr_ratio * mvp_average) as calc
+			((kills_average * 0.35) - (deaths_average * 0.15) + (assist_average * 0.1) + (kr_ratio * 0.2) + (mvp_average * 0.1)) * (1 + (elo / 1000)) AS calc
 		FROM player_stats_models ps 
 		INNER JOIN player_models p ON p.id = ps.id 
 		LEFT JOIN player_prominent_models ppm ON ppm.id = ps.id
