@@ -2,6 +2,7 @@ package service
 
 import (
 	"errors"
+	"fmt"
 	"ibercs/internal/model"
 	"ibercs/pkg/logger"
 	"sync"
@@ -114,19 +115,27 @@ func (svc *Players) GetNewProminentPlayers() *model.ProminentWeekModel {
 	if err == nil {
 		logger.Info("Prominent week already exists for the current week and year.")
 		return &existingWeek
-	} else if err != gorm.ErrRecordNotFound {
-		logger.Error("Error checking for existing prominent week:", err)
-		return nil
 	}
 
-	query := `
-		SELECT ps.id, p.nickname, p.faceit_id, p.steam_id, p.avatar, 
-			((ps.kills_average - ps.deaths_average + (ps.assist_average * 0.3)) * ps.kr_ratio * ps.mvp_average) as Score
-		FROM player_stats_models ps
-		INNER JOIN player_models p ON p.id = ps.id
-		ORDER BY Score DESC
+	query := fmt.Sprintf(`
+		WITH previous_week AS (
+			SELECT ppm.id
+			FROM player_prominent_models ppm
+			INNER JOIN prominent_week_models pwm ON ppm.prominent_week_id = pwm.id
+			WHERE pwm.year = %d AND pwm.week = %d
+		)
+
+		SELECT ps.id, p.avatar, p.nickname, 
+			((kills_average - deaths_average + (assist_average * 0.3)) * kr_ratio * mvp_average) as calc
+		FROM player_stats_models ps 
+		INNER JOIN player_models p ON p.id = ps.id 
+		LEFT JOIN player_prominent_models ppm ON ppm.id = ps.id
+		LEFT JOIN prominent_week_models pwm ON pwm.id = ppm.prominent_week_id
+		WHERE (pwm.week IS NULL OR pwm.year < %d OR pwm.week < %d)
+		AND ps.id NOT IN (SELECT id FROM previous_week)
+		ORDER BY calc DESC
 		LIMIT 5;
-	`
+	`, year, week-1, year, week+1)
 
 	var results []model.PlayerProminentModel
 
