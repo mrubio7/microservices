@@ -1,7 +1,7 @@
 syntax = "proto3";
 
 package players;
-option go_package = "proto/players;players";
+option go_package = "ibercs/proto/players;players";
 
 message Player {
     int32 Id = 1;

@@ -1,7 +1,7 @@
 .PHONY: proto clean run w-players ms-players ms-teams ms-users ms-tournaments
 
 proto:
-	protoc --go_out=. --go-grpc_out=. proto/*.proto
+	protoc --go_out=.. --go-grpc_out=.. proto/*.proto
 	
 clean:
 	del /s /q *.exe || exit 0
