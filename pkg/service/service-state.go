@@ -59,3 +59,31 @@ func (svc *State) SetLastUpdatePlayer(date time.Time) error {
 
 	return nil
 }
+
+func (svc *State) ClearLastUpdateTeams() error {
+	state := svc.GetState()
+
+	state.LastTeamUpdate = sql.NullTime{Valid: false}
+
+	err := svc.db.Where("id = ?", 1).Save(&state).Error
+	if err != nil {
+		logger.Error(err.Error())
+		return err
+	}
+
+	return nil
+}
+
+func (svc *State) SetLastUpdateTeams(date time.Time) error {
+	state := svc.GetState()
+
+	state.LastTeamUpdate = sql.NullTime{Valid: true, Time: date}
+
+	err := svc.db.Where("id = ?", 1).Save(&state).Error
+	if err != nil {
+		logger.Error(err.Error())
+		return err
+	}
+
+	return nil
+}

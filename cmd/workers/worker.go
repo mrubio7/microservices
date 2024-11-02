@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"ibercs/cmd/workers/players"
+	"ibercs/cmd/workers/teams"
 	"ibercs/cmd/workers/tournaments"
 	"ibercs/pkg/logger"
 	"log"
@@ -13,7 +14,7 @@ import (
 func main() {
 	logger.Initialize()
 	http.HandleFunc("/update", updateHandler)
-	http.HandleFunc("/find", findHandler)
+	http.HandleFunc("/teams-update", updateTeams)
 	http.HandleFunc("/tournaments", updateFindTournaments)
 
 	logger.Info("Starting server on :8080")
@@ -29,6 +30,17 @@ func updateHandler(w http.ResponseWriter, r *http.Request) {
 
 	// Inicia la rutina para el procesamiento de jugadores
 	players.Update(w)
+}
+
+func updateTeams(w http.ResponseWriter, r *http.Request) {
+	// Configuramos el header para SSE
+	w.Header().Set("Content-Type", "text/event-stream")
+	w.Header().Set("Cache-Control", "no-cache")
+	w.Header().Set("Connection", "keep-alive")
+	w.Header().Set("Access-Control-Allow-Origin", "*")
+
+	// Inicia la rutina para el procesamiento de jugadores
+	teams.Update(w)
 }
 
 func updateFindTournaments(w http.ResponseWriter, r *http.Request) {
