@@ -37,6 +37,8 @@ type (
 		UserPort        string
 		TournamentsHost string
 		TournamentsPort string
+		MatchesHost     string
+		MatchesPort     string
 	}
 )
 

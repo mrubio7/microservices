@@ -42,4 +42,5 @@ func migrateTables(db *gorm.DB) {
 	db.AutoMigrate(&model.StateModel{})
 	db.AutoMigrate(&model.TournamentModel{})
 	db.AutoMigrate(&model.OrganizerModel{})
+	db.AutoMigrate(&model.MatchModel{})
 }

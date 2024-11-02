@@ -1,0 +1,40 @@
+syntax = "proto3";
+
+package matches;
+option go_package = "ibercs/proto/matches;matches";
+
+import "proto/teams.proto";
+import "proto/tournaments.proto";
+
+message Match {
+    int32 ID = 1;
+    string FaceitId = 2;
+    teams.Team TeamA = 3;
+    string TeamAName = 4;
+    bool IsTeamAKnown = 5;
+    bool ScoreTeamA = 6;
+    teams.Team TeamB = 7;
+    string TeamBName = 8;
+    bool IsTeamBKnown = 9;
+    bool ScoreTeamB = 10;
+    int32 BestOf = 11;
+    int64 Timestamp = 12;
+    repeated string Streams = 13;
+    tournaments.Tournament Tournament = 14;
+    repeated string Map = 15;
+}
+
+message MatchList {
+    repeated Match Matches = 1;
+}
+
+message Empty {}
+
+service MatchesService {
+    rpc GetAllMatches (Empty) returns (MatchList);
+    rpc GetMatchByFaceitId (GetMatchRequest) returns (Match);
+}
+
+message GetMatchRequest {
+    string FaceitId = 1;
+}

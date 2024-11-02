@@ -43,6 +43,7 @@ func (api *Api) Start() {
 	users_handlers := handlers.NewUsersHandlers(*api.router.UsersServer)
 	tournaments_handlers := handlers.NewTournamentsHandlers(*api.router.TournamentsServer)
 	workers_handlers := handlers.NewWorkersHandlers(api.cfg.Workers)
+	matches_handlers := handlers.NewMatchesHandlers(*api.router.MatchesServer)
 	state_handlers := handlers.NewStateHandlers(api.db)
 
 	api.router.gin.Use(middlewares.CORSMiddleware())
@@ -64,6 +65,9 @@ func (api *Api) Start() {
 	api.router.gin.GET("/api/v1/teams/get", teams_handlers.Get)
 	api.router.gin.GET("/api/v1/teams/get-all", teams_handlers.GetAll)
 	api.router.gin.GET("/api/v1/teams/find-player", teams_handlers.FindTeamByPlayerId)
+
+	api.router.gin.GET("/api/v1/matches/get-all", matches_handlers.GetAll)
+	api.router.gin.GET("/api/v1/matches/get", matches_handlers.GetById)
 
 	api.router.gin.Use(middlewares.Auth(api.db))
 	api.router.gin.POST("/api/v1/organizers/new", tournaments_handlers.NewOrganizer)

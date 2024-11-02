@@ -12,12 +12,12 @@ import (
 )
 
 type Tournament_Handlers struct {
-	tournaments_client pb_tournaments.TournamentServiceClient
+	matches_client pb_tournaments.TournamentServiceClient
 }
 
 func NewTournamentsHandlers(tournamentsClient pb_tournaments.TournamentServiceClient) *Tournament_Handlers {
 	return &Tournament_Handlers{
-		tournaments_client: tournamentsClient,
+		matches_client: tournamentsClient,
 	}
 }
 
@@ -33,7 +33,7 @@ func (h *Tournament_Handlers) NewOrganizer(c *gin.Context) {
 		return
 	}
 
-	res, err := h.tournaments_client.NewOrganizer(c, &pb_tournaments.NewOrganizerRequest{FaceitId: req.FaceitId, Type: req.Type})
+	res, err := h.matches_client.NewOrganizer(c, &pb_tournaments.NewOrganizerRequest{FaceitId: req.FaceitId, Type: req.Type})
 	if err != nil {
 		if st, ok := status.FromError(err); ok && st.Code() == codes.AlreadyExists {
 			c.JSON(http.StatusOK, response.BuildOk("Already exist", nil))
@@ -59,7 +59,7 @@ func (h *Tournament_Handlers) NewTournament(c *gin.Context) {
 		return
 	}
 
-	res, err := h.tournaments_client.NewTournament(c, &pb_tournaments.NewTournamentRequest{FaceitId: req.FaceitId, Type: req.Type})
+	res, err := h.matches_client.NewTournament(c, &pb_tournaments.NewTournamentRequest{FaceitId: req.FaceitId, Type: req.Type})
 	if err != nil {
 		if st, ok := status.FromError(err); ok && st.Code() == codes.AlreadyExists {
 			c.JSON(http.StatusOK, response.BuildOk("Already exist", nil))
@@ -74,7 +74,7 @@ func (h *Tournament_Handlers) NewTournament(c *gin.Context) {
 }
 
 func (h *Tournament_Handlers) GetAllTournaments(c *gin.Context) {
-	res, err := h.tournaments_client.GetAllTorunaments(c, &pb_tournaments.Empty{})
+	res, err := h.matches_client.GetAllTorunaments(c, &pb_tournaments.Empty{})
 	if err != nil {
 		logger.Error(err.Error())
 		c.JSON(http.StatusBadRequest, response.BuildError("Error getting tournaments"))

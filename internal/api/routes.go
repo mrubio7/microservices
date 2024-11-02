@@ -3,6 +3,7 @@ package api
 import (
 	"ibercs/pkg/config"
 	"ibercs/pkg/microservices"
+	pb_matches "ibercs/proto/matches"
 	pb_players "ibercs/proto/players"
 	pb_teams "ibercs/proto/teams"
 	pb_tournaments "ibercs/proto/tournaments"
@@ -18,6 +19,7 @@ type Router struct {
 	TeamsServer       *pb_teams.TeamServiceClient
 	UsersServer       *pb_users.UserServiceClient
 	TournamentsServer *pb_tournaments.TournamentServiceClient
+	MatchesServer     *pb_matches.MatchesServiceClient
 }
 
 func NewRouter(cfg config.Config) *Router {
@@ -29,6 +31,7 @@ func NewRouter(cfg config.Config) *Router {
 	r.registerTeamsServer(cfg.Microservices)
 	r.registerUsersServer(cfg.Microservices)
 	r.registerTournamentsServer(cfg.Microservices)
+	r.registerMatchesServer(cfg.Microservices)
 
 	return r
 }
@@ -53,4 +56,8 @@ func (r *Router) registerUsersServer(cfg config.MicroservicesConfig) {
 
 func (r *Router) registerTournamentsServer(cfg config.MicroservicesConfig) {
 	r.TournamentsServer = microservices.New(cfg.TournamentsHost, cfg.TournamentsPort, pb_tournaments.NewTournamentServiceClient)
+}
+
+func (r *Router) registerMatchesServer(cfg config.MicroservicesConfig) {
+	r.MatchesServer = microservices.New(cfg.MatchesHost, cfg.MatchesPort, pb_matches.NewMatchesServiceClient)
 }
