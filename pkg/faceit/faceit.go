@@ -10,6 +10,7 @@ import (
 	"log"
 	"net/http"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/mconnat/go-faceit/pkg/client"
@@ -376,7 +377,7 @@ func (c *FaceitClient) GetESEADivisionBySeasonId_PRODUCTION(seasonId string, nam
 	return eseaDivisions
 }
 
-func (c *FaceitClient) GetMatchesFromTournamentId(faceitId string) []model.MatchModel {
+func (c *FaceitClient) GetMatchesFromTournamentId(faceitId string, tournamentName string) []model.MatchModel {
 	var offset int = 0
 	var limit int = 100
 
@@ -393,6 +394,14 @@ func (c *FaceitClient) GetMatchesFromTournamentId(faceitId string) []model.Match
 		}
 
 		for _, m := range matches.Items {
+			var datetime time.Time
+
+			if strings.Contains(tournamentName, "ESEA") {
+				datetime = time.Unix(int64(m.ScheduledAt), 0)
+			} else {
+				datetime = time.Unix(int64(m.StartedAt), 0)
+			}
+
 			res = append(res, model.MatchModel{
 				FaceitId:           m.MatchId,
 				TournamentFaceitId: m.CompetitionId,
@@ -401,7 +410,7 @@ func (c *FaceitClient) GetMatchesFromTournamentId(faceitId string) []model.Match
 				TeamBFaceitId:      m.Teams["faction2"].FactionId,
 				TeamBName:          m.Teams["faction2"].Name,
 				BestOf:             int32(m.BestOf),
-				Timestamp:          time.Unix(int64(m.StartedAt), 0),
+				Timestamp:          datetime,
 				Map:                nil,
 				Status:             m.Status,
 				ScoreTeamA:         int32(m.Results.Score["faction1"]),

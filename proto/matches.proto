@@ -32,9 +32,14 @@ message Empty {}
 
 service MatchesService {
     rpc GetAllMatches (Empty) returns (MatchList);
+    rpc GetUpcomingMatches (GetUpcomingRequest) returns (MatchList);
     rpc GetMatchByFaceitId (GetMatchRequest) returns (Match);
 }
 
 message GetMatchRequest {
     string FaceitId = 1;
+}
+
+message GetUpcomingRequest {
+    int32 Days = 1;
 }

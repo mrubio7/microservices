@@ -6,8 +6,11 @@ import (
 	"ibercs/pkg/database"
 	"ibercs/pkg/faceit"
 	"ibercs/pkg/logger"
+	"ibercs/pkg/microservices"
 	"ibercs/pkg/service"
 	pb "ibercs/proto/matches"
+	pb_teams "ibercs/proto/teams"
+	"time"
 
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -16,8 +19,12 @@ import (
 type Server struct {
 	pb.UnimplementedMatchesServiceServer
 	MatchesService *service.Matches
-	TeamService    *service.Teams
+	TeamsClient    pb_teams.TeamServiceClient
 	FaceitService  *faceit.FaceitClient
+}
+
+func registerTeamsClient(cfg config.MicroservicesConfig) *pb_teams.TeamServiceClient {
+	return microservices.New(cfg.TeamsHost, cfg.TeamsPort, pb_teams.NewTeamServiceClient)
 }
 
 func New() *Server {
@@ -28,12 +35,11 @@ func New() *Server {
 	}
 	db := database.New(cfg.Database)
 	matchesService := service.NewMatchesService(db)
-	teamsService := service.NewTeamsService(db)
 	faceit := faceit.New(cfg.FaceitApiToken)
 
 	return &Server{
 		MatchesService: matchesService,
-		TeamService:    teamsService,
+		TeamsClient:    *registerTeamsClient(cfg.Microservices),
 		FaceitService:  faceit,
 	}
 }
@@ -53,6 +59,47 @@ func (s *Server) GetAllMatches(ctx context.Context, _ *pb.Empty) (*pb.MatchList,
 			BestOf:     m.BestOf,
 			Map:        m.Map,
 			Timestamp:  m.Timestamp.Unix(),
+		})
+	}
+
+	return &pb.MatchList{Matches: res}, nil
+}
+
+func (s *Server) GetUpcomingMatches(ctx context.Context, req *pb.GetUpcomingRequest) (*pb.MatchList, error) {
+	matches := s.MatchesService.GetAllMatches()
+	teams, err := s.TeamsClient.GetTeams(ctx, &pb_teams.GetTeamsRequest{Active: true})
+	if err != nil {
+		return nil, err
+	}
+
+	mapa := make(map[string]*pb_teams.Team, len(teams.Teams))
+
+	for _, m := range teams.Teams {
+		mapa[m.FaceitId] = m
+	}
+
+	var res []*pb.Match
+	days := time.Duration(req.Days) * 24 * time.Hour
+	now := time.Now()
+	for _, m := range matches {
+		if m.Timestamp.Before(now.Add(-days)) || m.Timestamp.After(now.Add(days)) {
+			continue
+		}
+
+		res = append(res, &pb.Match{
+			ID:           int32(m.ID),
+			FaceitId:     m.FaceitId,
+			TeamAName:    m.TeamAName,
+			TeamBName:    m.TeamBName,
+			ScoreTeamA:   m.ScoreTeamA,
+			ScoreTeamB:   m.ScoreTeamB,
+			IsTeamAKnown: m.IsTeamAKnown,
+			IsTeamBKnown: m.IsTeamBKnown,
+			BestOf:       m.BestOf,
+			Map:          m.Map,
+			TeamA:        mapa[m.TeamAFaceitId],
+			TeamB:        mapa[m.TeamBFaceitId],
+			Timestamp:    m.Timestamp.Unix(),
 		})
 	}
 

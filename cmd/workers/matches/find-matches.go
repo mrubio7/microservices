@@ -41,10 +41,11 @@ func Find() {
 		if t.Type == "ESEA" {
 			divs := svcTournaments.GetEseaDivisions(t.FaceitId)
 			for _, d := range divs {
-				matches = append(matches, faceitClient.GetMatchesFromTournamentId(d.FaceitId)...)
+				matches = append(matches, faceitClient.GetMatchesFromTournamentId(d.FaceitId, d.Name)...)
 			}
 		} else {
-			matches = faceitClient.GetMatchesFromTournamentId(t.FaceitId)
+
+			matches = faceitClient.GetMatchesFromTournamentId(t.FaceitId, t.Name)
 		}
 
 		teamIds := make(map[string]bool)
