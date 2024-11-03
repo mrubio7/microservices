@@ -74,6 +74,8 @@ func Load() (Config, error) {
 			UserPort:        os.Getenv("MICROSERVICE_USERS_PORT"),
 			TournamentsHost: os.Getenv("MICROSERVICE_TOURNAMENTS_HOST"),
 			TournamentsPort: os.Getenv("MICROSERVICE_TOURNAMENTS_PORT"),
+			MatchesHost:     os.Getenv("MICROSERVICE_MATCHES_HOST"),
+			MatchesPort:     os.Getenv("MICROSERVICE_MATCHES_PORT"),
 		},
 	}
 
