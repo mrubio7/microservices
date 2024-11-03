@@ -10,7 +10,7 @@ import (
 )
 
 func Find() {
-	logger.Info("Initializing players worker [UpdatePlayers]")
+	logger.Info("Initializing players worker [FindMatches]")
 
 	cfg, err := config.Load()
 	if err != nil {
