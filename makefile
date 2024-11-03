@@ -1,4 +1,4 @@
-.PHONY: proto clean run w-players ms-players ms-teams ms-users ms-tournaments
+.PHONY: proto clean run w-players ms-players ms-teams ms-users ms-tournaments ms-matches
 
 proto:
 	protoc --go_out=.. --go-grpc_out=.. proto/*.proto
@@ -35,3 +35,7 @@ ms-users:
 ms-tournaments:
 	go build -o cmd/microservices/tournaments/microservice-tournaments.exe cmd/microservices/tournaments/main.go
 	./cmd/microservices/tournaments/microservice-tournaments.exe
+
+ms-matches:
+	go build -o cmd/microservices/matches/microservice-matches.exe cmd/microservices/matches/main.go
+	./cmd/microservices/matches/microservice-matches.exe

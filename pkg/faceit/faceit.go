@@ -401,7 +401,7 @@ func (c *FaceitClient) GetMatchesFromTournamentId(faceitId string) []model.Match
 				TeamBFaceitId:      m.Teams["faction2"].FactionId,
 				TeamBName:          m.Teams["faction2"].Name,
 				BestOf:             int32(m.BestOf),
-				Timestamp:          time.UnixMilli(int64(m.StartedAt)),
+				Timestamp:          time.Unix(int64(m.StartedAt), 0),
 				Map:                nil,
 				Status:             m.Status,
 				ScoreTeamA:         int32(m.Results.Score["faction1"]),

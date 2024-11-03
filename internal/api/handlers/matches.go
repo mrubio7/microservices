@@ -23,7 +23,7 @@ func (h *Matches_Handlers) GetAll(c *gin.Context) {
 	res, err := h.matches_client.GetAllMatches(c, nil)
 	if err != nil {
 		logger.Error(err.Error())
-		c.JSON(http.StatusBadRequest, response.BuildError("Error getting all players"))
+		c.JSON(http.StatusBadRequest, response.BuildError("Error getting all matches"))
 		return
 	}
 
