@@ -12,11 +12,11 @@ message Match {
     teams.Team TeamA = 3;
     string TeamAName = 4;
     bool IsTeamAKnown = 5;
-    bool ScoreTeamA = 6;
+    int32 ScoreTeamA = 6;
     teams.Team TeamB = 7;
     string TeamBName = 8;
     bool IsTeamBKnown = 9;
-    bool ScoreTeamB = 10;
+    int32 ScoreTeamB = 10;
     int32 BestOf = 11;
     int64 Timestamp = 12;
     repeated string Streams = 13;

@@ -30,6 +30,7 @@ func Find() {
 		switch org.Type {
 		case "ESEA":
 			save_ESEA_Tournament(org.Type, faceit, svcTournaments)
+
 		case "ORGANIZER":
 			save_ORGANIZER_Tournament(org.FaceitId, org.Type, faceit, svcTournaments)
 		}
@@ -44,6 +45,14 @@ func save_ESEA_Tournament(orgType string, faceit *faceit.FaceitClient, svcTourna
 		err := svcTournaments.UpdateTournament(&t)
 		if err != nil {
 			logger.Error("Unable to create tournament: %s", t.Name)
+		}
+
+		eseaDivisions := faceit.GetESEADivisionBySeasonId_PRODUCTION(t.FaceitId, t.Name)
+		for _, division := range eseaDivisions {
+			div := svcTournaments.NewEseaDivision(division)
+			if div == nil {
+				logger.Warning("cannot save esea division %s", division.Name)
+			}
 		}
 	}
 }

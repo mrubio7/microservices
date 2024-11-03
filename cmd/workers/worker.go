@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"ibercs/cmd/workers/matches"
 	"ibercs/cmd/workers/players"
 	"ibercs/cmd/workers/teams"
 	"ibercs/cmd/workers/tournaments"
@@ -15,7 +16,8 @@ func main() {
 	logger.Initialize()
 	http.HandleFunc("/update", updateHandler)
 	http.HandleFunc("/teams-update", updateTeams)
-	http.HandleFunc("/tournaments", updateFindTournaments)
+	http.HandleFunc("/tournaments", findTournaments)
+	http.HandleFunc("/find-matches", findMatches)
 
 	logger.Info("Starting server on :8080")
 	log.Fatal(http.ListenAndServe(":8080", nil))
@@ -43,7 +45,7 @@ func updateTeams(w http.ResponseWriter, r *http.Request) {
 	teams.Update(w)
 }
 
-func updateFindTournaments(w http.ResponseWriter, r *http.Request) {
+func findTournaments(w http.ResponseWriter, r *http.Request) {
 	tournaments.Find()
 	w.WriteHeader(http.StatusOK)
 }
@@ -74,4 +76,9 @@ func findHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	response := fmt.Sprintf(`{"start_time": "%s", "elapsed_time": "%s"}`, startTime.Format(time.RFC3339), elapsedTime)
 	w.Write([]byte(response))
+}
+
+func findMatches(w http.ResponseWriter, r *http.Request) {
+	matches.Find()
+	w.WriteHeader(http.StatusOK)
 }

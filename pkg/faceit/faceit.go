@@ -1,6 +1,7 @@
 package faceit
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
 	"ibercs/internal/model"
@@ -327,6 +328,96 @@ func (c *FaceitClient) GetESEASeasons_PRODUCTION() []model.TournamentModel {
 	return tournaments
 }
 
+func (c *FaceitClient) GetESEADivisionBySeasonId_PRODUCTION(seasonId string, name string) []model.EseaDivisionModel {
+	payloadBody := map[string]string{"seasonId": seasonId}
+	jsonData, err := json.Marshal(payloadBody)
+	if err != nil {
+		log.Printf("Error marshaling JSON: %s", err.Error())
+		return nil
+	}
+
+	res, err := http.Post("https://www.faceit.com/api/team-leagues/v1/get_filters", "application/json", bytes.NewBuffer(jsonData))
+	if err != nil {
+		log.Printf("Error getting ESEA Seasons: %s", err.Error())
+		return nil
+	}
+	defer res.Body.Close()
+
+	body, err := io.ReadAll(res.Body)
+	if err != nil {
+		log.Printf("Error reading response body: %s", err.Error())
+		return nil
+	}
+
+	var rb TournamentResponse
+	if err := json.Unmarshal(body, &rb); err != nil {
+		log.Printf("Error unmarshaling response body: %s", err.Error())
+		return nil
+	}
+
+	var eseaDivisions []model.EseaDivisionModel
+
+	for _, region := range rb.Payload.Regions {
+		if region.Name == "Europe" {
+			for _, division := range region.Divisions {
+				for _, stage := range division.Stages {
+					eseaDivisions = append(eseaDivisions, model.EseaDivisionModel{
+						FaceitId:     stage.Conferences[0].ChampionshipID,
+						TournamentId: seasonId,
+						Name:         fmt.Sprintf("%s %s - %s", name, division.Name, stage.Name),
+					})
+				}
+			}
+		} else {
+			continue
+		}
+	}
+
+	return eseaDivisions
+}
+
+func (c *FaceitClient) GetMatchesFromTournamentId(faceitId string) []model.MatchModel {
+	var offset int = 0
+	var limit int = 100
+
+	var res []model.MatchModel
+	for {
+		params := map[string]interface{}{
+			"offset": strconv.Itoa(offset),
+			"limit":  strconv.Itoa(limit),
+		}
+
+		matches, err := c.client.GetMatchesByChampionshipID(faceitId, params)
+		if err != nil {
+			return nil
+		}
+
+		for _, m := range matches.Items {
+			res = append(res, model.MatchModel{
+				FaceitId:           m.MatchId,
+				TournamentFaceitId: m.CompetitionId,
+				TeamAFaceitId:      m.Teams["faction1"].FactionId,
+				TeamAName:          m.Teams["faction1"].Name,
+				TeamBFaceitId:      m.Teams["faction2"].FactionId,
+				TeamBName:          m.Teams["faction2"].Name,
+				BestOf:             int32(m.BestOf),
+				Timestamp:          time.UnixMilli(int64(m.StartedAt)),
+				Map:                nil,
+				Status:             m.Status,
+				ScoreTeamA:         int32(m.Results.Score["faction1"]),
+				ScoreTeamB:         int32(m.Results.Score["faction2"]),
+			})
+		}
+
+		offset += limit
+
+		if len(matches.Items) == 0 {
+			return res
+		}
+	}
+
+}
+
 func convertToTournamentModel(season map[string]any) *model.TournamentModel {
 	registerDate, err := time.Parse("2006-01-02T15:04:05Z", season["time_start"].(string))
 	if err != nil {
@@ -362,6 +453,6 @@ func convertToTournamentModel(season map[string]any) *model.TournamentModel {
 		MinLevel:        1,
 		Status:          status,
 		JoinPolicy:      "esea pass",
-		GeoCountries:    nil,
+		GeoCountries:    []string{},
 	}
 }

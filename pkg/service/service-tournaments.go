@@ -21,19 +21,27 @@ func NewTournamentsService(database *gorm.DB) *Tournaments {
 }
 
 func (svc *Tournaments) NewOrganizer(organizer *model.OrganizerModel) *model.OrganizerModel {
-	if err := svc.db.Model(&model.OrganizerModel{}).Create(&organizer).Error; err != nil {
+	tx := svc.db.Begin()
+
+	if err := tx.Model(&model.OrganizerModel{}).Create(&organizer).Error; err != nil {
+		tx.Rollback()
+		logger.Error("error creating organizer %s", organizer.Name)
 		return nil
 	}
-
+	tx.Commit()
 	return organizer
 }
 
 func (svc *Tournaments) NewTournament(tournament *model.TournamentModel) *model.TournamentModel {
-	if err := svc.db.Model(&model.TournamentModel{}).Create(&tournament).Error; err != nil {
+	tx := svc.db.Begin()
+
+	if err := tx.Model(&model.TournamentModel{}).Create(&tournament).Error; err != nil {
+		tx.Rollback()
 		logger.Error(err.Error())
 		return nil
 	}
 
+	tx.Commit()
 	return tournament
 }
 
@@ -105,6 +113,13 @@ func (svc *Tournaments) UpdateTournament(tournament *model.TournamentModel) erro
 
 	err := svc.db.First(&existingTournament, "faceit_id = ?", tournament.FaceitId).Error
 	if err != nil {
+		if err == gorm.ErrRecordNotFound {
+			t := svc.NewTournament(tournament)
+			if t == nil {
+				logger.Error("Error cannot create tournament")
+			}
+			return nil
+		}
 		logger.Error(err.Error())
 		return err
 	}
@@ -116,4 +131,32 @@ func (svc *Tournaments) UpdateTournament(tournament *model.TournamentModel) erro
 	}
 
 	return nil
+}
+
+func (svc *Tournaments) NewEseaDivision(division model.EseaDivisionModel) *model.EseaDivisionModel {
+	tx := svc.db.Begin()
+
+	if err := tx.Model(&model.EseaDivisionModel{}).Create(&division).Error; err != nil {
+		tx.Rollback()
+		logger.Error(err.Error())
+		return nil
+	}
+	tx.Commit()
+
+	return &division
+}
+
+func (svc *Tournaments) GetEseaDivisions(faceitId string) []model.EseaDivisionModel {
+	var tournament []model.EseaDivisionModel
+
+	err := svc.db.Model(&model.EseaDivisionModel{}).Where("tournament_id = ?", faceitId).Find(&tournament).Error
+	if err != nil {
+		if gorm.ErrRecordNotFound == err {
+			return nil
+		}
+		logger.Error(err.Error())
+		return nil
+	}
+
+	return tournament
 }
