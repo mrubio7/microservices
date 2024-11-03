@@ -55,13 +55,9 @@ func Find() {
 		var filteredMatches []model.MatchModel
 		for _, match := range matches {
 			if teamIds[match.TeamAFaceitId] || teamIds[match.TeamBFaceitId] {
+				match.IsTeamAKnown = teamIds[match.TeamAFaceitId]
+				match.IsTeamBKnown = teamIds[match.TeamBFaceitId]
 				filteredMatches = append(filteredMatches, match)
-			}
-			if teamIds[match.TeamAFaceitId] {
-				match.IsTeamAKnown = true
-			}
-			if teamIds[match.TeamBFaceitId] {
-				match.IsTeamBKnown = true
 			}
 		}
 
