@@ -50,15 +50,17 @@ func (s *Server) GetAllMatches(ctx context.Context, _ *pb.Empty) (*pb.MatchList,
 	var res []*pb.Match
 	for _, m := range matches {
 		res = append(res, &pb.Match{
-			ID:         int32(m.ID),
-			FaceitId:   m.FaceitId,
-			TeamAName:  m.TeamAName,
-			TeamBName:  m.TeamBName,
-			ScoreTeamA: m.ScoreTeamA,
-			ScoreTeamB: m.ScoreTeamB,
-			BestOf:     m.BestOf,
-			Map:        m.Map,
-			Timestamp:  m.Timestamp.Unix(),
+			ID:                 int32(m.ID),
+			FaceitId:           m.FaceitId,
+			TeamAName:          m.TeamAName,
+			TeamBName:          m.TeamBName,
+			ScoreTeamA:         m.ScoreTeamA,
+			ScoreTeamB:         m.ScoreTeamB,
+			TournamentName:     m.TournamentName,
+			TournamentFaceitId: m.TournamentFaceitId,
+			BestOf:             m.BestOf,
+			Map:                m.Map,
+			Timestamp:          m.Timestamp.Unix(),
 		})
 	}
 
@@ -87,19 +89,21 @@ func (s *Server) GetUpcomingMatches(ctx context.Context, req *pb.GetUpcomingRequ
 		}
 
 		res = append(res, &pb.Match{
-			ID:           int32(m.ID),
-			FaceitId:     m.FaceitId,
-			TeamAName:    m.TeamAName,
-			TeamBName:    m.TeamBName,
-			ScoreTeamA:   m.ScoreTeamA,
-			ScoreTeamB:   m.ScoreTeamB,
-			IsTeamAKnown: m.IsTeamAKnown,
-			IsTeamBKnown: m.IsTeamBKnown,
-			BestOf:       m.BestOf,
-			Map:          m.Map,
-			TeamA:        mapa[m.TeamAFaceitId],
-			TeamB:        mapa[m.TeamBFaceitId],
-			Timestamp:    m.Timestamp.Unix(),
+			ID:                 int32(m.ID),
+			FaceitId:           m.FaceitId,
+			TournamentName:     m.TournamentName,
+			TournamentFaceitId: m.TournamentFaceitId,
+			TeamAName:          m.TeamAName,
+			TeamBName:          m.TeamBName,
+			ScoreTeamA:         m.ScoreTeamA,
+			ScoreTeamB:         m.ScoreTeamB,
+			IsTeamAKnown:       m.IsTeamAKnown,
+			IsTeamBKnown:       m.IsTeamBKnown,
+			BestOf:             m.BestOf,
+			Map:                m.Map,
+			TeamA:              mapa[m.TeamAFaceitId],
+			TeamB:              mapa[m.TeamBFaceitId],
+			Timestamp:          m.Timestamp.Unix(),
 		})
 	}
 
@@ -113,15 +117,19 @@ func (s *Server) GetMatchByFaceitId(ctx context.Context, req *pb.GetMatchRequest
 	}
 
 	res := &pb.Match{
-		ID:         int32(match.ID),
-		FaceitId:   match.FaceitId,
-		TeamAName:  match.TeamAName,
-		TeamBName:  match.TeamBName,
-		ScoreTeamA: match.ScoreTeamA,
-		ScoreTeamB: match.ScoreTeamB,
-		BestOf:     match.BestOf,
-		Map:        match.Map,
-		Timestamp:  match.Timestamp.Unix(),
+		ID:                 int32(match.ID),
+		FaceitId:           match.FaceitId,
+		TeamAName:          match.TeamAName,
+		TeamBName:          match.TeamBName,
+		IsTeamAKnown:       match.IsTeamAKnown,
+		IsTeamBKnown:       match.IsTeamBKnown,
+		ScoreTeamA:         match.ScoreTeamA,
+		ScoreTeamB:         match.ScoreTeamB,
+		BestOf:             match.BestOf,
+		TournamentName:     match.TournamentName,
+		TournamentFaceitId: match.TournamentFaceitId,
+		Map:                match.Map,
+		Timestamp:          match.Timestamp.Unix(),
 	}
 
 	return res, nil

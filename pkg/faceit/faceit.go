@@ -404,7 +404,8 @@ func (c *FaceitClient) GetMatchesFromTournamentId(faceitId string, tournamentNam
 
 			res = append(res, model.MatchModel{
 				FaceitId:           m.MatchId,
-				TournamentFaceitId: m.CompetitionId,
+				TournamentFaceitId: faceitId,
+				TournamentName:     tournamentName,
 				TeamAFaceitId:      m.Teams["faction1"].FactionId,
 				TeamAName:          m.Teams["faction1"].Name,
 				TeamBFaceitId:      m.Teams["faction2"].FactionId,

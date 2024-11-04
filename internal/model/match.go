@@ -21,6 +21,7 @@ type MatchModel struct {
 	Timestamp          time.Time       `gorm:"not null"`
 	Streams            JSONStringArray `gorm:"null"`
 	TournamentFaceitId string          `gorm:"not null"`
+	TournamentName     string          `gorm:"not null"`
 	Tournament         TournamentModel `gorm:"-"`
 	Map                JSONStringArray `gorm:"not null"`
 	Status             string          `gorm:"not null"`

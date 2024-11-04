@@ -20,8 +20,10 @@ message Match {
     int32 BestOf = 11;
     int64 Timestamp = 12;
     repeated string Streams = 13;
-    tournaments.Tournament Tournament = 14;
-    repeated string Map = 15;
+    string TournamentName = 14;
+    string TournamentFaceitId = 15;
+    tournaments.Tournament Tournament = 16;
+    repeated string Map = 17;
 }
 
 message MatchList {
