@@ -248,3 +248,39 @@ func (s *Server) FindTeamByPlayerId(ctx context.Context, request *pb.NewTeamRequ
 
 	return &pb.TeamList{Teams: pbTeams}, nil
 }
+
+func (s *Server) GetTeamFromFaceit(ctx context.Context, request *pb.NewTeamRequest) (*pb.Team, error) {
+	t := s.FaceitService.GetTeamById(request.FaceitId)
+
+	mapStats := make(map[string]*pb.TeamMapStats, len(t.Stats.MapStats))
+	for _, m := range t.Stats.MapStats {
+		mapStats[m.MapName] = &pb.TeamMapStats{
+			MapName: m.MapName,
+			Winrate: m.WinRate,
+			Matches: m.Matches,
+		}
+	}
+
+	pbTeam := &pb.Team{
+		Id:          t.ID,
+		FaceitId:    t.FaceitId,
+		Name:        t.Name,
+		Nickname:    t.Nickname,
+		Avatar:      t.Avatar,
+		Active:      t.Active,
+		PlayersId:   t.PlayersId,
+		Twitter:     t.Twitter,
+		Instagram:   t.Instagram,
+		Web:         t.Web,
+		Tournaments: t.Tournaments,
+		Stats: &pb.TeamStats{
+			TotalMatches:  t.Stats.TotalMatches,
+			Wins:          t.Stats.Wins,
+			Winrate:       t.Stats.Winrate,
+			RecentResults: t.Stats.RecentResults,
+			MapStats:      mapStats,
+		},
+	}
+
+	return pbTeam, nil
+}

@@ -42,6 +42,7 @@ service TeamService {
     rpc GetTeamByNickname (NewTeamRequest) returns (Team);
     rpc NewTeam (NewTeamRequest) returns (Team);
     rpc FindTeamByPlayerId(NewTeamRequest) returns (TeamList);
+    rpc GetTeamFromFaceit(NewTeamRequest) returns (Team);
 }
 
 message TeamList {

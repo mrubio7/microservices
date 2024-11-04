@@ -116,10 +116,42 @@ func (s *Server) GetMatchByFaceitId(ctx context.Context, req *pb.GetMatchRequest
 		return nil, status.Errorf(codes.NotFound, "Error: match not found")
 	}
 
+	var teamA *pb_teams.Team
+	var teamB *pb_teams.Team
+	var err error
+
+	if match.IsTeamAKnown {
+		teamA, err = s.TeamsClient.GetTeamById(ctx, &pb_teams.NewTeamRequest{FaceitId: match.TeamAFaceitId})
+		if err != nil {
+			logger.Error("error getting team")
+			return nil, err
+		}
+		teamB, err = s.TeamsClient.GetTeamFromFaceit(ctx, &pb_teams.NewTeamRequest{FaceitId: match.TeamBFaceitId})
+		if err != nil {
+			logger.Error("error getting team from faceit")
+			return nil, err
+		}
+	}
+
+	if match.IsTeamBKnown {
+		teamB, err = s.TeamsClient.GetTeamById(ctx, &pb_teams.NewTeamRequest{FaceitId: match.TeamBFaceitId})
+		if err != nil {
+			logger.Error("error getting team")
+			return nil, err
+		}
+		teamA, err = s.TeamsClient.GetTeamFromFaceit(ctx, &pb_teams.NewTeamRequest{FaceitId: match.TeamAFaceitId})
+		if err != nil {
+			logger.Error("error getting team from faceit")
+			return nil, err
+		}
+	}
+
 	res := &pb.Match{
 		ID:                 int32(match.ID),
 		FaceitId:           match.FaceitId,
 		TeamAName:          match.TeamAName,
+		TeamA:              teamA,
+		TeamB:              teamB,
 		TeamBName:          match.TeamBName,
 		IsTeamAKnown:       match.IsTeamAKnown,
 		IsTeamBKnown:       match.IsTeamBKnown,
