@@ -19,10 +19,10 @@ type MatchModel struct {
 	ScoreTeamB         int32           `gorm:"not null"`
 	BestOf             int32           `gorm:"not null"`
 	Timestamp          time.Time       `gorm:"not null"`
-	Streams            JSONStringArray `gorm:"null"`
+	Streams            JSONStringArray `gorm:"type:jsonb; null"`
 	TournamentFaceitId string          `gorm:"not null"`
 	TournamentName     string          `gorm:"not null"`
 	Tournament         TournamentModel `gorm:"-"`
-	Map                JSONStringArray `gorm:"not null"`
+	Map                JSONStringArray `gorm:"type:jsonb; not null"`
 	Status             string          `gorm:"not null"`
 }
