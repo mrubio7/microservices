@@ -75,3 +75,25 @@ func (h *Matches_Handlers) GetById(c *gin.Context) {
 
 	c.JSON(http.StatusOK, response.BuildOk("Ok", res))
 }
+
+func (h *Matches_Handlers) SetStreamMatch(c *gin.Context) {
+	var payload struct {
+		FaceitId      string `json:"faceit_id"`
+		StreamChannel string `json:"stream_channel"`
+	}
+
+	if err := c.ShouldBindJSON(&payload); err != nil {
+		logger.Error("body error")
+		c.JSON(http.StatusBadRequest, response.BuildError("Invalid body"))
+		return
+	}
+
+	res, err := h.matches_client.SetStreamToMatch(c, &pb_matches.SetStreamRequest{FaceitId: payload.FaceitId, StreamChannel: payload.StreamChannel})
+	if err != nil {
+		logger.Error("Error saving stream")
+		c.JSON(http.StatusInternalServerError, response.BuildError("Internal error"))
+		return
+	}
+
+	c.JSON(http.StatusOK, response.BuildOk("Ok", res))
+}

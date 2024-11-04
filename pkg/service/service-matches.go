@@ -63,3 +63,32 @@ func (svc *Matches) GetAllMatches() []model.MatchModel {
 
 	return matches
 }
+
+func (svc *Matches) SetNewStreamToMatch(streamName, matchId string) *model.MatchModel {
+	var existingMatch model.MatchModel
+
+	// Buscar el match por su faceit_id
+	err := svc.db.Where("faceit_id = ?", matchId).First(&existingMatch).Error
+	if err != nil {
+		logger.Error("Error getting match: %s\n", err)
+		return nil
+	}
+
+	// Agregar el nuevo stream si no existe ya en la lista
+	for _, stream := range existingMatch.Streams {
+		if stream == streamName {
+			// Si el stream ya existe, no lo añadimos de nuevo
+			return &existingMatch
+		}
+	}
+	existingMatch.Streams = append(existingMatch.Streams, streamName)
+
+	// Actualizar el registro en la base de datos
+	err = svc.db.Model(&existingMatch).Update("streams", existingMatch.Streams).Error
+	if err != nil {
+		logger.Error("Error updating streams: %s\n", err)
+		return nil
+	}
+
+	return &existingMatch
+}

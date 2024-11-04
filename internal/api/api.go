@@ -71,6 +71,7 @@ func (api *Api) Start() {
 	api.router.gin.GET("/api/v1/matches/get-range", matches_handlers.GetRange)
 
 	api.router.gin.Use(middlewares.Auth(api.db))
+	api.router.gin.POST("/api/v1/matches/set-stream", matches_handlers.SetStreamMatch)
 	api.router.gin.POST("/api/v1/organizers/new", tournaments_handlers.NewOrganizer)
 	api.router.gin.POST("/api/v1/tournaments/new", tournaments_handlers.NewTournament)
 	api.router.gin.GET("/api/v1/workers/players/update", workers_handlers.Update)

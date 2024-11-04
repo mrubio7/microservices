@@ -31,11 +31,15 @@ message MatchList {
 }
 
 message Empty {}
+message Bool {
+    bool res = 1;
+}
 
 service MatchesService {
     rpc GetAllMatches (Empty) returns (MatchList);
     rpc GetUpcomingMatches (GetUpcomingRequest) returns (MatchList);
     rpc GetMatchByFaceitId (GetMatchRequest) returns (Match);
+    rpc SetStreamToMatch (SetStreamRequest) returns (Bool);
 }
 
 message GetMatchRequest {
@@ -44,4 +48,9 @@ message GetMatchRequest {
 
 message GetUpcomingRequest {
     int32 Days = 1;
+}
+
+message SetStreamRequest {
+    string FaceitId = 1;
+    string StreamChannel = 2;
 }

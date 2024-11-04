@@ -166,3 +166,12 @@ func (s *Server) GetMatchByFaceitId(ctx context.Context, req *pb.GetMatchRequest
 
 	return res, nil
 }
+
+func (s *Server) SetStreamToMatch(ctx context.Context, req *pb.SetStreamRequest) (*pb.Bool, error) {
+	match := s.MatchesService.SetNewStreamToMatch(req.StreamChannel, req.FaceitId)
+	if match == nil {
+		return &pb.Bool{Res: false}, nil
+	}
+
+	return &pb.Bool{Res: true}, nil
+}
