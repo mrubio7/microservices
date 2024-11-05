@@ -40,6 +40,7 @@ service MatchesService {
     rpc GetUpcomingMatches (GetUpcomingRequest) returns (MatchList);
     rpc GetMatchByFaceitId (GetMatchRequest) returns (Match);
     rpc SetStreamToMatch (SetStreamRequest) returns (Bool);
+    rpc GetMatchsOfTeamId (GetMatchRequest) returns (MatchList);
 }
 
 message GetMatchRequest {

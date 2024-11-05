@@ -176,3 +176,28 @@ func (s *Server) SetStreamToMatch(ctx context.Context, req *pb.SetStreamRequest)
 
 	return &pb.Bool{Res: true}, nil
 }
+
+func (s *Server) GetMatchsOfTeamId(ctx context.Context, req *pb.GetMatchRequest) (*pb.MatchList, error) {
+	matches := s.MatchesService.GetMatchesByTeamId(req.FaceitId)
+
+	var res []*pb.Match
+	for _, m := range matches {
+		res = append(res, &pb.Match{
+			ID:                 int32(m.ID),
+			FaceitId:           m.FaceitId,
+			TournamentName:     m.TournamentName,
+			TournamentFaceitId: m.TournamentFaceitId,
+			TeamAName:          m.TeamAName,
+			TeamBName:          m.TeamBName,
+			ScoreTeamA:         m.ScoreTeamA,
+			ScoreTeamB:         m.ScoreTeamB,
+			IsTeamAKnown:       m.IsTeamAKnown,
+			IsTeamBKnown:       m.IsTeamBKnown,
+			BestOf:             m.BestOf,
+			Map:                m.Map,
+			Timestamp:          m.Timestamp.Unix(),
+		})
+	}
+
+	return &pb.MatchList{Matches: res}, nil
+}

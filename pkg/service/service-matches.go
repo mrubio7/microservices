@@ -92,3 +92,17 @@ func (svc *Matches) SetNewStreamToMatch(streamName, matchId string) *model.Match
 
 	return &existingMatch
 }
+
+func (svc *Matches) GetMatchesByTeamId(faceitId string) []model.MatchModel {
+	var matches []model.MatchModel
+
+	err := svc.db.Model(&model.MatchModel{}).
+		Where("team_a_faceit_id = ? OR team_b_faceit_id = ?", faceitId, faceitId).
+		Find(&matches).Error
+	if err != nil {
+		logger.Error("Error getting matches for team %s: %s", faceitId, err)
+		return nil
+	}
+
+	return matches
+}
