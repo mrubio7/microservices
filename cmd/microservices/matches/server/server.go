@@ -161,6 +161,7 @@ func (s *Server) GetMatchByFaceitId(ctx context.Context, req *pb.GetMatchRequest
 		TournamentName:     match.TournamentName,
 		TournamentFaceitId: match.TournamentFaceitId,
 		Map:                match.Map,
+		Streams:            match.Streams,
 		Timestamp:          match.Timestamp.Unix(),
 	}
 
