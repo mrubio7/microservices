@@ -3,6 +3,7 @@ package microservice_players
 import (
 	"context"
 	"errors"
+	"ibercs/internal/model"
 	"ibercs/pkg/config"
 	"ibercs/pkg/consts"
 	"ibercs/pkg/database"
@@ -10,6 +11,7 @@ import (
 	"ibercs/pkg/logger"
 	"ibercs/pkg/service"
 	pb "ibercs/proto/players"
+	"strconv"
 	"time"
 
 	"google.golang.org/grpc/codes"
@@ -19,6 +21,7 @@ import (
 type Server struct {
 	pb.UnimplementedPlayerServiceServer
 	PlayersService *service.Players
+	UsersService   *service.Users
 	FaceitService  *faceit.FaceitClient
 }
 
@@ -30,11 +33,13 @@ func New() *Server {
 	}
 	db := database.New(cfg.Database)
 	playerService := service.NewPlayersService(db)
+	userService := service.NewUsersService(db)
 	faceit := faceit.New(cfg.FaceitApiToken)
 
 	return &Server{
 		PlayersService: playerService,
 		FaceitService:  faceit,
+		UsersService:   userService,
 	}
 }
 
@@ -213,4 +218,86 @@ func (s *Server) NewPlayer(ctx context.Context, req *pb.NewPlayerRequest) (*pb.P
 	}
 
 	return res, nil
+}
+
+func (s *Server) NewLookingForTeam(ctx context.Context, req *pb.NewPlayerLookingForTeam) (*pb.PlayerLookingForTeam, error) {
+	lookingForTeam := &model.LookingForTeamModel{
+		InGameRole:   req.InGameRole,
+		TimeTable:    req.TimeTable,
+		OldTeams:     req.OldTeams,
+		PlayingYears: req.PlayingYears,
+		BornDate:     time.Unix(int64(req.BornDate), 0),
+		Description:  req.Description,
+		Location:     req.Location,
+	}
+
+	user := s.UsersService.GetUserById(strconv.Itoa(int(req.UserId)))
+	if user == nil {
+		logger.Error("Error creating looking for team")
+		return nil, status.Errorf(codes.Internal, "Error creating looking for team")
+	}
+
+	lookingForTeam.FaceitId = user.FaceitID
+	lft := s.PlayersService.UpdateLookingforTeam(*lookingForTeam)
+	if lft == nil {
+		logger.Error("Error creating looking for team")
+		return nil, status.Errorf(codes.Internal, "Error creating looking for team")
+	}
+
+	player, err := s.GetPlayer(ctx, &pb.GetPlayerRequest{FaceitId: []string{lft.FaceitId}})
+	if err != nil {
+		logger.Error("Error getting player")
+		return nil, status.Errorf(codes.Internal, "Error getting player")
+	}
+
+	res := &pb.PlayerLookingForTeam{
+		Id:           lft.Id,
+		InGameRole:   lft.InGameRole,
+		TimeTable:    lft.TimeTable,
+		OldTeams:     lft.OldTeams,
+		PlayingYears: lft.PlayingYears,
+		Location:     lft.Location,
+		BornDate:     lft.BornDate.Unix(),
+		Description:  lft.Description,
+		CreatedAt:    lft.CreatedAt,
+		UpdatedAt:    lft.UpdatedAt,
+		Player:       player.Players[0],
+	}
+
+	return res, nil
+}
+
+func (s *Server) GetAllLookingForTeam(ctx context.Context, _ *pb.Empty) (*pb.PlayerLookingForTeamList, error) {
+	lookingForTeams := s.PlayersService.GetAllLookingForTeam()
+	if lookingForTeams == nil {
+		logger.Error("Error getting all looking for team")
+		return nil, status.Errorf(codes.Internal, "Error getting all looking for team")
+	}
+
+	var lfts []*pb.PlayerLookingForTeam
+	for _, lft := range lookingForTeams {
+		player, err := s.GetPlayer(ctx, &pb.GetPlayerRequest{FaceitId: []string{lft.FaceitId}})
+		if err != nil {
+			logger.Error("Error getting player")
+			return nil, status.Errorf(codes.Internal, "Error getting player")
+		}
+
+		lft := &pb.PlayerLookingForTeam{
+			Id:           lft.Id,
+			InGameRole:   lft.InGameRole,
+			TimeTable:    lft.TimeTable,
+			OldTeams:     lft.OldTeams,
+			PlayingYears: lft.PlayingYears,
+			Location:     lft.Location,
+			BornDate:     lft.BornDate.Unix(),
+			Description:  lft.Description,
+			CreatedAt:    lft.CreatedAt,
+			UpdatedAt:    lft.UpdatedAt,
+			Player:       player.Players[0],
+		}
+
+		lfts = append(lfts, lft)
+	}
+
+	return &pb.PlayerLookingForTeamList{LookingForTeam: lfts}, nil
 }

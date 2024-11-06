@@ -28,6 +28,24 @@ message PlayerList {
     repeated Player players = 1;
 }
 
+message PlayerLookingForTeam {
+    int32 Id = 1;
+    repeated string InGameRole = 2;
+    string TimeTable = 3;
+    string OldTeams = 4;
+    string Location = 5;
+    int32 PlayingYears = 6;
+    int64 BornDate = 7;
+    string Description = 8;
+    int64 CreatedAt = 9;
+    int64 UpdatedAt = 10;
+    Player Player = 11;
+}
+
+message PlayerLookingForTeamList {
+    repeated PlayerLookingForTeam LookingForTeam = 1;
+}
+
 message Empty {}
 
 service PlayerService {
@@ -36,6 +54,19 @@ service PlayerService {
     rpc GetPlayers (Empty) returns (PlayerList);
     rpc GetProminentPlayers (Empty) returns (ProminentPlayerList);
     rpc NewPlayer (NewPlayerRequest) returns (Player);
+    rpc NewLookingForTeam (NewPlayerLookingForTeam) returns (PlayerLookingForTeam);
+    rpc GetAllLookingForTeam (Empty) returns (PlayerLookingForTeamList);
+}
+
+message NewPlayerLookingForTeam {
+    repeated string InGameRole = 2;
+    string TimeTable = 3;
+    string OldTeams = 4;
+    int32 PlayingYears = 5;
+    int32 BornDate = 6;
+    string Description = 7;
+    string Location = 8;
+    int32 UserId = 9;
 }
 
 message GetPlayerRequest {

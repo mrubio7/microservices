@@ -213,3 +213,38 @@ func (svc *Players) BatchUpdatePlayers(players []model.PlayerModel) error {
 		return nil
 	})
 }
+
+func (svc *Players) UpdateLookingforTeam(lft model.LookingForTeamModel) *model.LookingForTeamModel {
+	var lookingForTeam model.LookingForTeamModel
+
+	svc.mutex.Lock()
+	defer svc.mutex.Unlock()
+
+	err := svc.db.Where("faceit_id = ?", lft.FaceitId).FirstOrCreate(&lookingForTeam).Error
+	if err != nil {
+		logger.Error(err.Error())
+		return nil
+	}
+
+	if err := svc.db.Model(&lookingForTeam).Updates(lft).Error; err != nil {
+		logger.Error(err.Error())
+		return nil
+	}
+
+	return &lookingForTeam
+}
+
+func (svc *Players) GetAllLookingForTeam() []model.LookingForTeamModel {
+	var lookingForTeam []model.LookingForTeamModel
+
+	err := svc.db.Model(&model.LookingForTeamModel{}).Find(&lookingForTeam).Error
+	if err != nil {
+		if gorm.ErrRecordNotFound == err {
+			return nil
+		}
+		logger.Error(err.Error())
+		return nil
+	}
+
+	return lookingForTeam
+}

@@ -79,3 +79,56 @@ func (ph *Player_Handlers) GetProminentPlayers(c *gin.Context) {
 
 	c.JSON(http.StatusOK, response.BuildOk("Ok", res))
 }
+
+func (ph *Player_Handlers) NewLookingForTeam(c *gin.Context) {
+	var payload struct {
+		InGameRole   []string `json:"in_game_role"`
+		TimeTable    string   `json:"time_table"`
+		OldTeams     string   `json:"old_teams"`
+		PlayingYears int32    `json:"playing_years"`
+		BornDate     int32    `json:"born_date"`
+		Description  string   `json:"description"`
+	}
+
+	identity, identityExist := c.Get("identity")
+	if !identityExist {
+		c.JSON(http.StatusUnauthorized, response.BuildError("Unauthorized"))
+		return
+	}
+
+	if err := c.ShouldBindJSON(&payload); err != nil {
+		logger.Error(err.Error())
+		c.JSON(http.StatusBadRequest, response.BuildError("Error getting NewLookingForTeam body"))
+		return
+	}
+
+	req := &pb_players.NewPlayerLookingForTeam{
+		InGameRole:   payload.InGameRole,
+		TimeTable:    payload.TimeTable,
+		OldTeams:     payload.OldTeams,
+		PlayingYears: payload.PlayingYears,
+		BornDate:     payload.BornDate,
+		Description:  payload.Description,
+		UserId:       int32(identity.(int)),
+	}
+
+	res, err := ph.players_client.NewLookingForTeam(c, req)
+	if err != nil {
+		logger.Error(err.Error())
+		c.JSON(http.StatusInternalServerError, response.BuildError("Internal error"))
+		return
+	}
+
+	c.JSON(http.StatusOK, response.BuildOk("Ok", res))
+}
+
+func (ph *Player_Handlers) GetAllLookingForTeam(c *gin.Context) {
+	res, err := ph.players_client.GetAllLookingForTeam(c, nil)
+	if err != nil {
+		logger.Error(err.Error())
+		c.JSON(http.StatusBadRequest, response.BuildError("Error getting all looking for team"))
+		return
+	}
+
+	c.JSON(http.StatusOK, response.BuildOk("Ok", res))
+}

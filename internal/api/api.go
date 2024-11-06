@@ -60,6 +60,7 @@ func (api *Api) Start() {
 	api.router.gin.GET("/api/v1/players/get", players_handlers.GetPlayers)
 	api.router.gin.GET("/api/v1/players/get-all", players_handlers.GetAllPlayers)
 	api.router.gin.GET("/api/v1/players/get-prominent-players", players_handlers.GetProminentPlayers)
+	api.router.gin.GET("/api/v1/players/get-looking-for-team", players_handlers.GetAllLookingForTeam)
 
 	api.router.gin.POST("/api/v1/teams/new", teams_handlers.New)
 	api.router.gin.GET("/api/v1/teams/get", teams_handlers.Get)
@@ -72,6 +73,7 @@ func (api *Api) Start() {
 	api.router.gin.GET("/api/v1/matches/get-team", matches_handlers.GetTeamMatches)
 
 	api.router.gin.Use(middlewares.Auth(api.db))
+	api.router.gin.POST("/api/v1/players/looking-for-team", players_handlers.NewLookingForTeam)
 	api.router.gin.POST("/api/v1/matches/set-stream", matches_handlers.SetStreamMatch)
 	api.router.gin.POST("/api/v1/organizers/new", tournaments_handlers.NewOrganizer)
 	api.router.gin.POST("/api/v1/tournaments/new", tournaments_handlers.NewTournament)
