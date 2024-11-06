@@ -11,19 +11,21 @@ message Match {
     string FaceitId = 2;
     teams.Team TeamA = 3;
     string TeamAName = 4;
-    bool IsTeamAKnown = 5;
-    int32 ScoreTeamA = 6;
-    teams.Team TeamB = 7;
-    string TeamBName = 8;
-    bool IsTeamBKnown = 9;
-    int32 ScoreTeamB = 10;
-    int32 BestOf = 11;
-    int64 Timestamp = 12;
-    repeated string Streams = 13;
-    string TournamentName = 14;
-    string TournamentFaceitId = 15;
-    tournaments.Tournament Tournament = 16;
-    repeated string Map = 17;
+    string TeamAFaceitId = 5;
+    bool IsTeamAKnown = 6;
+    int32 ScoreTeamA = 7;
+    teams.Team TeamB = 8;
+    string TeamBName = 9;
+    string TeamBFaceitId = 10;
+    bool IsTeamBKnown = 11;
+    int32 ScoreTeamB = 12;
+    int32 BestOf = 13;
+    int64 Timestamp = 14;
+    repeated string Streams = 15;
+    string TournamentName = 16;
+    string TournamentFaceitId = 17;
+    tournaments.Tournament Tournament = 18;
+    repeated string Map = 19;
 }
 
 message MatchList {
