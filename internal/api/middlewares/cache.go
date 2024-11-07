@@ -24,21 +24,35 @@ func (w *cachedWriter) Write(b []byte) (int, error) {
 
 func CacheMiddleware(c *cache.Cache, ttl time.Duration) gin.HandlerFunc {
 	return func(ctx *gin.Context) {
+		// Define los endpoints que no deben ser cacheados
+		noCachePaths := map[string]bool{
+			"/api/v1/auth/callback": true,
+		}
+
+		// Verifica si el endpoint actual debe omitirse de la cache
+		if _, shouldSkip := noCachePaths[ctx.Request.URL.Path]; shouldSkip {
+			ctx.Next()
+			return
+		}
+
+		// Construye la clave de cache para el endpoint actual
 		cacheKey := buildCacheKey(ctx.Request.URL)
 
+		// Intenta obtener datos en cache
 		if cachedData, found := c.Get(cacheKey); found {
 			ctx.Data(http.StatusOK, "application/json", cachedData.([]byte))
 			ctx.Abort()
 			return
 		}
 
+		// Intercepta la respuesta para almacenarla en cache si corresponde
 		writer := &cachedWriter{body: bytes.NewBuffer([]byte{}), ResponseWriter: ctx.Writer}
 		ctx.Writer = writer
 
 		ctx.Next()
 
+		// Verifica si la respuesta fue exitosa y si no es una solicitud autenticada
 		_, isAuthReq := ctx.Get("identity")
-
 		if ctx.Writer.Status() == http.StatusOK && !isAuthReq {
 			responseData := writer.body.Bytes()
 			c.Set(cacheKey, responseData, ttl)
