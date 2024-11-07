@@ -323,7 +323,7 @@ func (s *Server) DeleteLookingForTeam(ctx context.Context, req *pb.DeleteLooking
 	}
 
 	lft := s.PlayersService.DeleteLookingForTeam(req.PlayerId)
-	if lft == nil {
+	if lft != nil {
 		logger.Error("Error deleting looking for team")
 		return nil, status.Errorf(codes.Internal, "Error deleting looking for team")
 	}
