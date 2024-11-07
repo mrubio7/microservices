@@ -48,6 +48,7 @@ func (api *Api) Start() {
 
 	api.router.gin.Use(middlewares.CORSMiddleware())
 	api.router.gin.Use(middlewares.CacheMiddleware(cache, consts.CACHE_DURATION))
+	api.router.gin.Use(middlewares.CacheInvalidationMiddleware(cache))
 
 	api.router.gin.GET("/api/v1/tournaments/get-all", tournaments_handlers.GetAllTournaments)
 
