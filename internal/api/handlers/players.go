@@ -82,11 +82,11 @@ func (ph *Player_Handlers) GetProminentPlayers(c *gin.Context) {
 
 func (ph *Player_Handlers) NewLookingForTeam(c *gin.Context) {
 	var payload struct {
+		PlayerId     string   `json:"player_id"`
 		InGameRole   []string `json:"in_game_role"`
 		TimeTable    string   `json:"time_table"`
 		OldTeams     string   `json:"old_teams"`
 		PlayingYears int32    `json:"playing_years"`
-		BornDate     int32    `json:"born_date"`
 		Description  string   `json:"description"`
 	}
 
@@ -107,12 +107,12 @@ func (ph *Player_Handlers) NewLookingForTeam(c *gin.Context) {
 		TimeTable:    payload.TimeTable,
 		OldTeams:     payload.OldTeams,
 		PlayingYears: payload.PlayingYears,
-		BornDate:     payload.BornDate,
 		Description:  payload.Description,
+		PlayerId:     payload.PlayerId,
 		UserId:       int32(identity.(int)),
 	}
 
-	res, err := ph.players_client.NewLookingForTeam(c, req)
+	res, err := ph.players_client.UpdateLookingForTeam(c, req)
 	if err != nil {
 		logger.Error(err.Error())
 		c.JSON(http.StatusInternalServerError, response.BuildError("Internal error"))

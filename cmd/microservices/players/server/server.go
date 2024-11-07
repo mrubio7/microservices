@@ -220,13 +220,13 @@ func (s *Server) NewPlayer(ctx context.Context, req *pb.NewPlayerRequest) (*pb.P
 	return res, nil
 }
 
-func (s *Server) NewLookingForTeam(ctx context.Context, req *pb.NewPlayerLookingForTeam) (*pb.PlayerLookingForTeam, error) {
+func (s *Server) UpdateLookingForTeam(ctx context.Context, req *pb.NewPlayerLookingForTeam) (*pb.PlayerLookingForTeam, error) {
 	lookingForTeam := &model.LookingForTeamModel{
 		InGameRole:   req.InGameRole,
 		TimeTable:    req.TimeTable,
 		OldTeams:     req.OldTeams,
 		PlayingYears: req.PlayingYears,
-		BornDate:     time.Unix(int64(req.BornDate), 0),
+		FaceitId:     req.PlayerId,
 		Description:  req.Description,
 		Location:     req.Location,
 	}
@@ -237,7 +237,13 @@ func (s *Server) NewLookingForTeam(ctx context.Context, req *pb.NewPlayerLooking
 		return nil, status.Errorf(codes.Internal, "Error creating looking for team")
 	}
 
-	lookingForTeam.FaceitId = user.FaceitID
+	if user.FaceitID != lookingForTeam.FaceitId {
+		if user.Role < consts.ROLE_ADMIN {
+			logger.Error("Error creating looking for team")
+			return nil, status.Errorf(codes.PermissionDenied, "Error creating looking for team")
+		}
+	}
+
 	lft := s.PlayersService.UpdateLookingforTeam(*lookingForTeam)
 	if lft == nil {
 		logger.Error("Error creating looking for team")

@@ -24,7 +24,7 @@ const (
 	PlayerService_GetPlayers_FullMethodName           = "/players.PlayerService/GetPlayers"
 	PlayerService_GetProminentPlayers_FullMethodName  = "/players.PlayerService/GetProminentPlayers"
 	PlayerService_NewPlayer_FullMethodName            = "/players.PlayerService/NewPlayer"
-	PlayerService_NewLookingForTeam_FullMethodName    = "/players.PlayerService/NewLookingForTeam"
+	PlayerService_UpdateLookingForTeam_FullMethodName = "/players.PlayerService/UpdateLookingForTeam"
 	PlayerService_GetAllLookingForTeam_FullMethodName = "/players.PlayerService/GetAllLookingForTeam"
 )
 
@@ -37,7 +37,7 @@ type PlayerServiceClient interface {
 	GetPlayers(ctx context.Context, in *Empty, opts ...grpc.CallOption) (*PlayerList, error)
 	GetProminentPlayers(ctx context.Context, in *Empty, opts ...grpc.CallOption) (*ProminentPlayerList, error)
 	NewPlayer(ctx context.Context, in *NewPlayerRequest, opts ...grpc.CallOption) (*Player, error)
-	NewLookingForTeam(ctx context.Context, in *NewPlayerLookingForTeam, opts ...grpc.CallOption) (*PlayerLookingForTeam, error)
+	UpdateLookingForTeam(ctx context.Context, in *NewPlayerLookingForTeam, opts ...grpc.CallOption) (*PlayerLookingForTeam, error)
 	GetAllLookingForTeam(ctx context.Context, in *Empty, opts ...grpc.CallOption) (*PlayerLookingForTeamList, error)
 }
 
@@ -99,10 +99,10 @@ func (c *playerServiceClient) NewPlayer(ctx context.Context, in *NewPlayerReques
 	return out, nil
 }
 
-func (c *playerServiceClient) NewLookingForTeam(ctx context.Context, in *NewPlayerLookingForTeam, opts ...grpc.CallOption) (*PlayerLookingForTeam, error) {
+func (c *playerServiceClient) UpdateLookingForTeam(ctx context.Context, in *NewPlayerLookingForTeam, opts ...grpc.CallOption) (*PlayerLookingForTeam, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(PlayerLookingForTeam)
-	err := c.cc.Invoke(ctx, PlayerService_NewLookingForTeam_FullMethodName, in, out, cOpts...)
+	err := c.cc.Invoke(ctx, PlayerService_UpdateLookingForTeam_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -128,7 +128,7 @@ type PlayerServiceServer interface {
 	GetPlayers(context.Context, *Empty) (*PlayerList, error)
 	GetProminentPlayers(context.Context, *Empty) (*ProminentPlayerList, error)
 	NewPlayer(context.Context, *NewPlayerRequest) (*Player, error)
-	NewLookingForTeam(context.Context, *NewPlayerLookingForTeam) (*PlayerLookingForTeam, error)
+	UpdateLookingForTeam(context.Context, *NewPlayerLookingForTeam) (*PlayerLookingForTeam, error)
 	GetAllLookingForTeam(context.Context, *Empty) (*PlayerLookingForTeamList, error)
 	mustEmbedUnimplementedPlayerServiceServer()
 }
@@ -155,8 +155,8 @@ func (UnimplementedPlayerServiceServer) GetProminentPlayers(context.Context, *Em
 func (UnimplementedPlayerServiceServer) NewPlayer(context.Context, *NewPlayerRequest) (*Player, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method NewPlayer not implemented")
 }
-func (UnimplementedPlayerServiceServer) NewLookingForTeam(context.Context, *NewPlayerLookingForTeam) (*PlayerLookingForTeam, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method NewLookingForTeam not implemented")
+func (UnimplementedPlayerServiceServer) UpdateLookingForTeam(context.Context, *NewPlayerLookingForTeam) (*PlayerLookingForTeam, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method UpdateLookingForTeam not implemented")
 }
 func (UnimplementedPlayerServiceServer) GetAllLookingForTeam(context.Context, *Empty) (*PlayerLookingForTeamList, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetAllLookingForTeam not implemented")
@@ -272,20 +272,20 @@ func _PlayerService_NewPlayer_Handler(srv interface{}, ctx context.Context, dec 
 	return interceptor(ctx, in, info, handler)
 }
 
-func _PlayerService_NewLookingForTeam_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _PlayerService_UpdateLookingForTeam_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(NewPlayerLookingForTeam)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(PlayerServiceServer).NewLookingForTeam(ctx, in)
+		return srv.(PlayerServiceServer).UpdateLookingForTeam(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: PlayerService_NewLookingForTeam_FullMethodName,
+		FullMethod: PlayerService_UpdateLookingForTeam_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(PlayerServiceServer).NewLookingForTeam(ctx, req.(*NewPlayerLookingForTeam))
+		return srv.(PlayerServiceServer).UpdateLookingForTeam(ctx, req.(*NewPlayerLookingForTeam))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -336,8 +336,8 @@ var PlayerService_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _PlayerService_NewPlayer_Handler,
 		},
 		{
-			MethodName: "NewLookingForTeam",
-			Handler:    _PlayerService_NewLookingForTeam_Handler,
+			MethodName: "UpdateLookingForTeam",
+			Handler:    _PlayerService_UpdateLookingForTeam_Handler,
 		},
 		{
 			MethodName: "GetAllLookingForTeam",

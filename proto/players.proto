@@ -54,7 +54,7 @@ service PlayerService {
     rpc GetPlayers (Empty) returns (PlayerList);
     rpc GetProminentPlayers (Empty) returns (ProminentPlayerList);
     rpc NewPlayer (NewPlayerRequest) returns (Player);
-    rpc NewLookingForTeam (NewPlayerLookingForTeam) returns (PlayerLookingForTeam);
+    rpc UpdateLookingForTeam (NewPlayerLookingForTeam) returns (PlayerLookingForTeam);
     rpc GetAllLookingForTeam (Empty) returns (PlayerLookingForTeamList);
 }
 
@@ -63,10 +63,10 @@ message NewPlayerLookingForTeam {
     string TimeTable = 3;
     string OldTeams = 4;
     int32 PlayingYears = 5;
-    int32 BornDate = 6;
-    string Description = 7;
-    string Location = 8;
-    int32 UserId = 9;
+    string Description = 6;
+    string Location = 7;
+    int32 UserId = 8;
+    string PlayerId = 9;
 }
 
 message GetPlayerRequest {
