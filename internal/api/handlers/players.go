@@ -132,3 +132,30 @@ func (ph *Player_Handlers) GetAllLookingForTeam(c *gin.Context) {
 
 	c.JSON(http.StatusOK, response.BuildOk("Ok", res))
 }
+
+func (ph *Player_Handlers) DeleteLookingForTeam(c *gin.Context) {
+	var payload struct {
+		PlayerId string `json:"player_id"`
+	}
+
+	identity, identityExist := c.Get("identity")
+	if !identityExist {
+		c.JSON(http.StatusUnauthorized, response.BuildError("Unauthorized"))
+		return
+	}
+
+	if err := c.ShouldBindJSON(&payload); err != nil {
+		logger.Error(err.Error())
+		c.JSON(http.StatusBadRequest, response.BuildError("Error getting DeleteLookingForTeam body"))
+		return
+	}
+
+	res, err := ph.players_client.DeleteLookingForTeam(c, &pb_players.DeleteLookingForTeamRequest{PlayerId: payload.PlayerId, UserId: int32(identity.(int))})
+	if err != nil {
+		logger.Error(err.Error())
+		c.JSON(http.StatusInternalServerError, response.BuildError("Internal error"))
+		return
+	}
+
+	c.JSON(http.StatusOK, response.BuildOk("Ok", res))
+}

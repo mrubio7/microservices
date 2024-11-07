@@ -248,3 +248,15 @@ func (svc *Players) GetAllLookingForTeam() []model.LookingForTeamModel {
 
 	return lookingForTeam
 }
+
+func (svc *Players) DeleteLookingForTeam(faceitID string) error {
+	svc.mutex.Lock()
+	defer svc.mutex.Unlock()
+
+	err := svc.db.Delete(&model.LookingForTeamModel{}, "faceit_id = ?", faceitID).Error
+	if err != nil {
+		return err
+	}
+
+	return nil
+}

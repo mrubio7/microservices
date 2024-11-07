@@ -307,3 +307,26 @@ func (s *Server) GetAllLookingForTeam(ctx context.Context, _ *pb.Empty) (*pb.Pla
 
 	return &pb.PlayerLookingForTeamList{LookingForTeam: lfts}, nil
 }
+
+func (s *Server) DeleteLookingForTeam(ctx context.Context, req *pb.DeleteLookingForTeamRequest) (*pb.Empty, error) {
+	user := s.UsersService.GetUserById(strconv.Itoa(int(req.UserId)))
+	if user == nil {
+		logger.Error("Error creating looking for team")
+		return nil, status.Errorf(codes.Internal, "Error creating looking for team")
+	}
+
+	if user.FaceitID != req.PlayerId {
+		if user.Role < consts.ROLE_ADMIN {
+			logger.Error("Error deleting lft")
+			return nil, status.Errorf(codes.PermissionDenied, "Error deleting lft")
+		}
+	}
+
+	lft := s.PlayersService.DeleteLookingForTeam(req.PlayerId)
+	if lft == nil {
+		logger.Error("Error deleting looking for team")
+		return nil, status.Errorf(codes.Internal, "Error deleting looking for team")
+	}
+
+	return &pb.Empty{}, nil
+}

@@ -56,6 +56,12 @@ service PlayerService {
     rpc NewPlayer (NewPlayerRequest) returns (Player);
     rpc UpdateLookingForTeam (NewPlayerLookingForTeam) returns (PlayerLookingForTeam);
     rpc GetAllLookingForTeam (Empty) returns (PlayerLookingForTeamList);
+    rpc DeleteLookingForTeam (DeleteLookingForTeamRequest) returns (Empty);
+}
+
+message DeleteLookingForTeamRequest {
+    string PlayerId = 1;
+    int32 UserId = 2;
 }
 
 message NewPlayerLookingForTeam {

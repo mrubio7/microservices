@@ -26,6 +26,7 @@ const (
 	PlayerService_NewPlayer_FullMethodName            = "/players.PlayerService/NewPlayer"
 	PlayerService_UpdateLookingForTeam_FullMethodName = "/players.PlayerService/UpdateLookingForTeam"
 	PlayerService_GetAllLookingForTeam_FullMethodName = "/players.PlayerService/GetAllLookingForTeam"
+	PlayerService_DeleteLookingForTeam_FullMethodName = "/players.PlayerService/DeleteLookingForTeam"
 )
 
 // PlayerServiceClient is the client API for PlayerService service.
@@ -39,6 +40,7 @@ type PlayerServiceClient interface {
 	NewPlayer(ctx context.Context, in *NewPlayerRequest, opts ...grpc.CallOption) (*Player, error)
 	UpdateLookingForTeam(ctx context.Context, in *NewPlayerLookingForTeam, opts ...grpc.CallOption) (*PlayerLookingForTeam, error)
 	GetAllLookingForTeam(ctx context.Context, in *Empty, opts ...grpc.CallOption) (*PlayerLookingForTeamList, error)
+	DeleteLookingForTeam(ctx context.Context, in *DeleteLookingForTeamRequest, opts ...grpc.CallOption) (*Empty, error)
 }
 
 type playerServiceClient struct {
@@ -119,6 +121,16 @@ func (c *playerServiceClient) GetAllLookingForTeam(ctx context.Context, in *Empt
 	return out, nil
 }
 
+func (c *playerServiceClient) DeleteLookingForTeam(ctx context.Context, in *DeleteLookingForTeamRequest, opts ...grpc.CallOption) (*Empty, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(Empty)
+	err := c.cc.Invoke(ctx, PlayerService_DeleteLookingForTeam_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // PlayerServiceServer is the server API for PlayerService service.
 // All implementations must embed UnimplementedPlayerServiceServer
 // for forward compatibility.
@@ -130,6 +142,7 @@ type PlayerServiceServer interface {
 	NewPlayer(context.Context, *NewPlayerRequest) (*Player, error)
 	UpdateLookingForTeam(context.Context, *NewPlayerLookingForTeam) (*PlayerLookingForTeam, error)
 	GetAllLookingForTeam(context.Context, *Empty) (*PlayerLookingForTeamList, error)
+	DeleteLookingForTeam(context.Context, *DeleteLookingForTeamRequest) (*Empty, error)
 	mustEmbedUnimplementedPlayerServiceServer()
 }
 
@@ -160,6 +173,9 @@ func (UnimplementedPlayerServiceServer) UpdateLookingForTeam(context.Context, *N
 }
 func (UnimplementedPlayerServiceServer) GetAllLookingForTeam(context.Context, *Empty) (*PlayerLookingForTeamList, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetAllLookingForTeam not implemented")
+}
+func (UnimplementedPlayerServiceServer) DeleteLookingForTeam(context.Context, *DeleteLookingForTeamRequest) (*Empty, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method DeleteLookingForTeam not implemented")
 }
 func (UnimplementedPlayerServiceServer) mustEmbedUnimplementedPlayerServiceServer() {}
 func (UnimplementedPlayerServiceServer) testEmbeddedByValue()                       {}
@@ -308,6 +324,24 @@ func _PlayerService_GetAllLookingForTeam_Handler(srv interface{}, ctx context.Co
 	return interceptor(ctx, in, info, handler)
 }
 
+func _PlayerService_DeleteLookingForTeam_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(DeleteLookingForTeamRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(PlayerServiceServer).DeleteLookingForTeam(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: PlayerService_DeleteLookingForTeam_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(PlayerServiceServer).DeleteLookingForTeam(ctx, req.(*DeleteLookingForTeamRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // PlayerService_ServiceDesc is the grpc.ServiceDesc for PlayerService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -342,6 +376,10 @@ var PlayerService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GetAllLookingForTeam",
 			Handler:    _PlayerService_GetAllLookingForTeam_Handler,
+		},
+		{
+			MethodName: "DeleteLookingForTeam",
+			Handler:    _PlayerService_DeleteLookingForTeam_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
