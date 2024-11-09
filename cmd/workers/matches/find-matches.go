@@ -27,7 +27,7 @@ func Find() {
 	svcMatches := service.NewMatchesService(db)
 	faceitClient := faceit.New(cfg.FaceitApiToken)
 
-	tournaments := svcTournaments.GetAllTournaments()
+	tournaments := svcTournaments.GetAllTournaments(true)
 	if tournaments == nil {
 		logger.Error("tournaments empty")
 		return
@@ -44,7 +44,6 @@ func Find() {
 				matches = append(matches, faceitClient.GetMatchesFromTournamentId(d.FaceitId, d.Name)...)
 			}
 		} else {
-
 			matches = faceitClient.GetMatchesFromTournamentId(t.FaceitId, t.Name)
 		}
 

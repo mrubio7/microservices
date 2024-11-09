@@ -18,14 +18,15 @@ type TournamentModel struct {
 	MinLevel        int             `gorm:"not null"`
 	MaxLevel        int             `gorm:"not null"`
 	Type            string          `gorm:"not null"`
+	TeamsId         JSONStringArray `gorm:"type:jsonb;null"`
 	CurrentTeams    int             `gorm:"-"`
-	TeamsId         []string        `gorm:"-"`
 	Slots           int             `gorm:"-"`
 }
 
 type EseaDivisionModel struct {
-	ID           uint32 `gorm:"primaryKey; autoIncrement"`
-	FaceitId     string `gorm:"unique; not null"`
-	TournamentId string `gorm:"not null"`
-	Name         string `gorm:"not null"`
+	ID           uint32          `gorm:"primaryKey; autoIncrement"`
+	FaceitId     string          `gorm:"unique; not null"`
+	TournamentId string          `gorm:"not null"`
+	TeamsId      JSONStringArray `gorm:"type:jsonb;null"`
+	Name         string          `gorm:"not null"`
 }

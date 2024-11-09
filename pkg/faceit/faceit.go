@@ -258,19 +258,18 @@ func (c *FaceitClient) GetAllChampionshipFromOrganizer(organizerId string, offse
 	return tournaments
 }
 
-func (c *FaceitClient) GetTeamsInTournament(tournamentId string, size int) []model.TeamModel {
+func (c *FaceitClient) GetTeamsInTournament(tournamentId string) []model.TeamModel {
 	var res []model.TeamModel
 
 	var offset int = 0
-	var limit int = 50
+	var limit int = 10
 
-	params := map[string]interface{}{
-		"offset":  strconv.Itoa(offset),
-		"limit":   strconv.Itoa(limit),
-		"country": "es",
-	}
+	for {
+		params := map[string]interface{}{
+			"offset": strconv.Itoa(offset),
+			"limit":  strconv.Itoa(limit),
+		}
 
-	for offset < size {
 		teams, err := c.client.GetSubscriptionsByChampionshipID(tournamentId, params)
 		if err != nil {
 			return nil
@@ -290,6 +289,9 @@ func (c *FaceitClient) GetTeamsInTournament(tournamentId string, size int) []mod
 		}
 
 		offset += limit
+		if len(teams.Items) == 0 {
+			break
+		}
 	}
 
 	return res
@@ -425,7 +427,6 @@ func (c *FaceitClient) GetMatchesFromTournamentId(faceitId string, tournamentNam
 			return res
 		}
 	}
-
 }
 
 func convertToTournamentModel(season map[string]any) *model.TournamentModel {

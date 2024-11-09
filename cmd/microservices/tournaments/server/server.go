@@ -109,7 +109,7 @@ func (s *Server) NewTournament(ctx context.Context, tournamentReq *pb.NewTournam
 }
 
 func (s *Server) GetAllTorunaments(ctx context.Context, _ *pb.Empty) (*pb.TournamentList, error) {
-	tournaments := s.TournamentsService.GetAllTournaments()
+	tournaments := s.TournamentsService.GetAllTournaments(false)
 
 	res := make([]*pb.Tournament, len(tournaments))
 	for i, t := range tournaments {

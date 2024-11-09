@@ -45,16 +45,27 @@ func (svc *Tournaments) NewTournament(tournament *model.TournamentModel) *model.
 	return tournament
 }
 
-func (svc *Tournaments) GetAllTournaments() []model.TournamentModel {
+func (svc *Tournaments) GetAllTournaments(active bool) []model.TournamentModel {
 	var tournaments []model.TournamentModel
 
-	err := svc.db.Model(&model.TournamentModel{}).Find(&tournaments).Error
-	if err != nil {
-		if gorm.ErrRecordNotFound == err {
+	if active {
+		err := svc.db.Model(&model.TournamentModel{}).Where("status != ? || status != ?", "finished", "cancelled").Find(&tournaments).Error
+		if err != nil {
+			if gorm.ErrRecordNotFound == err {
+				return nil
+			}
+			logger.Error(err.Error())
 			return nil
 		}
-		logger.Error(err.Error())
-		return nil
+	} else {
+		err := svc.db.Model(&model.TournamentModel{}).Find(&tournaments).Error
+		if err != nil {
+			if gorm.ErrRecordNotFound == err {
+				return nil
+			}
+			logger.Error(err.Error())
+			return nil
+		}
 	}
 
 	return tournaments
@@ -144,6 +155,34 @@ func (svc *Tournaments) NewEseaDivision(division model.EseaDivisionModel) *model
 	tx.Commit()
 
 	return &division
+}
+
+func (svc *Tournaments) UpdateEseaDivision(tournament model.EseaDivisionModel) error {
+	var existingDivision model.EseaDivisionModel
+
+	svc.mutex.Lock()
+	defer svc.mutex.Unlock()
+
+	err := svc.db.First(&existingDivision, "faceit_id = ?", tournament.FaceitId).Error
+	if err != nil {
+		if err == gorm.ErrRecordNotFound {
+			t := svc.NewEseaDivision(tournament)
+			if t == nil {
+				logger.Error("Error cannot create tournament")
+			}
+			return nil
+		}
+		logger.Error(err.Error())
+		return err
+	}
+
+	if !reflect.DeepEqual(existingDivision, tournament) {
+		if err := svc.db.Model(&existingDivision).Updates(tournament).Error; err != nil {
+			return err
+		}
+	}
+
+	return nil
 }
 
 func (svc *Tournaments) GetEseaDivisions(faceitId string) []model.EseaDivisionModel {
