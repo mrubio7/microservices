@@ -17,7 +17,7 @@ message Tournament {
     string JoinPolicy = 9;
     repeated string GeoCountries = 10;
     int32 MinLevel = 11;
-    int32 MaxLavel = 12;
+    int32 MaxLevel = 12;
     string Status = 13;
     string BackgroundImage = 14;
     string CoverImage = 15;
