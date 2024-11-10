@@ -65,6 +65,15 @@ func save_ESEA_Tournament(orgType string, faceit *faceit.FaceitClient, svcTourna
 				}
 			}
 
+			if t.Status == "live" {
+				standings := faceit.GetESEADivisionStanding_PRODUCTION(division.ConferenceId)
+				for _, standing := range standings {
+					if teams[standing.FaceitId] {
+						svcTournaments.UpdateEseaDivisionStanding(standing)
+					}
+				}
+			}
+
 			div := svcTournaments.UpdateEseaDivision(division)
 			if div == nil {
 				logger.Warning("cannot save esea division %s", division.Name)

@@ -199,3 +199,35 @@ func (svc *Tournaments) GetEseaDivisions(faceitId string) []model.EseaDivisionMo
 
 	return tournament
 }
+
+func (svc *Tournaments) UpdateEseaDivisionStanding(Standings model.EseaStandingModel) error {
+	var existingStanding model.EseaStandingModel
+
+	svc.mutex.Lock()
+	defer svc.mutex.Unlock()
+
+	err := svc.db.First(&existingStanding, "faceit_id = ? and tournament_id = ?", Standings.FaceitId, Standings.TournamentId).Error
+	if err != nil {
+		if err == gorm.ErrRecordNotFound {
+			tx := svc.db.Begin()
+
+			if err := tx.Model(&model.EseaStandingModel{}).Create(&Standings).Error; err != nil {
+				tx.Rollback()
+				logger.Error(err.Error())
+				return err
+			}
+			tx.Commit()
+			return nil
+		}
+		logger.Error(err.Error())
+		return err
+	}
+
+	if !reflect.DeepEqual(existingStanding, Standings) {
+		if err := svc.db.Model(&existingStanding).Updates(Standings).Error; err != nil {
+			return err
+		}
+	}
+
+	return nil
+}

@@ -366,6 +366,7 @@ func (c *FaceitClient) GetESEADivisionBySeasonId_PRODUCTION(seasonId string, nam
 				for _, stage := range division.Stages {
 					eseaDivisions = append(eseaDivisions, model.EseaDivisionModel{
 						FaceitId:     stage.Conferences[0].ChampionshipID,
+						ConferenceId: stage.Conferences[0].ID,
 						TournamentId: seasonId,
 						Name:         fmt.Sprintf("%s %s - %s", name, division.Name, stage.Name),
 					})
@@ -377,6 +378,88 @@ func (c *FaceitClient) GetESEADivisionBySeasonId_PRODUCTION(seasonId string, nam
 	}
 
 	return eseaDivisions
+}
+
+func (c *FaceitClient) GetESEADivisionStanding_PRODUCTION(seasonId string) []model.EseaStandingModel {
+	var standings []model.EseaStandingModel
+	var offset int = 0
+	var limit int = 100
+
+	for {
+		res, err := http.Get(fmt.Sprintf("https://www.faceit.com/api/team-leagues/v2/standings?entityId=%s&entityType=conference&offset=%d&limit=%d", seasonId, offset, limit))
+		if err != nil {
+			log.Printf("Error getting ESEA Seasons: %s", err.Error())
+			return nil
+		}
+		defer res.Body.Close()
+
+		body, err := io.ReadAll(res.Body)
+		if err != nil {
+			log.Printf("Error reading response body: %s", err.Error())
+			return nil
+		}
+
+		var rb map[string]interface{}
+		if err := json.Unmarshal(body, &rb); err != nil {
+			log.Printf("Error unmarshaling response body: %s", err.Error())
+			return nil
+		}
+
+		// Acceder al payload
+		payload, ok := rb["payload"].(map[string]interface{})
+		if !ok {
+			log.Printf("Error: payload is not a map")
+			return nil
+		}
+
+		// Acceder a standings como un arreglo
+		standingsData, ok := payload["standings"].([]interface{})
+		if !ok {
+			log.Printf("Error: standings is not an array")
+			return nil
+		}
+
+		for _, s := range standingsData {
+			standing, ok := s.(map[string]interface{})
+			if !ok {
+				log.Printf("Error: standing is not a map")
+				continue
+			}
+
+			// Manejar posibles valores nulos o tipos incorrectos
+			faceitID, _ := standing["premade_team_id"].(string)
+			points, _ := standing["points"].(float64)
+			matchesPlayed, _ := standing["matches"].(float64)
+			matchesWon, _ := standing["won"].(float64)
+			matchesLost, _ := standing["lost"].(float64)
+			matchesTied, _ := standing["tied"].(float64)
+			buchholzScore, _ := standing["buchholz_score"].(float64)
+			rankStart, _ := standing["rank_start"].(float64)
+			rankEnd, _ := standing["rank_end"].(float64)
+			isDisqualified, _ := standing["is_disqualified"].(bool)
+
+			standings = append(standings, model.EseaStandingModel{
+				FaceitId:       faceitID,
+				Points:         int(points),
+				MatchesPlayed:  int(matchesPlayed),
+				MatchesWon:     int(matchesWon),
+				MatchesLost:    int(matchesLost),
+				MatchesTied:    int(matchesTied),
+				BuchholzScore:  int(buchholzScore),
+				TournamentId:   seasonId,
+				RankStart:      int(rankStart),
+				RankEnd:        int(rankEnd),
+				IsDisqualified: isDisqualified,
+			})
+		}
+
+		offset += limit
+		if len(standingsData) == 0 {
+			break
+		}
+	}
+
+	return standings
 }
 
 func (c *FaceitClient) GetMatchesFromTournamentId(faceitId string, tournamentName string) []model.MatchModel {
