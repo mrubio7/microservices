@@ -2,6 +2,7 @@ package microservice_tournaments
 
 import (
 	"context"
+	"ibercs/internal/model"
 	"ibercs/pkg/config"
 	"ibercs/pkg/database"
 	"ibercs/pkg/faceit"
@@ -178,16 +179,26 @@ func (s *Server) GetTournamentById(ctx context.Context, req *pb.GetTournamentByI
 	return res, nil
 }
 
-func (s *Server) GetEseaDetails(ctx context.Context, req *pb.GetTournamentByIdRequest) (*pb.EseaDetails, error) {
-	t := s.TournamentsService.GetTournament(req.FaceitId)
-	if t == nil {
-		err := status.Errorf(codes.NotFound, "tournament with FaceitID %s not found", req.FaceitId)
-		return nil, err
+func (s *Server) GetEseaDetails(ctx context.Context, req *pb.GetEseaDetailsRequest) (*pb.EseaDetails, error) {
+	var t *model.TournamentModel
+
+	if req.Season == nil {
+		t = s.TournamentsService.GetEseaTournamentLive()
+		if t == nil {
+			err := status.Errorf(codes.NotFound, "tournament with FaceitID %s not found", *req.Season)
+			return nil, err
+		}
+	} else {
+		t = s.TournamentsService.GetEseaTournamentBySeasonNumber(*req.Season)
+		if t == nil {
+			err := status.Errorf(codes.NotFound, "tournament with FaceitID %s not found", *req.Season)
+			return nil, err
+		}
 	}
 
 	divisions := s.TournamentsService.GetEseaDivisions(t.FaceitId)
 	if divisions == nil {
-		err := status.Errorf(codes.NotFound, "esea divisions for tournament with FaceitID %s not found", req.FaceitId)
+		err := status.Errorf(codes.NotFound, "esea divisions for tournament with FaceitID %s not found", *req.Season)
 		return nil, err
 	}
 

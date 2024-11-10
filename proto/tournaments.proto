@@ -49,7 +49,11 @@ service TournamentService {
     rpc NewTournament (NewTournamentRequest) returns (Tournament);
     rpc GetAllTorunaments (Empty) returns (TournamentList);
     rpc GetTournament (GetTournamentByIdRequest) returns (Tournament);
-    rpc GetEseaDetails (GetTournamentByIdRequest) returns (EseaDetails);
+    rpc GetEseaDetails (GetEseaDetailsRequest) returns (EseaDetails);
+}
+
+message GetEseaDetailsRequest {
+    optional string season = 1;
 }
 
 message GetTournamentByIdRequest {

@@ -1,6 +1,7 @@
 package service
 
 import (
+	"fmt"
 	"ibercs/internal/model"
 	"ibercs/pkg/logger"
 	"reflect"
@@ -155,6 +156,36 @@ func (svc *Tournaments) NewEseaDivision(division model.EseaDivisionModel) *model
 	tx.Commit()
 
 	return &division
+}
+
+func (svc *Tournaments) GetEseaTournamentBySeasonNumber(seasonNumber string) *model.TournamentModel {
+	var tournament model.TournamentModel
+
+	err := svc.db.Model(&model.TournamentModel{}).Where("type = ? AND name like ?", "ESEA", fmt.Sprintf("%%%s%%", seasonNumber)).First(&tournament).Error
+	if err != nil {
+		if gorm.ErrRecordNotFound == err {
+			return nil
+		}
+		logger.Error(err.Error())
+		return nil
+	}
+
+	return &tournament
+}
+
+func (svc *Tournaments) GetEseaTournamentLive() *model.TournamentModel {
+	var tournament model.TournamentModel
+
+	err := svc.db.Model(&model.TournamentModel{}).Where("type = ? AND status = ?", "ESEA", "live").First(&tournament).Error
+	if err != nil {
+		if gorm.ErrRecordNotFound == err {
+			return nil
+		}
+		logger.Error(err.Error())
+		return nil
+	}
+
+	return &tournament
 }
 
 func (svc *Tournaments) UpdateEseaDivision(tournament model.EseaDivisionModel) error {

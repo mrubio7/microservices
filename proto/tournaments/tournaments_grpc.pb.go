@@ -34,7 +34,7 @@ type TournamentServiceClient interface {
 	NewTournament(ctx context.Context, in *NewTournamentRequest, opts ...grpc.CallOption) (*Tournament, error)
 	GetAllTorunaments(ctx context.Context, in *Empty, opts ...grpc.CallOption) (*TournamentList, error)
 	GetTournament(ctx context.Context, in *GetTournamentByIdRequest, opts ...grpc.CallOption) (*Tournament, error)
-	GetEseaDetails(ctx context.Context, in *GetTournamentByIdRequest, opts ...grpc.CallOption) (*EseaDetails, error)
+	GetEseaDetails(ctx context.Context, in *GetEseaDetailsRequest, opts ...grpc.CallOption) (*EseaDetails, error)
 }
 
 type tournamentServiceClient struct {
@@ -85,7 +85,7 @@ func (c *tournamentServiceClient) GetTournament(ctx context.Context, in *GetTour
 	return out, nil
 }
 
-func (c *tournamentServiceClient) GetEseaDetails(ctx context.Context, in *GetTournamentByIdRequest, opts ...grpc.CallOption) (*EseaDetails, error) {
+func (c *tournamentServiceClient) GetEseaDetails(ctx context.Context, in *GetEseaDetailsRequest, opts ...grpc.CallOption) (*EseaDetails, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(EseaDetails)
 	err := c.cc.Invoke(ctx, TournamentService_GetEseaDetails_FullMethodName, in, out, cOpts...)
@@ -103,7 +103,7 @@ type TournamentServiceServer interface {
 	NewTournament(context.Context, *NewTournamentRequest) (*Tournament, error)
 	GetAllTorunaments(context.Context, *Empty) (*TournamentList, error)
 	GetTournament(context.Context, *GetTournamentByIdRequest) (*Tournament, error)
-	GetEseaDetails(context.Context, *GetTournamentByIdRequest) (*EseaDetails, error)
+	GetEseaDetails(context.Context, *GetEseaDetailsRequest) (*EseaDetails, error)
 	mustEmbedUnimplementedTournamentServiceServer()
 }
 
@@ -126,7 +126,7 @@ func (UnimplementedTournamentServiceServer) GetAllTorunaments(context.Context, *
 func (UnimplementedTournamentServiceServer) GetTournament(context.Context, *GetTournamentByIdRequest) (*Tournament, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetTournament not implemented")
 }
-func (UnimplementedTournamentServiceServer) GetEseaDetails(context.Context, *GetTournamentByIdRequest) (*EseaDetails, error) {
+func (UnimplementedTournamentServiceServer) GetEseaDetails(context.Context, *GetEseaDetailsRequest) (*EseaDetails, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetEseaDetails not implemented")
 }
 func (UnimplementedTournamentServiceServer) mustEmbedUnimplementedTournamentServiceServer() {}
@@ -223,7 +223,7 @@ func _TournamentService_GetTournament_Handler(srv interface{}, ctx context.Conte
 }
 
 func _TournamentService_GetEseaDetails_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(GetTournamentByIdRequest)
+	in := new(GetEseaDetailsRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -235,7 +235,7 @@ func _TournamentService_GetEseaDetails_Handler(srv interface{}, ctx context.Cont
 		FullMethod: TournamentService_GetEseaDetails_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(TournamentServiceServer).GetEseaDetails(ctx, req.(*GetTournamentByIdRequest))
+		return srv.(TournamentServiceServer).GetEseaDetails(ctx, req.(*GetEseaDetailsRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
