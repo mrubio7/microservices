@@ -19,12 +19,13 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	TeamService_GetTeams_FullMethodName           = "/teams.TeamService/GetTeams"
-	TeamService_GetTeamById_FullMethodName        = "/teams.TeamService/GetTeamById"
-	TeamService_GetTeamByNickname_FullMethodName  = "/teams.TeamService/GetTeamByNickname"
-	TeamService_NewTeam_FullMethodName            = "/teams.TeamService/NewTeam"
-	TeamService_FindTeamByPlayerId_FullMethodName = "/teams.TeamService/FindTeamByPlayerId"
-	TeamService_GetTeamFromFaceit_FullMethodName  = "/teams.TeamService/GetTeamFromFaceit"
+	TeamService_GetTeams_FullMethodName                = "/teams.TeamService/GetTeams"
+	TeamService_GetTeamById_FullMethodName             = "/teams.TeamService/GetTeamById"
+	TeamService_GetTeamByNickname_FullMethodName       = "/teams.TeamService/GetTeamByNickname"
+	TeamService_NewTeam_FullMethodName                 = "/teams.TeamService/NewTeam"
+	TeamService_FindTeamByPlayerId_FullMethodName      = "/teams.TeamService/FindTeamByPlayerId"
+	TeamService_GetTeamFromFaceit_FullMethodName       = "/teams.TeamService/GetTeamFromFaceit"
+	TeamService_GetTeamWithEseaStanding_FullMethodName = "/teams.TeamService/GetTeamWithEseaStanding"
 )
 
 // TeamServiceClient is the client API for TeamService service.
@@ -37,6 +38,7 @@ type TeamServiceClient interface {
 	NewTeam(ctx context.Context, in *NewTeamRequest, opts ...grpc.CallOption) (*Team, error)
 	FindTeamByPlayerId(ctx context.Context, in *NewTeamRequest, opts ...grpc.CallOption) (*TeamList, error)
 	GetTeamFromFaceit(ctx context.Context, in *NewTeamRequest, opts ...grpc.CallOption) (*Team, error)
+	GetTeamWithEseaStanding(ctx context.Context, in *NewTeamRequest, opts ...grpc.CallOption) (*Team, error)
 }
 
 type teamServiceClient struct {
@@ -107,6 +109,16 @@ func (c *teamServiceClient) GetTeamFromFaceit(ctx context.Context, in *NewTeamRe
 	return out, nil
 }
 
+func (c *teamServiceClient) GetTeamWithEseaStanding(ctx context.Context, in *NewTeamRequest, opts ...grpc.CallOption) (*Team, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(Team)
+	err := c.cc.Invoke(ctx, TeamService_GetTeamWithEseaStanding_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // TeamServiceServer is the server API for TeamService service.
 // All implementations must embed UnimplementedTeamServiceServer
 // for forward compatibility.
@@ -117,6 +129,7 @@ type TeamServiceServer interface {
 	NewTeam(context.Context, *NewTeamRequest) (*Team, error)
 	FindTeamByPlayerId(context.Context, *NewTeamRequest) (*TeamList, error)
 	GetTeamFromFaceit(context.Context, *NewTeamRequest) (*Team, error)
+	GetTeamWithEseaStanding(context.Context, *NewTeamRequest) (*Team, error)
 	mustEmbedUnimplementedTeamServiceServer()
 }
 
@@ -144,6 +157,9 @@ func (UnimplementedTeamServiceServer) FindTeamByPlayerId(context.Context, *NewTe
 }
 func (UnimplementedTeamServiceServer) GetTeamFromFaceit(context.Context, *NewTeamRequest) (*Team, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetTeamFromFaceit not implemented")
+}
+func (UnimplementedTeamServiceServer) GetTeamWithEseaStanding(context.Context, *NewTeamRequest) (*Team, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetTeamWithEseaStanding not implemented")
 }
 func (UnimplementedTeamServiceServer) mustEmbedUnimplementedTeamServiceServer() {}
 func (UnimplementedTeamServiceServer) testEmbeddedByValue()                     {}
@@ -274,6 +290,24 @@ func _TeamService_GetTeamFromFaceit_Handler(srv interface{}, ctx context.Context
 	return interceptor(ctx, in, info, handler)
 }
 
+func _TeamService_GetTeamWithEseaStanding_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(NewTeamRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(TeamServiceServer).GetTeamWithEseaStanding(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: TeamService_GetTeamWithEseaStanding_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(TeamServiceServer).GetTeamWithEseaStanding(ctx, req.(*NewTeamRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // TeamService_ServiceDesc is the grpc.ServiceDesc for TeamService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -304,6 +338,10 @@ var TeamService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GetTeamFromFaceit",
 			Handler:    _TeamService_GetTeamFromFaceit_Handler,
+		},
+		{
+			MethodName: "GetTeamWithEseaStanding",
+			Handler:    _TeamService_GetTeamWithEseaStanding_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

@@ -73,6 +73,8 @@ func (api *Api) Start() {
 	api.router.gin.GET("/api/v1/matches/get-range", matches_handlers.GetRange)
 	api.router.gin.GET("/api/v1/matches/get-team", matches_handlers.GetTeamMatches)
 
+	api.router.gin.GET("/api/v1/esea/details", tournaments_handlers.GetEseaDetails)
+
 	api.router.gin.Use(middlewares.Auth(api.db))
 	api.router.gin.POST("/api/v1/players/looking-for-team", players_handlers.NewLookingForTeam)
 	api.router.gin.DELETE("/api/v1/players/looking-for-team", players_handlers.DeleteLookingForTeam)

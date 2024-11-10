@@ -16,6 +16,21 @@ message Team {
     string Instagram = 10;
     string Web = 11;
     repeated string Tournaments = 12;
+    Standing Standing = 13;
+}
+
+message Standing {
+    string FaceitId = 1;
+    string TournamentId = 2;
+    bool IsDisqualified = 3;
+    int32 RankStart = 4;
+    int32 RankEnd = 5;
+    int32 Points = 6;
+    int32 MatchesPlayed = 7;
+    int32 MatchesWon = 8;
+    int32 MatchesLost = 9;
+    int32 MatchesTied = 10;
+    int32 BuchholzScore = 11;
 }
 
 message TeamStats {
@@ -43,6 +58,7 @@ service TeamService {
     rpc NewTeam (NewTeamRequest) returns (Team);
     rpc FindTeamByPlayerId(NewTeamRequest) returns (TeamList);
     rpc GetTeamFromFaceit(NewTeamRequest) returns (Team);
+    rpc GetTeamWithEseaStanding(NewTeamRequest) returns (Team);
 }
 
 message TeamList {

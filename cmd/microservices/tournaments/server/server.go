@@ -6,7 +6,9 @@ import (
 	"ibercs/pkg/database"
 	"ibercs/pkg/faceit"
 	"ibercs/pkg/logger"
+	"ibercs/pkg/microservices"
 	"ibercs/pkg/service"
+	pb_teams "ibercs/proto/teams"
 	pb "ibercs/proto/tournaments"
 
 	"google.golang.org/grpc/codes"
@@ -16,6 +18,7 @@ import (
 type Server struct {
 	pb.UnimplementedTournamentServiceServer
 	TournamentsService *service.Tournaments
+	TeamClient         pb_teams.TeamServiceClient
 	FaceitService      *faceit.FaceitClient
 }
 
@@ -32,7 +35,12 @@ func New() *Server {
 	return &Server{
 		TournamentsService: tournamentService,
 		FaceitService:      faceit,
+		TeamClient:         *registerTeamsClient(cfg.Microservices),
 	}
+}
+
+func registerTeamsClient(cfg config.MicroservicesConfig) *pb_teams.TeamServiceClient {
+	return microservices.New(cfg.TeamsHost, cfg.TeamsPort, pb_teams.NewTeamServiceClient)
 }
 
 func (s *Server) NewOrganizer(ctx context.Context, organizerReq *pb.NewOrganizerRequest) (*pb.Organizer, error) {
@@ -168,4 +176,62 @@ func (s *Server) GetTournamentById(ctx context.Context, req *pb.GetTournamentByI
 	}
 
 	return res, nil
+}
+
+func (s *Server) GetEseaDetails(ctx context.Context, req *pb.GetTournamentByIdRequest) (*pb.EseaDetails, error) {
+	t := s.TournamentsService.GetTournament(req.FaceitId)
+	if t == nil {
+		err := status.Errorf(codes.NotFound, "tournament with FaceitID %s not found", req.FaceitId)
+		return nil, err
+	}
+
+	divisions := s.TournamentsService.GetEseaDivisions(t.FaceitId)
+	if divisions == nil {
+		err := status.Errorf(codes.NotFound, "esea divisions for tournament with FaceitID %s not found", req.FaceitId)
+		return nil, err
+	}
+
+	var eseaLeagues []*pb.EseaLeague
+	for _, d := range divisions {
+		var teams []*pb_teams.Team
+		for _, team := range d.TeamsId {
+			teamRes, err := s.TeamClient.GetTeamWithEseaStanding(ctx, &pb_teams.NewTeamRequest{FaceitId: team})
+			if err != nil {
+				logger.Error(err.Error())
+				return nil, err
+			}
+			teams = append(teams, teamRes)
+		}
+
+		eseaLeagues = append(eseaLeagues, &pb.EseaLeague{
+			FaceitId: d.FaceitId,
+			Name:     d.Name,
+			Teams:    teams,
+		})
+	}
+
+	eseaDetails := &pb.EseaDetails{
+		Tournament: &pb.Tournament{
+			FaceitId:        t.FaceitId,
+			OrganizerId:     t.OrganizerId,
+			Name:            t.Name,
+			RegisterDate:    t.RegisterDate.Unix(),
+			StartDate:       t.RegisterDate.Unix(),
+			CurrentTeams:    int32(t.CurrentTeams),
+			Slots:           int32(t.Slots),
+			JoinPolicy:      t.JoinPolicy,
+			GeoCountries:    t.GeoCountries,
+			MinLevel:        int32(t.MinLevel),
+			MaxLavel:        int32(t.MaxLevel),
+			Status:          t.Status,
+			BackgroundImage: t.BackgroundImage,
+			CoverImage:      t.CoverImage,
+			Avatar:          t.Avatar,
+			TeamsId:         t.TeamsId,
+			Id:              int32(t.ID),
+		},
+		EseaLeague: eseaLeagues,
+	}
+
+	return eseaDetails, nil
 }

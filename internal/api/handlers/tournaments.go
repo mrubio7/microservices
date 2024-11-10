@@ -83,3 +83,22 @@ func (h *Tournament_Handlers) GetAllTournaments(c *gin.Context) {
 
 	c.JSON(http.StatusOK, response.BuildOk("Ok", res))
 }
+
+func (h *Tournament_Handlers) GetEseaDetails(c *gin.Context) {
+	id := c.Query("id")
+	if id == "" {
+		logger.Error("tried to get an empty id")
+		c.JSON(http.StatusBadRequest, response.BuildError("Invalid ID"))
+		return
+	}
+
+	res, err := h.matches_client.GetEseaDetails(c, &pb_tournaments.GetTournamentByIdRequest{FaceitId: id})
+	if err != nil {
+		logger.Error(err.Error())
+		c.JSON(http.StatusBadRequest, response.BuildError("Error getting tournament"))
+		return
+	}
+
+	c.JSON(http.StatusOK, response.BuildOk("Ok", res))
+
+}

@@ -284,3 +284,63 @@ func (s *Server) GetTeamFromFaceit(ctx context.Context, request *pb.NewTeamReque
 
 	return pbTeam, nil
 }
+
+func (s *Server) GetTeamWithEseaStanding(ctx context.Context, request *pb.NewTeamRequest) (*pb.Team, error) {
+	t := s.TeamsService.GetTeam(request.FaceitId)
+	if t == nil {
+		err := errors.New("team not found")
+		logger.Error(err.Error())
+		return nil, err
+	}
+
+	mapStats := make(map[string]*pb.TeamMapStats, len(t.Stats.MapStats))
+	for _, m := range t.Stats.MapStats {
+		mapStats[m.MapName] = &pb.TeamMapStats{
+			MapName: m.MapName,
+			Winrate: m.WinRate,
+			Matches: m.Matches,
+		}
+	}
+
+	standing, err := s.TeamsService.GetEseaStanding(t.FaceitId)
+	if err != nil {
+		logger.Error(err.Error())
+		return nil, err
+	}
+
+	pbTeam := &pb.Team{
+		Id:          t.ID,
+		FaceitId:    t.FaceitId,
+		Name:        t.Name,
+		Nickname:    t.Nickname,
+		Avatar:      t.Avatar,
+		Active:      t.Active,
+		PlayersId:   t.PlayersId,
+		Twitter:     t.Twitter,
+		Instagram:   t.Instagram,
+		Web:         t.Web,
+		Tournaments: t.Tournaments,
+		Stats: &pb.TeamStats{
+			TotalMatches:  t.Stats.TotalMatches,
+			Wins:          t.Stats.Wins,
+			Winrate:       t.Stats.Winrate,
+			RecentResults: t.Stats.RecentResults,
+			MapStats:      mapStats,
+		},
+		Standing: &pb.Standing{
+			FaceitId:       standing.FaceitId,
+			TournamentId:   standing.TournamentId,
+			IsDisqualified: standing.IsDisqualified,
+			RankStart:      int32(standing.RankStart),
+			RankEnd:        int32(standing.RankEnd),
+			MatchesPlayed:  int32(standing.MatchesPlayed),
+			MatchesWon:     int32(standing.MatchesWon),
+			MatchesLost:    int32(standing.MatchesLost),
+			MatchesTied:    int32(standing.MatchesTied),
+			Points:         int32(standing.Points),
+			BuchholzScore:  int32(standing.BuchholzScore),
+		},
+	}
+
+	return pbTeam, nil
+}

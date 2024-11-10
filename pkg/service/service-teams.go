@@ -127,3 +127,14 @@ func (s *Teams) FindTeamsByPlayerId(id string) ([]model.TeamModel, error) {
 
 	return teams, nil
 }
+
+func (s *Teams) GetEseaStanding(id string) (model.EseaStandingModel, error) {
+	var standing model.EseaStandingModel
+
+	err := s.db.Where("faceit_id = ?", id).First(&standing).Error
+	if err != nil {
+		return model.EseaStandingModel{}, err
+	}
+
+	return standing, nil
+}

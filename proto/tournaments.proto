@@ -3,6 +3,7 @@ syntax = "proto3";
 package tournaments;
 option go_package = "ibercs/proto/tournaments;tournaments";
 
+import "proto/teams.proto";
 
 message Tournament {
     int32 Id = 1;
@@ -32,11 +33,23 @@ message Organizer {
 
 message Empty {}
 
+message EseaLeague {
+    string FaceitId = 1;
+    string Name = 2;
+    repeated teams.Team Teams = 3;
+}
+
+message EseaDetails {
+    Tournament Tournament = 1;
+    repeated EseaLeague EseaLeague = 2;
+}
+
 service TournamentService {
     rpc NewOrganizer (NewOrganizerRequest) returns (Organizer);
     rpc NewTournament (NewTournamentRequest) returns (Tournament);
     rpc GetAllTorunaments (Empty) returns (TournamentList);
     rpc GetTournament (GetTournamentByIdRequest) returns (Tournament);
+    rpc GetEseaDetails (GetTournamentByIdRequest) returns (EseaDetails);
 }
 
 message GetTournamentByIdRequest {
