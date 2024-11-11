@@ -50,7 +50,7 @@ func (svc *Tournaments) GetAllTournaments(active bool) []model.TournamentModel {
 	var tournaments []model.TournamentModel
 
 	if active {
-		err := svc.db.Model(&model.TournamentModel{}).Where("status != ? || status != ?", "finished", "cancelled").Find(&tournaments).Error
+		err := svc.db.Model(&model.TournamentModel{}).Where("status != ? OR status != ?", "finished", "cancelled").Find(&tournaments).Error
 		if err != nil {
 			if gorm.ErrRecordNotFound == err {
 				return nil
