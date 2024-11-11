@@ -148,7 +148,6 @@ func (c *FaceitClient) GetTeamById(teamId string) *model.TeamModel {
 	teamStats, err := c.client.GetTeamStats(teamId, "cs2", nil)
 	if err != nil {
 		logger.Error("Error getting team stats in faceitservice: %s", err.Error())
-		return nil
 	}
 
 	var players []string
