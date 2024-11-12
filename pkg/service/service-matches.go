@@ -25,7 +25,14 @@ func (svc *Matches) SaveMatch(match model.MatchModel) *model.MatchModel {
 
 	err := svc.db.Model(&model.MatchModel{}).Where("faceit_id = ?", match.FaceitId).First(&existingMatch).Error
 	if err == nil {
-		logger.Warning("Match %s already exist", match.FaceitId)
+		if existingMatch.ID > 0 {
+			logger.Warning("Match %s already exist", match.FaceitId)
+			err = svc.db.Model(&model.MatchModel{}).Where("faceit_id = ?", match.FaceitId).Updates(&match).Error
+			if err != nil {
+				logger.Error("Error updating match: %s", err)
+				return nil
+			}
+		}
 		return &existingMatch
 	}
 

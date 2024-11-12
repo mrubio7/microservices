@@ -40,4 +40,6 @@ func Update(w http.ResponseWriter) {
 		}
 	}
 	svcState.SetLastUpdateTeams(time.Now())
+	logger.Info("Finished teams worker [UpdateTeams]")
+
 }

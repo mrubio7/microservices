@@ -105,4 +105,5 @@ func Update(w http.ResponseWriter) {
 	wg.Wait()
 
 	svcState.SetLastUpdatePlayer(time.Now().UTC())
+	logger.Info("Players update worker [UpdatePlayers] finished")
 }

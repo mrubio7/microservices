@@ -69,4 +69,5 @@ func Find() {
 		}
 	}
 
+	logger.Info("Matches worker [FindMatches] finished")
 }
