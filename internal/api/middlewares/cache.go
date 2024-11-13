@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"net/http"
 	"net/url"
+	"regexp"
 	"time"
 
 	"ibercs/pkg/cache" // Ajusta el import al path correcto
@@ -22,37 +23,49 @@ func (w *cachedWriter) Write(b []byte) (int, error) {
 	return w.ResponseWriter.Write(b)
 }
 
+var nonCacheablePatterns = []*regexp.Regexp{
+	regexp.MustCompile(`^/api/v1/users/get/.*$`),   // Coincide con /api/v1/users/get?...
+	regexp.MustCompile(`^/api/v1/matches/get/.*$`), // Coincide con /api/v1/players/get?...
+}
+
+func isCacheableRequest(requestPath string) bool {
+	for _, pattern := range nonCacheablePatterns {
+		if pattern.MatchString(requestPath) {
+			return false
+		}
+	}
+	return true
+}
+
 func CacheMiddleware(c *cache.Cache, ttl time.Duration) gin.HandlerFunc {
 	return func(ctx *gin.Context) {
-		// Define los endpoints que no deben ser cacheados
-		noCachePaths := map[string]bool{
-			"/api/v1/auth/callback": true,
-		}
+		requestPath := ctx.Request.URL.Path
 
-		// Verifica si el endpoint actual debe omitirse de la cache
-		if _, shouldSkip := noCachePaths[ctx.Request.URL.Path]; shouldSkip {
+		// Verifica si la solicitud debe ser cacheada
+		if !isCacheableRequest(requestPath) {
+			// Omite el cacheo para esta solicitud
 			ctx.Next()
 			return
 		}
 
-		// Construye la clave de cache para el endpoint actual
+		// Construye la clave de caché
 		cacheKey := buildCacheKey(ctx.Request.URL)
 
-		// Intenta obtener datos en cache
+		// Intenta obtener la respuesta de la caché
 		if cachedData, found := c.Get(cacheKey); found {
 			ctx.Data(http.StatusOK, "application/json", cachedData.([]byte))
 			ctx.Abort()
 			return
 		}
 
-		// Intercepta la respuesta para almacenarla en cache si corresponde
+		// Captura la respuesta
 		writer := &cachedWriter{body: bytes.NewBuffer([]byte{}), ResponseWriter: ctx.Writer}
 		ctx.Writer = writer
 
 		ctx.Next()
 
-		// Verifica si la respuesta fue exitosa y si no es una solicitud autenticada
 		_, isAuthReq := ctx.Get("identity")
+
 		if ctx.Writer.Status() == http.StatusOK && !isAuthReq {
 			responseData := writer.body.Bytes()
 			c.Set(cacheKey, responseData, ttl)
