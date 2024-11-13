@@ -8,6 +8,7 @@ import (
 	pb_users "ibercs/proto/users"
 	"net/http"
 	"strconv"
+	"sync"
 
 	"github.com/gin-gonic/gin"
 	"google.golang.org/grpc/codes"
@@ -59,13 +60,33 @@ func (h *Users_Handlers) GetStreams(c *gin.Context) {
 		return
 	}
 
-	var res []*twitch.Channel
+	var (
+		res       []*twitch.Channel
+		wg        sync.WaitGroup
+		chMutex   sync.Mutex
+		numGorout = 10
+		semaphore = make(chan struct{}, numGorout)
+	)
+
 	for _, channel := range streams.Streams {
-		ch := twitch.GetStreamData(channel.Stream, channel.Name)
-		if ch != nil {
-			res = append(res, ch)
-		}
+		wg.Add(1)
+		semaphore <- struct{}{}
+
+		go func(channel *pb_users.StreamResponse) {
+			defer wg.Done()
+			defer func() { <-semaphore }()
+
+			ch := twitch.GetStreamData(channel.Stream, channel.Name)
+			if ch != nil {
+				chMutex.Lock()
+				res = append(res, ch)
+				chMutex.Unlock()
+			}
+		}(channel)
 	}
+
+	wg.Wait()
+	close(semaphore)
 
 	c.JSON(http.StatusOK, response.BuildOk("Ok", res))
 }
