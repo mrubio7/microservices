@@ -7,7 +7,7 @@ const (
 )
 
 const (
-	CACHE_DURATION = 5 * time.Minute
+	CACHE_DURATION = 15 * time.Minute
 )
 
 const (
