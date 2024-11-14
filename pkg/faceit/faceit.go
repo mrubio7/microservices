@@ -168,6 +168,8 @@ func (c *FaceitClient) GetTeamById(teamId string) *model.TeamModel {
 		FaceitId:  team.TeamId,
 		Name:      team.Name,
 		Nickname:  team.Nickname,
+		Web:       team.Website,
+		Twitter:   team.Twitter,
 		Avatar:    team.Avatar,
 		PlayersId: players,
 		Stats: model.TeamStatsModel{
