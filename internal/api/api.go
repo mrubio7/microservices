@@ -66,6 +66,7 @@ func (api *Api) Start() {
 	api.router.gin.POST("/api/v1/teams/new", teams_handlers.New)
 	api.router.gin.GET("/api/v1/teams/get", teams_handlers.Get)
 	api.router.gin.GET("/api/v1/teams/get-all", teams_handlers.GetAll)
+	api.router.gin.GET("/api/v1/teams/ranks", teams_handlers.GetRanks)
 	api.router.gin.GET("/api/v1/teams/find-player", teams_handlers.FindTeamByPlayerId)
 
 	api.router.gin.GET("/api/v1/matches/get-all", matches_handlers.GetAll)

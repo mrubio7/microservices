@@ -344,3 +344,23 @@ func (s *Server) GetTeamWithEseaStanding(ctx context.Context, request *pb.NewTea
 
 	return pbTeam, nil
 }
+
+func (s *Server) GetRanks(ctx context.Context, _ *pb.Empty) (*pb.TeamList, error) {
+	ranks, err := s.TeamsService.GetRanking()
+	if err != nil {
+		return nil, err
+	}
+
+	var pbTeams []*pb.Team
+	for _, t := range ranks {
+		pbTeams = append(pbTeams, &pb.Team{
+			Id:       t.ID,
+			FaceitId: t.FaceitId,
+			Name:     t.Name,
+			Rank:     int32(t.Rank),
+			Avatar:   t.Avatar,
+		})
+	}
+
+	return &pb.TeamList{Teams: pbTeams}, nil
+}

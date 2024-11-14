@@ -16,7 +16,8 @@ message Team {
     string Instagram = 10;
     string Web = 11;
     repeated string Tournaments = 12;
-    Standing Standing = 13;
+    int32 Rank = 13;
+    Standing Standing = 14;
 }
 
 message Standing {
@@ -59,6 +60,7 @@ service TeamService {
     rpc FindTeamByPlayerId(NewTeamRequest) returns (TeamList);
     rpc GetTeamFromFaceit(NewTeamRequest) returns (Team);
     rpc GetTeamWithEseaStanding(NewTeamRequest) returns (Team);
+    rpc GetRanks(Empty) returns (TeamList);
 }
 
 message TeamList {

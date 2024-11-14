@@ -138,3 +138,58 @@ func (s *Teams) GetEseaStanding(id string) (model.EseaStandingModel, error) {
 
 	return standing, nil
 }
+
+func (s *Teams) GetRanking() ([]model.TeamModel, error) {
+	var rankings []model.TeamModel
+
+	// Subconsulta match_results
+	matchResults := s.db.
+		Table("match_models").
+		Select(`
+            CASE 
+                WHEN best_of = 1 AND score_team_a = 1 THEN team_a_faceit_id
+                WHEN best_of = 1 AND score_team_b = 1 THEN team_b_faceit_id
+                WHEN best_of > 1 AND score_team_a > score_team_b THEN team_a_faceit_id
+                WHEN best_of > 1 AND score_team_b > score_team_a THEN team_b_faceit_id
+                ELSE NULL
+            END AS winning_team,
+            tournament_faceit_id`).
+		Where(`
+            (best_of = 1 AND (score_team_a = 1 OR score_team_b = 1)) OR 
+            (best_of > 1 AND (score_team_a != score_team_b))
+        `)
+
+	// Subconsulta ranking_update
+	rankingUpdate := s.db.
+		Table("(?) AS match_results", matchResults).
+		Select(`
+            esea_division_models.name AS league_name,
+            team_models.name AS name,
+            team_models.avatar AS avatar,
+            team_models.faceit_id AS faceit_id,
+            CASE 
+                WHEN esea_division_models.name ILIKE '%Advanced%' THEN 45
+                WHEN esea_division_models.name ILIKE '%Main%' THEN 35
+                WHEN esea_division_models.name ILIKE '%Intermediate%' THEN 25
+                WHEN esea_division_models.name ILIKE '%Open10%' THEN 20
+                WHEN esea_division_models.name ILIKE '%Open%' THEN 10
+                ELSE 0
+            END AS base_rank,
+            SUM(CASE WHEN match_results.winning_team = team_models.faceit_id THEN 3 ELSE 0 END) AS additional_rank`).
+		Joins("JOIN esea_division_models ON esea_division_models.faceit_id = match_results.tournament_faceit_id").
+		Joins("JOIN team_models ON team_models.faceit_id = match_results.winning_team").
+		Group("esea_division_models.name, team_models.name, team_models.avatar, team_models.faceit_id")
+
+	// Consulta final
+	err := s.db.
+		Table("(?) AS ranking_update", rankingUpdate).
+		Select("league_name, name, avatar, faceit_id, base_rank + additional_rank AS Rank").
+		Order("Rank DESC").
+		Find(&rankings).Error
+
+	if err != nil {
+		return nil, err
+	}
+
+	return rankings, nil
+}

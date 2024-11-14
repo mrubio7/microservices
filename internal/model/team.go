@@ -19,6 +19,7 @@ type TeamModel struct {
 	Instagram   string          `gorm:"null"`
 	Web         string          `gorm:"null"`
 	Tournaments JSONStringArray `gorm:"type:json;null"`
+	Rank        int             `gorm:"null"`
 }
 
 // Define a custom type

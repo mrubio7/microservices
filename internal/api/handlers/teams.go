@@ -114,3 +114,14 @@ func (th *Team_Handlers) FindTeamByPlayerId(c *gin.Context) {
 
 	c.JSON(http.StatusOK, response.BuildOk("Ok", res))
 }
+
+func (th *Team_Handlers) GetRanks(c *gin.Context) {
+	res, err := th.teams_client.GetRanks(c, &pb_teams.Empty{})
+	if err != nil {
+		logger.Error("Error getting team ranking")
+		c.JSON(http.StatusInternalServerError, response.BuildError("Error getting team ranking"))
+		return
+	}
+
+	c.JSON(http.StatusOK, response.BuildOk("Ok", res))
+}
