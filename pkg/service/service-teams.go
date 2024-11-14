@@ -166,6 +166,7 @@ func (s *Teams) GetRanking() ([]model.TeamModel, error) {
             esea_division_models.name AS league_name,
             team_models.name AS name,
             team_models.avatar AS avatar,
+			team_models.nickname as nickname,
             team_models.faceit_id AS faceit_id,
             CASE 
                 WHEN esea_division_models.name ILIKE '%Advanced%' THEN 45
@@ -178,12 +179,12 @@ func (s *Teams) GetRanking() ([]model.TeamModel, error) {
             SUM(CASE WHEN match_results.winning_team = team_models.faceit_id THEN 3 ELSE 0 END) AS additional_rank`).
 		Joins("JOIN esea_division_models ON esea_division_models.faceit_id = match_results.tournament_faceit_id").
 		Joins("JOIN team_models ON team_models.faceit_id = match_results.winning_team").
-		Group("esea_division_models.name, team_models.name, team_models.avatar, team_models.faceit_id")
+		Group("esea_division_models.name, team_models.name, team_models.avatar, team_models.nickname, team_models.faceit_id")
 
 	// Consulta final
 	err := s.db.
 		Table("(?) AS ranking_update", rankingUpdate).
-		Select("league_name, name, avatar, faceit_id, base_rank + additional_rank AS Rank").
+		Select("league_name, name, nickname, avatar, faceit_id, base_rank + additional_rank AS Rank").
 		Order("Rank DESC").
 		Find(&rankings).Error
 

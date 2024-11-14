@@ -357,6 +357,7 @@ func (s *Server) GetRanks(ctx context.Context, _ *pb.Empty) (*pb.TeamList, error
 			Id:       t.ID,
 			FaceitId: t.FaceitId,
 			Name:     t.Name,
+			Nickname: t.Nickname,
 			Rank:     int32(t.Rank),
 			Avatar:   t.Avatar,
 		})
