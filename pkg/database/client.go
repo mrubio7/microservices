@@ -3,6 +3,7 @@ package database
 import (
 	"fmt"
 	"ibercs/internal/model"
+	"ibercs/internal/model/webhooks"
 	"ibercs/pkg/config"
 
 	"ibercs/pkg/logger"
@@ -46,4 +47,5 @@ func migrateTables(db *gorm.DB) {
 	db.AutoMigrate(&model.MatchModel{})
 	db.AutoMigrate(&model.LookingForTeamModel{})
 	db.AutoMigrate(&model.EseaStandingModel{})
+	db.AutoMigrate(&webhooks.AllstarClipProcessed{})
 }

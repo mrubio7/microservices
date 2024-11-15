@@ -45,10 +45,13 @@ func (api *Api) Start() {
 	workers_handlers := handlers.NewWorkersHandlers(api.cfg.Workers)
 	matches_handlers := handlers.NewMatchesHandlers(*api.router.MatchesServer)
 	state_handlers := handlers.NewStateHandlers(api.db)
+	webhooks_handlers := handlers.NewWebhooksHandlers(api.db)
 
 	api.router.gin.Use(middlewares.CORSMiddleware())
 	api.router.gin.Use(middlewares.CacheMiddleware(cache, consts.CACHE_DURATION))
 	api.router.gin.Use(middlewares.CacheInvalidationMiddleware(cache))
+
+	api.router.gin.POST("/api/v1/webhooks/allstar-clip-processed", webhooks_handlers.AllstarClipProcessed)
 
 	api.router.gin.GET("/api/v1/tournaments/get-all", tournaments_handlers.GetAllTournaments)
 
