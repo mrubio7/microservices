@@ -29,7 +29,7 @@ func (h *Webhooks_Handlers) AllstarClipProcessed(c *gin.Context) {
 		return
 	}
 
-	if err := h.db.Create(&clip).Error; err != nil {
+	if err := h.db.Model(&webhooks.AllstarClipProcessed{}).Create(&clip).Error; err != nil {
 		logger.Error("Error creating clip", err)
 		c.JSON(http.StatusInternalServerError, response.BuildError("Error creating clip"))
 		return
