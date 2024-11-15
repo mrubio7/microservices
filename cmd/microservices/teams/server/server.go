@@ -135,6 +135,9 @@ func (s *Server) GetTeamByNickname(ctx context.Context, teamRequest *pb.NewTeamR
 	}
 
 	teamUpdated.ID = t.ID
+	teamUpdated.Twitter = t.Twitter
+	teamUpdated.Instagram = t.Instagram
+	teamUpdated.Web = t.Web
 	if !reflect.DeepEqual(t, teamUpdated) {
 		t = teamUpdated
 		res := s.TeamsService.UpdateTeam(*teamUpdated)
