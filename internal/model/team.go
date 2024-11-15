@@ -12,7 +12,7 @@ type TeamModel struct {
 	Name        string          `gorm:"not null"`
 	Nickname    string          `gorm:"not null"`
 	Avatar      string          `gorm:"null"`
-	Active      bool            `gorm:"not null; default:true"`
+	Active      bool            `gorm:"not null; default:false"`
 	Stats       TeamStatsModel  `gorm:"foreignKey:ID;references:ID"`
 	PlayersId   JSONStringArray `gorm:"type:jsonb;not null"`
 	Twitter     string          `gorm:"null"`
