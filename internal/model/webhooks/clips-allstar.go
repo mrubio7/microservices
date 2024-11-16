@@ -6,15 +6,15 @@ import (
 	"errors"
 )
 
-// AdditionalData define un array de arrays de estructuras
-type AdditionalData [][]struct {
+// AdditionalData define un array de objetos simples
+type AdditionalData []struct {
 	Key   string `json:"key"`
 	Value string `json:"value"`
 }
 
 // Implementación de los métodos para manejar AdditionalData como jsonb
 func (a AdditionalData) Value() (driver.Value, error) {
-	// Serializar el array de arrays como JSON
+	// Serializar AdditionalData como JSON
 	return json.Marshal(a)
 }
 
