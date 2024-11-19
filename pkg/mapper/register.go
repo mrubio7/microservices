@@ -1,21 +1,22 @@
 package mapper
 
 import (
-	"psonder/internal/models"
-	users_mapper "psonder/pkg/mapper/users"
-	pb "psonder/proto/users"
+	"ibercs/internal/model"
+	matches_mapper "ibercs/pkg/mapper/matches"
+	pb "ibercs/proto/matches"
 )
 
 func RegisterMappers() {
-	// Mapper para User
-	Register(Mapper[models.UserModel, *pb.User]{
-		From: users_mapper.UserMapper{}.Proto,
-		To:   users_mapper.UserMapper{}.Model,
+	// Mapper para MatchModel -> Proto
+	Register(Mapper[model.MatchModel, *pb.Match]{
+		From: matches_mapper.MatchMapper{}.Proto,
+		To:   matches_mapper.MatchMapper{}.Model,
 	})
 
-	Register(Mapper[*pb.User, models.UserModel]{
-		From: users_mapper.UserMapper{}.Model,
-		To:   users_mapper.UserMapper{}.Proto,
+	// Mapper para Proto -> MatchModel
+	Register(Mapper[*pb.Match, model.MatchModel]{
+		From: matches_mapper.MatchMapper{}.Model,
+		To:   matches_mapper.MatchMapper{}.Proto,
 	})
 
 }

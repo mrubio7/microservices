@@ -18,41 +18,24 @@ func NewMatchManager(database *gorm.DB) *MatchManager {
 	return &MatchManager{repo: repo}
 }
 
-func (m *MatchManager) UpdateOrCreateMatch(match model.MatchModel) (*model.MatchModel, error) {
-	existingMatch, err := m.repo.GetByFaceitId(match.FaceitId)
-	if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
-		return nil, err
-	}
+func (m *MatchManager) Create(match *model.MatchModel) (*model.MatchModel, error) {
+	return m.repo.Create(match)
+}
 
-	if existingMatch == nil {
-		if err := m.repo.Create(&match); err != nil {
-			return nil, err
-		}
-		return &match, nil
-	}
-
-	if err := m.repo.Update(&match); err != nil {
-		return nil, err
-	}
-
-	updatedMatch, err := m.repo.GetByFaceitId(match.FaceitId)
-	if err != nil {
-		return nil, err
-	}
-
-	return updatedMatch, nil
+func (m *MatchManager) Update(match *model.MatchModel) error {
+	return m.repo.Update(match, "faceit_id", match.FaceitId)
 }
 
 func (m *MatchManager) GetMatchByFaceitId(faceitId string) (*model.MatchModel, error) {
-	return m.repo.GetByFaceitId(faceitId)
+	return m.repo.Get(repositories.Where("faceit_id", faceitId))
 }
 
 func (m *MatchManager) GetMatchesByTeamId(teamId string) ([]model.MatchModel, error) {
-	return m.repo.GetWhere("team_a_faceit_id = ? OR team_b_faceit_id = ?", teamId, teamId)
+	return m.repo.Find(repositories.Where("team_a_faceit_id = ? OR team_b_faceit_id = ?", teamId, teamId))
 }
 
 func (m *MatchManager) SetStreamUrl(faceitId, streamUrl string) error {
-	existingMatch, err := m.repo.GetByFaceitId(faceitId)
+	existingMatch, err := m.GetMatchByFaceitId(faceitId)
 	if err != nil {
 		return err
 	}
@@ -64,7 +47,7 @@ func (m *MatchManager) SetStreamUrl(faceitId, streamUrl string) error {
 	}
 	existingMatch.Streams = append(existingMatch.Streams, streamUrl)
 
-	if err := m.repo.Update(existingMatch); err != nil {
+	if err := m.Update(existingMatch); err != nil {
 		return err
 	}
 
@@ -72,5 +55,5 @@ func (m *MatchManager) SetStreamUrl(faceitId, streamUrl string) error {
 }
 
 func (m *MatchManager) GetAll() ([]model.MatchModel, error) {
-	return m.repo.GetAll()
+	return m.repo.Find()
 }

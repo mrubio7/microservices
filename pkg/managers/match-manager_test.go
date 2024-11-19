@@ -34,7 +34,7 @@ func TestMatchCreateWithFaker(t *testing.T) {
 	fakeMatch := faker.GenerateMatch(time.Now().Unix())
 
 	// Create the match
-	createdMatch, err := manager.UpdateOrCreateMatch(fakeMatch)
+	createdMatch, err := manager.Create(&fakeMatch)
 	assert.Nil(t, err, "Error should be nil")
 	assert.Equal(t, fakeMatch.FaceitId, createdMatch.FaceitId, "FaceitId should match")
 	assert.Equal(t, fakeMatch.TeamAName, createdMatch.TeamAName, "TeamAName should match")
@@ -50,15 +50,20 @@ func TestMatchUpdateWithFaker(t *testing.T) {
 	fakeMatch := faker.GenerateMatch(time.Now().Unix())
 
 	// Create the match
-	createdMatch, err := manager.UpdateOrCreateMatch(fakeMatch)
+	createdMatch, err := manager.Create(&fakeMatch)
 	assert.Nil(t, err, "Error should be nil")
 	assert.Equal(t, fakeMatch.FaceitId, createdMatch.FaceitId, "FaceitId should match")
 	assert.Equal(t, fakeMatch.TeamAName, createdMatch.TeamAName, "TeamAName should match")
 
 	createdMatch.TeamAName = "New Team A Name"
 	// Update the match
-	updatedMatch, err := manager.UpdateOrCreateMatch(*createdMatch)
+	err = manager.Update(createdMatch)
 	assert.Nil(t, err, "Error should be nil")
+
+	// Get the match by FaceitId
+	updatedMatch, err := manager.GetMatchByFaceitId(createdMatch.FaceitId)
+	assert.Nil(t, err, "Error should be nil")
+
 	assert.Equal(t, createdMatch.FaceitId, updatedMatch.FaceitId, "FaceitId should match")
 	assert.Equal(t, createdMatch.TeamAName, updatedMatch.TeamAName, "TeamAName should match")
 }
@@ -73,7 +78,7 @@ func TestMatchGetByFaceitId(t *testing.T) {
 	fakeMatch := faker.GenerateMatch(time.Now().Unix())
 
 	// Create the match
-	createdMatch, err := manager.UpdateOrCreateMatch(fakeMatch)
+	createdMatch, err := manager.Create(&fakeMatch)
 	assert.Nil(t, err, "Error should be nil")
 	assert.Equal(t, fakeMatch.FaceitId, createdMatch.FaceitId, "FaceitId should match")
 
@@ -93,7 +98,7 @@ func TestSetStream(t *testing.T) {
 	fakeMatch := faker.GenerateMatch(time.Now().Unix())
 
 	// Create the match
-	createdMatch, err := manager.UpdateOrCreateMatch(fakeMatch)
+	createdMatch, err := manager.Create(&fakeMatch)
 	assert.Nil(t, err, "Error should be nil")
 	assert.Equal(t, fakeMatch.FaceitId, createdMatch.FaceitId, "FaceitId should match")
 
@@ -121,19 +126,19 @@ func TestGetAllMatches(t *testing.T) {
 	fakeMatch4 := faker.GenerateMatch(4444)
 
 	// Create the matches
-	createdMatch1, err := manager.UpdateOrCreateMatch(fakeMatch1)
+	createdMatch1, err := manager.Create(&fakeMatch1)
 	assert.Nil(t, err, "Error should be nil")
 	assert.Equal(t, fakeMatch1.FaceitId, createdMatch1.FaceitId, "FaceitId should match")
 
-	createdMatch2, err := manager.UpdateOrCreateMatch(fakeMatch2)
+	createdMatch2, err := manager.Create(&fakeMatch2)
 	assert.Nil(t, err, "Error should be nil")
 	assert.Equal(t, fakeMatch2.FaceitId, createdMatch2.FaceitId, "FaceitId should match")
 
-	createdMatch3, err := manager.UpdateOrCreateMatch(fakeMatch3)
+	createdMatch3, err := manager.Create(&fakeMatch3)
 	assert.Nil(t, err, "Error should be nil")
 	assert.Equal(t, fakeMatch3.FaceitId, createdMatch3.FaceitId, "FaceitId should match")
 
-	createdMatch4, err := manager.UpdateOrCreateMatch(fakeMatch4)
+	createdMatch4, err := manager.Create(&fakeMatch4)
 	assert.Nil(t, err, "Error should be nil")
 	assert.Equal(t, fakeMatch4.FaceitId, createdMatch4.FaceitId, "FaceitId should match")
 
@@ -156,24 +161,23 @@ func TestGetMatchesByTeam(t *testing.T) {
 
 	teamFaceitID := gofakeit.UUID()
 	fakeMatch1.TeamAFaceitId = teamFaceitID
-	fakeMatch2.TeamBFaceitId = teamFaceitID
 	fakeMatch3.TeamBFaceitId = teamFaceitID
 
 	// Create the matches
-	createdMatch1, err := manager.UpdateOrCreateMatch(fakeMatch1)
+	createdMatch1, err := manager.Create(&fakeMatch1)
 	assert.Nil(t, err, "Error should be nil")
 	assert.Equal(t, fakeMatch1.FaceitId, createdMatch1.FaceitId, "FaceitId should match")
 
-	createdMatch2, err := manager.UpdateOrCreateMatch(fakeMatch2)
+	createdMatch2, err := manager.Create(&fakeMatch2)
 	assert.Nil(t, err, "Error should be nil")
 	assert.Equal(t, fakeMatch2.FaceitId, createdMatch2.FaceitId, "FaceitId should match")
 
-	createdMatch3, err := manager.UpdateOrCreateMatch(fakeMatch3)
+	createdMatch3, err := manager.Create(&fakeMatch3)
 	assert.Nil(t, err, "Error should be nil")
 	assert.Equal(t, fakeMatch3.FaceitId, createdMatch3.FaceitId, "FaceitId should match")
 
 	// Get the match by TeamId
 	gotMatches, err := manager.GetMatchesByTeamId(teamFaceitID)
 	assert.Nil(t, err, "Error should be nil")
-	assert.Len(t, gotMatches, 3, "Length should be 3")
+	assert.Len(t, gotMatches, 2, "Length should be 2")
 }
