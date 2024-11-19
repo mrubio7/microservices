@@ -2,12 +2,14 @@ package microservice_players
 
 import (
 	"context"
+	"ibercs/internal/model"
 	"ibercs/pkg/config"
 	"ibercs/pkg/consts"
 	"ibercs/pkg/database"
 	"ibercs/pkg/faceit"
 	"ibercs/pkg/logger"
 	"ibercs/pkg/managers"
+	"ibercs/pkg/mapper"
 	pb "ibercs/proto/players"
 )
 
@@ -43,26 +45,8 @@ func (s *Server) GetPlayer(ctx context.Context, req *pb.GetPlayerRequest) (*pb.P
 			return nil, err
 		}
 
-		player := &pb.Player{
-			Id:       p.ID,
-			Nickname: p.Nickname,
-			FaceitId: p.FaceitId,
-			SteamId:  p.SteamId,
-			Avatar:   p.Avatar,
-			Stats: &pb.PlayerStats{
-				PlayerId:               p.Stats.ID,
-				KdRatio:                p.Stats.KdRatio,
-				KrRatio:                p.Stats.KrRatio,
-				KillsAverage:           p.Stats.KillsAverage,
-				DeathsAverage:          p.Stats.DeathsAverage,
-				HeadshotPercentAverage: p.Stats.HeadshotPercentAverage,
-				MVPAverage:             p.Stats.MVPAverage,
-				AssistAverage:          p.Stats.AssistAverage,
-				Elo:                    p.Stats.Elo,
-			},
-		}
-
-		playersRes[i] = player
+		pbPlayer := mapper.Convert[*model.PlayerModel, pb.Player](p)
+		playersRes[i] = &pbPlayer
 	}
 
 	return &pb.PlayerList{Players: playersRes}, nil
