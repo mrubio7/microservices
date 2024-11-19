@@ -27,7 +27,7 @@ func NewDatabase(cfg config.DatabaseConfig) *Database {
 	})
 	if err != nil {
 		logger.Error("Failed to connect to database: %v", err)
-		return nil
+		log.Fatalf("Cannot proceed without a database connection")
 	}
 
 	logger.Debug("Database initialized")

@@ -22,16 +22,16 @@ type Router struct {
 	MatchesServer     *pb_matches.MatchesServiceClient
 }
 
-func NewRouter(cfg config.Config) *Router {
+func NewRouter(cfg config.ConfigV2) *Router {
 	r := &Router{
 		gin: gin.Default(),
 	}
 
-	r.registerPlayersServer(cfg.Microservices)
-	r.registerTeamsServer(cfg.Microservices)
-	r.registerUsersServer(cfg.Microservices)
-	r.registerTournamentsServer(cfg.Microservices)
-	r.registerMatchesServer(cfg.Microservices)
+	r.registerMatchesServer(cfg.MicroserviceMatches)
+	// r.registerPlayersServer(cfg.MicroservicePlayers)
+	// r.registerTeamsServer(cfg.MicroserviceTeams)
+	// r.registerUsersServer(cfg.MicroserviceUsers)
+	// r.registerTournamentsServer(cfg.MicroserviceTournaments)
 
 	return r
 }
@@ -42,22 +42,22 @@ func (r *Router) Listen() {
 	}
 }
 
-func (r *Router) registerPlayersServer(cfg config.MicroservicesConfig) {
-	r.PlayersServer = microservices.New(cfg.PlayersHost, cfg.PlayersPort, pb_players.NewPlayerServiceClient)
+func (r *Router) registerPlayersServer(cfg config.MicroserviceConfig) {
+	r.PlayersServer = microservices.New(cfg.Host_gRPC, cfg.Port_gRPC, pb_players.NewPlayerServiceClient)
 }
 
-func (r *Router) registerTeamsServer(cfg config.MicroservicesConfig) {
-	r.TeamsServer = microservices.New(cfg.TeamsHost, cfg.TeamsPort, pb_teams.NewTeamServiceClient)
+func (r *Router) registerTeamsServer(cfg config.MicroserviceConfig) {
+	r.TeamsServer = microservices.New(cfg.Host_gRPC, cfg.Port_gRPC, pb_teams.NewTeamServiceClient)
 }
 
-func (r *Router) registerUsersServer(cfg config.MicroservicesConfig) {
-	r.UsersServer = microservices.New(cfg.UserHost, cfg.UserPort, pb_users.NewUserServiceClient)
+func (r *Router) registerUsersServer(cfg config.MicroserviceConfig) {
+	r.UsersServer = microservices.New(cfg.Host_gRPC, cfg.Port_gRPC, pb_users.NewUserServiceClient)
 }
 
-func (r *Router) registerTournamentsServer(cfg config.MicroservicesConfig) {
-	r.TournamentsServer = microservices.New(cfg.TournamentsHost, cfg.TournamentsPort, pb_tournaments.NewTournamentServiceClient)
+func (r *Router) registerTournamentsServer(cfg config.MicroserviceConfig) {
+	r.TournamentsServer = microservices.New(cfg.Host_gRPC, cfg.Port_gRPC, pb_tournaments.NewTournamentServiceClient)
 }
 
-func (r *Router) registerMatchesServer(cfg config.MicroservicesConfig) {
-	r.MatchesServer = microservices.New(cfg.MatchesHost, cfg.MatchesPort, pb_matches.NewMatchesServiceClient)
+func (r *Router) registerMatchesServer(cfg config.MicroserviceConfig) {
+	r.MatchesServer = microservices.New(cfg.Host_gRPC, cfg.Port_gRPC, pb_matches.NewMatchesServiceClient)
 }

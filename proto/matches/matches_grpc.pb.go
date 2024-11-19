@@ -23,7 +23,8 @@ const (
 	MatchesService_GetUpcomingMatches_FullMethodName = "/matches.MatchesService/GetUpcomingMatches"
 	MatchesService_GetMatchByFaceitId_FullMethodName = "/matches.MatchesService/GetMatchByFaceitId"
 	MatchesService_SetStreamToMatch_FullMethodName   = "/matches.MatchesService/SetStreamToMatch"
-	MatchesService_GetMatchsOfTeamId_FullMethodName  = "/matches.MatchesService/GetMatchsOfTeamId"
+	MatchesService_GetMatchesByTeamId_FullMethodName = "/matches.MatchesService/GetMatchesByTeamId"
+	MatchesService_NewMatch_FullMethodName           = "/matches.MatchesService/NewMatch"
 )
 
 // MatchesServiceClient is the client API for MatchesService service.
@@ -34,7 +35,8 @@ type MatchesServiceClient interface {
 	GetUpcomingMatches(ctx context.Context, in *GetUpcomingRequest, opts ...grpc.CallOption) (*MatchList, error)
 	GetMatchByFaceitId(ctx context.Context, in *GetMatchRequest, opts ...grpc.CallOption) (*Match, error)
 	SetStreamToMatch(ctx context.Context, in *SetStreamRequest, opts ...grpc.CallOption) (*Bool, error)
-	GetMatchsOfTeamId(ctx context.Context, in *GetMatchRequest, opts ...grpc.CallOption) (*MatchList, error)
+	GetMatchesByTeamId(ctx context.Context, in *GetMatchRequest, opts ...grpc.CallOption) (*MatchList, error)
+	NewMatch(ctx context.Context, in *NewMatchRequest, opts ...grpc.CallOption) (*Match, error)
 }
 
 type matchesServiceClient struct {
@@ -85,10 +87,20 @@ func (c *matchesServiceClient) SetStreamToMatch(ctx context.Context, in *SetStre
 	return out, nil
 }
 
-func (c *matchesServiceClient) GetMatchsOfTeamId(ctx context.Context, in *GetMatchRequest, opts ...grpc.CallOption) (*MatchList, error) {
+func (c *matchesServiceClient) GetMatchesByTeamId(ctx context.Context, in *GetMatchRequest, opts ...grpc.CallOption) (*MatchList, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(MatchList)
-	err := c.cc.Invoke(ctx, MatchesService_GetMatchsOfTeamId_FullMethodName, in, out, cOpts...)
+	err := c.cc.Invoke(ctx, MatchesService_GetMatchesByTeamId_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *matchesServiceClient) NewMatch(ctx context.Context, in *NewMatchRequest, opts ...grpc.CallOption) (*Match, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(Match)
+	err := c.cc.Invoke(ctx, MatchesService_NewMatch_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -103,7 +115,8 @@ type MatchesServiceServer interface {
 	GetUpcomingMatches(context.Context, *GetUpcomingRequest) (*MatchList, error)
 	GetMatchByFaceitId(context.Context, *GetMatchRequest) (*Match, error)
 	SetStreamToMatch(context.Context, *SetStreamRequest) (*Bool, error)
-	GetMatchsOfTeamId(context.Context, *GetMatchRequest) (*MatchList, error)
+	GetMatchesByTeamId(context.Context, *GetMatchRequest) (*MatchList, error)
+	NewMatch(context.Context, *NewMatchRequest) (*Match, error)
 	mustEmbedUnimplementedMatchesServiceServer()
 }
 
@@ -126,8 +139,11 @@ func (UnimplementedMatchesServiceServer) GetMatchByFaceitId(context.Context, *Ge
 func (UnimplementedMatchesServiceServer) SetStreamToMatch(context.Context, *SetStreamRequest) (*Bool, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method SetStreamToMatch not implemented")
 }
-func (UnimplementedMatchesServiceServer) GetMatchsOfTeamId(context.Context, *GetMatchRequest) (*MatchList, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method GetMatchsOfTeamId not implemented")
+func (UnimplementedMatchesServiceServer) GetMatchesByTeamId(context.Context, *GetMatchRequest) (*MatchList, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetMatchesByTeamId not implemented")
+}
+func (UnimplementedMatchesServiceServer) NewMatch(context.Context, *NewMatchRequest) (*Match, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method NewMatch not implemented")
 }
 func (UnimplementedMatchesServiceServer) mustEmbedUnimplementedMatchesServiceServer() {}
 func (UnimplementedMatchesServiceServer) testEmbeddedByValue()                        {}
@@ -222,20 +238,38 @@ func _MatchesService_SetStreamToMatch_Handler(srv interface{}, ctx context.Conte
 	return interceptor(ctx, in, info, handler)
 }
 
-func _MatchesService_GetMatchsOfTeamId_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _MatchesService_GetMatchesByTeamId_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(GetMatchRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(MatchesServiceServer).GetMatchsOfTeamId(ctx, in)
+		return srv.(MatchesServiceServer).GetMatchesByTeamId(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: MatchesService_GetMatchsOfTeamId_FullMethodName,
+		FullMethod: MatchesService_GetMatchesByTeamId_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(MatchesServiceServer).GetMatchsOfTeamId(ctx, req.(*GetMatchRequest))
+		return srv.(MatchesServiceServer).GetMatchesByTeamId(ctx, req.(*GetMatchRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _MatchesService_NewMatch_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(NewMatchRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(MatchesServiceServer).NewMatch(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: MatchesService_NewMatch_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(MatchesServiceServer).NewMatch(ctx, req.(*NewMatchRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -264,8 +298,12 @@ var MatchesService_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _MatchesService_SetStreamToMatch_Handler,
 		},
 		{
-			MethodName: "GetMatchsOfTeamId",
-			Handler:    _MatchesService_GetMatchsOfTeamId_Handler,
+			MethodName: "GetMatchesByTeamId",
+			Handler:    _MatchesService_GetMatchesByTeamId_Handler,
+		},
+		{
+			MethodName: "NewMatch",
+			Handler:    _MatchesService_NewMatch_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

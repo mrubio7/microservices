@@ -11,13 +11,6 @@ import (
 )
 
 type (
-	Config struct {
-		Database       DatabaseConfig
-		FaceitApiToken string
-		Workers        WorkersConfig
-		Microservices  MicroservicesConfig
-	}
-
 	ConfigV2 struct {
 		ThirdPartyApiTokens     ThirdPartyApiTokens
 		MicroservicePlayers     MicroserviceConfig
@@ -40,27 +33,10 @@ type (
 		Scheme   string
 	}
 
-	WorkersConfig struct {
-		PlayersHost string
-	}
-
 	MicroserviceConfig struct {
 		Database  DatabaseConfig
 		Host_gRPC string
 		Port_gRPC string
-	}
-
-	MicroservicesConfig struct {
-		PlayersHost     string
-		PlayersPort     string
-		TeamsHost       string
-		TeamsPort       string
-		UserHost        string
-		UserPort        string
-		TournamentsHost string
-		TournamentsPort string
-		MatchesHost     string
-		MatchesPort     string
 	}
 )
 
@@ -82,47 +58,6 @@ func LoadTestDatabaseConfig(ctx context.Context, testContainer testcontainers.Co
 		Password: "testpass",
 		Scheme:   scheme,
 	}
-}
-
-func Load() (Config, error) {
-	logger.Debug("Loading config...")
-
-	env := os.Getenv("ENV")
-	if env == "" {
-		err := godotenv.Load()
-		if err != nil {
-			log.Fatal("Error al cargar el archivo .env")
-		}
-	}
-
-	config := Config{
-		Database: DatabaseConfig{
-			Host:     os.Getenv("DB_HOST"),
-			DbName:   os.Getenv("DB_NAME"),
-			Port:     os.Getenv("DB_PORT"),
-			User:     os.Getenv("DB_USER"),
-			Password: os.Getenv("DB_PASSWORD"),
-		},
-		FaceitApiToken: os.Getenv("FACEIT_API_TOKEN"),
-		Workers: WorkersConfig{
-			PlayersHost: os.Getenv("WORKER_PLAYERS_HOST"),
-		},
-		Microservices: MicroservicesConfig{
-			PlayersHost:     os.Getenv("MICROSERVICE_PLAYERS_HOST"),
-			PlayersPort:     os.Getenv("MICROSERVICE_PLAYERS_PORT"),
-			TeamsHost:       os.Getenv("MICROSERVICE_TEAMS_HOST"),
-			TeamsPort:       os.Getenv("MICROSERVICE_TEAMS_PORT"),
-			UserHost:        os.Getenv("MICROSERVICE_USERS_HOST"),
-			UserPort:        os.Getenv("MICROSERVICE_USERS_PORT"),
-			TournamentsHost: os.Getenv("MICROSERVICE_TOURNAMENTS_HOST"),
-			TournamentsPort: os.Getenv("MICROSERVICE_TOURNAMENTS_PORT"),
-			MatchesHost:     os.Getenv("MICROSERVICE_MATCHES_HOST"),
-			MatchesPort:     os.Getenv("MICROSERVICE_MATCHES_PORT"),
-		},
-	}
-
-	logger.Debug("Config loaded successfully")
-	return config, nil
 }
 
 func LoadV2() (ConfigV2, error) {
@@ -147,6 +82,7 @@ func LoadV2() (ConfigV2, error) {
 				Port:     os.Getenv("DB_PORT"),
 				User:     os.Getenv("DB_USER"),
 				Password: os.Getenv("DB_PASSWORD"),
+				Scheme:   os.Getenv("MICROSERVICE_PLAYERS_DB_SCHEME"),
 			},
 			Host_gRPC: os.Getenv("MICROSERVICE_PLAYERS_HOST"),
 			Port_gRPC: os.Getenv("MICROSERVICE_PLAYERS_PORT"),
@@ -158,6 +94,7 @@ func LoadV2() (ConfigV2, error) {
 				Port:     os.Getenv("DB_PORT"),
 				User:     os.Getenv("DB_USER"),
 				Password: os.Getenv("DB_PASSWORD"),
+				Scheme:   os.Getenv("MICROSERVICE_TEAMS_DB_SCHEME"),
 			},
 			Host_gRPC: os.Getenv("MICROSERVICE_TEAMS_HOST"),
 			Port_gRPC: os.Getenv("MICROSERVICE_TEAMS_PORT"),
@@ -169,6 +106,7 @@ func LoadV2() (ConfigV2, error) {
 				Port:     os.Getenv("DB_PORT"),
 				User:     os.Getenv("DB_USER"),
 				Password: os.Getenv("DB_PASSWORD"),
+				Scheme:   os.Getenv("MICROSERVICE_USERS_DB_SCHEME"),
 			},
 			Host_gRPC: os.Getenv("MICROSERVICE_USERS_HOST"),
 			Port_gRPC: os.Getenv("MICROSERVICE_USERS_PORT"),
@@ -180,6 +118,7 @@ func LoadV2() (ConfigV2, error) {
 				Port:     os.Getenv("DB_PORT"),
 				User:     os.Getenv("DB_USER"),
 				Password: os.Getenv("DB_PASSWORD"),
+				Scheme:   os.Getenv("MICROSERVICE_TOURNAMENTS_DB_SCHEME"),
 			},
 			Host_gRPC: os.Getenv("MICROSERVICE_TOURNAMENTS_HOST"),
 			Port_gRPC: os.Getenv("MICROSERVICE_TOURNAMENTS_PORT"),
@@ -191,6 +130,7 @@ func LoadV2() (ConfigV2, error) {
 				Port:     os.Getenv("DB_PORT"),
 				User:     os.Getenv("DB_USER"),
 				Password: os.Getenv("DB_PASSWORD"),
+				Scheme:   os.Getenv("MICROSERVICE_MATCHES_DB_SCHEME"),
 			},
 			Host_gRPC: os.Getenv("MICROSERVICE_MATCHES_HOST"),
 			Port_gRPC: os.Getenv("MICROSERVICE_MATCHES_PORT"),

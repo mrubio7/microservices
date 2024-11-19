@@ -26,3 +26,7 @@ type MatchModel struct {
 	Map                JSONStringArray `gorm:"type:jsonb; not null"`
 	Status             string          `gorm:"not null"`
 }
+
+func (MatchModel) TableName() string {
+	return "matches.match"
+}
