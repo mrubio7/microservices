@@ -46,13 +46,28 @@ func (d *Database) GetDB() *gorm.DB {
 }
 
 func (d *Database) Automigrate() {
-	// Crear el esquema si no existe
 	if err := d.db.Exec(fmt.Sprintf("CREATE SCHEMA IF NOT EXISTS %s", d.scheme)).Error; err != nil {
 		log.Fatalf("Failed to create schema '%s': %v", d.scheme, err)
 	}
 
-	// Migrar los modelos
-	if err := d.db.AutoMigrate(&model.MatchModel{}); err != nil {
-		log.Fatalf("Failed to automigrate: %v", err)
+	switch d.scheme {
+	case "matches":
+		if err := d.db.AutoMigrate(&model.MatchModel{}); err != nil {
+			log.Fatalf("Failed to automigrate: %v", err)
+		}
+	case "players":
+		if err := d.db.AutoMigrate(&model.PlayerModel{}); err != nil {
+			log.Fatalf("Failed to automigrate: %v", err)
+		}
+		if err := d.db.AutoMigrate(&model.PlayerStatsModel{}); err != nil {
+			log.Fatalf("Failed to automigrate: %v", err)
+		}
+		if err := d.db.AutoMigrate(&model.ProminentWeekModel{}); err != nil {
+			log.Fatalf("Failed to automigrate: %v", err)
+		}
+		if err := d.db.AutoMigrate(&model.PlayerProminentModel{}); err != nil {
+			log.Fatalf("Failed to automigrate: %v", err)
+		}
 	}
+
 }

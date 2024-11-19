@@ -38,6 +38,10 @@ func (m *PlayerManager) GetAll() ([]model.PlayerModel, error) {
 	return m.repoPlayers.Find()
 }
 
+func (m *PlayerManager) GetByFaceitId(faceitId string) (*model.PlayerModel, error) {
+	return m.repoPlayers.Get(repositories.Preload("Stats"), repositories.Where("faceit_id", faceitId))
+}
+
 func (m *PlayerManager) GetProminentPlayers() (*model.ProminentWeekModel, error) {
 	return m.repoProminent.Get(repositories.Preload("Players"), repositories.OrderBy("year DESC, week DESC"))
 }

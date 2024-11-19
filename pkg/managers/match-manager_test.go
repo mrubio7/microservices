@@ -4,7 +4,6 @@ import (
 	"ibercs/internal/faker"
 	testutil "ibercs/internal/test"
 	"ibercs/pkg/managers"
-	"os"
 	"testing"
 	"time"
 
@@ -12,19 +11,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestMain(m *testing.M) {
-	schemas := []string{"matches"}
-
-	testutil.SetupTestDBs(schemas)
-
-	code := m.Run()
-
-	testutil.CleanupTestDBs()
-
-	os.Exit(code)
-}
-
-func TestMatchCreateWithFaker(t *testing.T) {
+func TestMatchCreate(t *testing.T) {
 	db := testutil.GetTestDB("matches")
 
 	// Create the MatchManager
@@ -40,7 +27,7 @@ func TestMatchCreateWithFaker(t *testing.T) {
 	assert.Equal(t, fakeMatch.TeamAName, createdMatch.TeamAName, "TeamAName should match")
 }
 
-func TestMatchUpdateWithFaker(t *testing.T) {
+func TestMatchUpdate(t *testing.T) {
 	db := testutil.GetTestDB("matches")
 
 	// Create the MatchManager

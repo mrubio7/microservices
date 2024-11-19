@@ -37,6 +37,7 @@ func (api *Api) Start() {
 	cache := cache.NewCache()
 
 	matchHandler := handlers.NewMatchesHandlers(*api.router.MatchesServer)
+	playerHandler := handlers.NewPlayersHandlers(*api.router.PlayersServer)
 
 	api.router.gin.Use(middlewares.CORSMiddleware())
 	api.router.gin.Use(middlewares.CacheMiddleware(cache, consts.CACHE_DURATION))
@@ -46,5 +47,8 @@ func (api *Api) Start() {
 	api.router.gin.GET("/api/v2/matches", matchHandler.GetAll) // query param: team_id
 	api.router.gin.GET("/api/v2/matches/range", matchHandler.GetRange)
 
+	api.router.gin.GET("/api/v2/players", playerHandler.GetAll)
+
+	logger.Debug("API initialized")
 	api.router.Listen()
 }

@@ -9,6 +9,10 @@ type PlayerModel struct {
 	Stats    PlayerStatsModel `gorm:"foreignKey:ID;references:ID"`
 }
 
+func (PlayerModel) TableName() string {
+	return "players.player"
+}
+
 type PlayerStatsModel struct {
 	ID                     int32   `gorm:"primaryKey;autoIncrement:false"`
 	KrRatio                float32 `gorm:"type:numeric(8,2)"`
@@ -24,6 +28,10 @@ type PlayerStatsModel struct {
 	Elo                    int32
 }
 
+func (PlayerStatsModel) TableName() string {
+	return "players.player_stats"
+}
+
 type PlayerProminentModel struct {
 	ID              int32   `gorm:"primaryKey;autoIncrement"`
 	Avatar          string  `gorm:"null"`
@@ -34,9 +42,17 @@ type PlayerProminentModel struct {
 	ProminentWeekID int32   `gorm:"index"`
 }
 
+func (PlayerProminentModel) TableName() string {
+	return "players.prominent_player"
+}
+
 type ProminentWeekModel struct {
 	ID      int32                  `gorm:"primaryKey;autoIncrement"`
 	Week    int16                  `gorm:"not null;uniqueIndex:unique_week_year"`
 	Year    int16                  `gorm:"not null;uniqueIndex:unique_week_year"`
 	Players []PlayerProminentModel `gorm:"foreignKey:ProminentWeekID;references:ID"`
+}
+
+func (ProminentWeekModel) TableName() string {
+	return "players.prominent_week"
 }
