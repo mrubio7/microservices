@@ -13,12 +13,12 @@ import (
 
 func main() {
 	logger.Initialize()
-	cfg, err := config.Load()
+	cfg, err := config.LoadV2()
 	if err != nil {
 		panic(err)
 	}
 
-	port := cfg.Microservices.MatchesPort
+	port := cfg.MicroserviceMatches.Port_gRPC
 	listener, err := net.Listen("tcp", port)
 	if err != nil {
 		logger.Error("Cannot create tcp connection: %s", err.Error())
@@ -28,7 +28,7 @@ func main() {
 	}
 
 	grpcServer := grpc.NewServer()
-	microserviceMatches := microservice_matches.New()
+	microserviceMatches := microservice_matches.New(cfg.MicroserviceMatches, cfg.ThirdPartyApiTokens)
 
 	pb.RegisterMatchesServiceServer(grpcServer, microserviceMatches)
 

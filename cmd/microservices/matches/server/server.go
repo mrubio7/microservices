@@ -23,23 +23,18 @@ type Server struct {
 	FaceitService  *faceit.FaceitClient
 }
 
-func registerTeamsClient(cfg config.MicroservicesConfig) *pb_teams.TeamServiceClient {
-	return microservices.New(cfg.TeamsHost, cfg.TeamsPort, pb_teams.NewTeamServiceClient)
+func registerTeamsClient(cfg config.MicroserviceConfig) *pb_teams.TeamServiceClient {
+	return microservices.New(cfg.Host_gRPC, cfg.Port_gRPC, pb_teams.NewTeamServiceClient)
 }
 
-func New() *Server {
-	cfg, err := config.Load()
-	if err != nil {
-		logger.Error("Unable to create grpc player server")
-		return nil
-	}
+func New(cfg config.MicroserviceConfig, cfgThirdParty config.ThirdPartyApiTokens) *Server {
 	db := database.New(cfg.Database)
 	matchesService := service.NewMatchesService(db)
-	faceit := faceit.New(cfg.FaceitApiToken)
+	faceit := faceit.New(cfgThirdParty.FaceitApiToken)
 
 	return &Server{
 		MatchesService: matchesService,
-		TeamsClient:    *registerTeamsClient(cfg.Microservices),
+		TeamsClient:    *registerTeamsClient(cfg),
 		FaceitService:  faceit,
 	}
 }
