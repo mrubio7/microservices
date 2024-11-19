@@ -6,7 +6,7 @@ type PlayerModel struct {
 	FaceitId string           `gorm:"unique;index"`
 	SteamId  string           `gorm:"null"`
 	Avatar   string           `gorm:"null"`
-	Stats    PlayerStatsModel `gorm:"foreignKey:ID;references:ID"`
+	Stats    PlayerStatsModel `gorm:"foreignKey:ID;constraint:OnUpdate:CASCADE,OnDelete:CASCADE"`
 }
 
 func (PlayerModel) TableName() string {

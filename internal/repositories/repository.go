@@ -23,7 +23,7 @@ func (r *GenericRepository[T]) Create(entity *T) (*T, error) {
 }
 
 func (r *GenericRepository[T]) Update(entity *T, idField string, idValue interface{}) error {
-	return r.db.Model(entity).Where(idField+" = ?", idValue).Updates(entity).Error
+	return r.db.Session(&gorm.Session{FullSaveAssociations: true}).Save(entity).Error
 }
 
 func (r *GenericRepository[T]) Delete(field string, value interface{}) error {
