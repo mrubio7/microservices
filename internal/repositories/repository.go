@@ -22,7 +22,7 @@ func (r *GenericRepository[T]) Create(entity *T) (*T, error) {
 	return entity, nil
 }
 
-func (r *GenericRepository[T]) Update(entity *T, idField string, idValue interface{}) error {
+func (r *GenericRepository[T]) Update(entity *T) error {
 	return r.db.Session(&gorm.Session{FullSaveAssociations: true}).Save(entity).Error
 }
 

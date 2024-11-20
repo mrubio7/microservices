@@ -23,7 +23,7 @@ func (m *MatchManager) Create(match *model.MatchModel) (*model.MatchModel, error
 }
 
 func (m *MatchManager) Update(match *model.MatchModel) error {
-	return m.repo.Update(match, "faceit_id", match.FaceitId)
+	return m.repo.Update(match)
 }
 
 func (m *MatchManager) GetMatchByFaceitId(faceitId string) (*model.MatchModel, error) {

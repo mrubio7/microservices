@@ -16,8 +16,6 @@ message Team {
     string Instagram = 10;
     string Web = 11;
     repeated string Tournaments = 12;
-    int32 Rank = 13;
-    Standing Standing = 14;
 }
 
 message Standing {
@@ -48,19 +46,17 @@ message TeamMapStats {
     int32 Matches = 3;
 }
 
-
-
 message Empty {}
 
 service TeamService {
-    rpc GetTeams (GetTeamsRequest) returns (TeamList);
-    rpc GetTeamById (NewTeamRequest) returns (Team);
-    rpc GetTeamByNickname (NewTeamRequest) returns (Team);
-    rpc NewTeam (NewTeamRequest) returns (Team);
-    rpc FindTeamByPlayerId(NewTeamRequest) returns (TeamList);
-    rpc GetTeamFromFaceit(NewTeamRequest) returns (Team);
-    rpc GetTeamWithEseaStanding(NewTeamRequest) returns (Team);
-    rpc GetRanks(Empty) returns (TeamList);
+    rpc GetAllTeams (Empty) returns (TeamList);
+    rpc GetActiveTeams (Empty) returns (TeamList);
+    rpc GetTeamById (GetTeamByIdRequest) returns (Team);
+    rpc GetTeamByNickname (GetTeamByNicknameRequest) returns (Team);
+    rpc CreateFromFaceit (NewTeamFromFaceitRequest) returns (Team);
+    rpc Update(NewTeamFromFaceitRequest) returns (Team);
+    rpc FindTeamsByPlayerId(GetTeamByPlayerIdRequest) returns (TeamList);
+    rpc GetTeamFromFaceit(GetTeamFromFaceitRequest) returns (Team);
 }
 
 message TeamList {
@@ -71,6 +67,22 @@ message GetTeamsRequest {
     bool active = 1;
 }
 
-message NewTeamRequest {
+message GetTeamByIdRequest {
+    int32 Id = 1;
+}
+
+message GetTeamByNicknameRequest {
+    string Nickname = 1;
+}
+
+message NewTeamFromFaceitRequest {
+    string FaceitId = 1;
+}
+
+message GetTeamByPlayerIdRequest {
+    string PlayerId = 1;
+}
+
+message GetTeamFromFaceitRequest {
     string FaceitId = 1;
 }

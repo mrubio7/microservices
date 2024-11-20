@@ -35,7 +35,7 @@ func (m *UserManager) Create(user *model.UserModel) (*model.UserModel, error) {
 }
 
 func (m *UserManager) Update(user *model.UserModel) (*model.UserModel, error) {
-	err := m.repoUsers.Update(user, "id", int32(user.ID))
+	err := m.repoUsers.Update(user)
 	if err != nil {
 		return nil, err
 	}

@@ -19,28 +19,28 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	TeamService_GetTeams_FullMethodName                = "/teams.TeamService/GetTeams"
-	TeamService_GetTeamById_FullMethodName             = "/teams.TeamService/GetTeamById"
-	TeamService_GetTeamByNickname_FullMethodName       = "/teams.TeamService/GetTeamByNickname"
-	TeamService_NewTeam_FullMethodName                 = "/teams.TeamService/NewTeam"
-	TeamService_FindTeamByPlayerId_FullMethodName      = "/teams.TeamService/FindTeamByPlayerId"
-	TeamService_GetTeamFromFaceit_FullMethodName       = "/teams.TeamService/GetTeamFromFaceit"
-	TeamService_GetTeamWithEseaStanding_FullMethodName = "/teams.TeamService/GetTeamWithEseaStanding"
-	TeamService_GetRanks_FullMethodName                = "/teams.TeamService/GetRanks"
+	TeamService_GetAllTeams_FullMethodName         = "/teams.TeamService/GetAllTeams"
+	TeamService_GetActiveTeams_FullMethodName      = "/teams.TeamService/GetActiveTeams"
+	TeamService_GetTeamById_FullMethodName         = "/teams.TeamService/GetTeamById"
+	TeamService_GetTeamByNickname_FullMethodName   = "/teams.TeamService/GetTeamByNickname"
+	TeamService_CreateFromFaceit_FullMethodName    = "/teams.TeamService/CreateFromFaceit"
+	TeamService_Update_FullMethodName              = "/teams.TeamService/Update"
+	TeamService_FindTeamsByPlayerId_FullMethodName = "/teams.TeamService/FindTeamsByPlayerId"
+	TeamService_GetTeamFromFaceit_FullMethodName   = "/teams.TeamService/GetTeamFromFaceit"
 )
 
 // TeamServiceClient is the client API for TeamService service.
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type TeamServiceClient interface {
-	GetTeams(ctx context.Context, in *GetTeamsRequest, opts ...grpc.CallOption) (*TeamList, error)
-	GetTeamById(ctx context.Context, in *NewTeamRequest, opts ...grpc.CallOption) (*Team, error)
-	GetTeamByNickname(ctx context.Context, in *NewTeamRequest, opts ...grpc.CallOption) (*Team, error)
-	NewTeam(ctx context.Context, in *NewTeamRequest, opts ...grpc.CallOption) (*Team, error)
-	FindTeamByPlayerId(ctx context.Context, in *NewTeamRequest, opts ...grpc.CallOption) (*TeamList, error)
-	GetTeamFromFaceit(ctx context.Context, in *NewTeamRequest, opts ...grpc.CallOption) (*Team, error)
-	GetTeamWithEseaStanding(ctx context.Context, in *NewTeamRequest, opts ...grpc.CallOption) (*Team, error)
-	GetRanks(ctx context.Context, in *Empty, opts ...grpc.CallOption) (*TeamList, error)
+	GetAllTeams(ctx context.Context, in *Empty, opts ...grpc.CallOption) (*TeamList, error)
+	GetActiveTeams(ctx context.Context, in *Empty, opts ...grpc.CallOption) (*TeamList, error)
+	GetTeamById(ctx context.Context, in *GetTeamByIdRequest, opts ...grpc.CallOption) (*Team, error)
+	GetTeamByNickname(ctx context.Context, in *GetTeamByNicknameRequest, opts ...grpc.CallOption) (*Team, error)
+	CreateFromFaceit(ctx context.Context, in *NewTeamFromFaceitRequest, opts ...grpc.CallOption) (*Team, error)
+	Update(ctx context.Context, in *NewTeamFromFaceitRequest, opts ...grpc.CallOption) (*Team, error)
+	FindTeamsByPlayerId(ctx context.Context, in *GetTeamByPlayerIdRequest, opts ...grpc.CallOption) (*TeamList, error)
+	GetTeamFromFaceit(ctx context.Context, in *GetTeamFromFaceitRequest, opts ...grpc.CallOption) (*Team, error)
 }
 
 type teamServiceClient struct {
@@ -51,17 +51,27 @@ func NewTeamServiceClient(cc grpc.ClientConnInterface) TeamServiceClient {
 	return &teamServiceClient{cc}
 }
 
-func (c *teamServiceClient) GetTeams(ctx context.Context, in *GetTeamsRequest, opts ...grpc.CallOption) (*TeamList, error) {
+func (c *teamServiceClient) GetAllTeams(ctx context.Context, in *Empty, opts ...grpc.CallOption) (*TeamList, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(TeamList)
-	err := c.cc.Invoke(ctx, TeamService_GetTeams_FullMethodName, in, out, cOpts...)
+	err := c.cc.Invoke(ctx, TeamService_GetAllTeams_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *teamServiceClient) GetTeamById(ctx context.Context, in *NewTeamRequest, opts ...grpc.CallOption) (*Team, error) {
+func (c *teamServiceClient) GetActiveTeams(ctx context.Context, in *Empty, opts ...grpc.CallOption) (*TeamList, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(TeamList)
+	err := c.cc.Invoke(ctx, TeamService_GetActiveTeams_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *teamServiceClient) GetTeamById(ctx context.Context, in *GetTeamByIdRequest, opts ...grpc.CallOption) (*Team, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(Team)
 	err := c.cc.Invoke(ctx, TeamService_GetTeamById_FullMethodName, in, out, cOpts...)
@@ -71,7 +81,7 @@ func (c *teamServiceClient) GetTeamById(ctx context.Context, in *NewTeamRequest,
 	return out, nil
 }
 
-func (c *teamServiceClient) GetTeamByNickname(ctx context.Context, in *NewTeamRequest, opts ...grpc.CallOption) (*Team, error) {
+func (c *teamServiceClient) GetTeamByNickname(ctx context.Context, in *GetTeamByNicknameRequest, opts ...grpc.CallOption) (*Team, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(Team)
 	err := c.cc.Invoke(ctx, TeamService_GetTeamByNickname_FullMethodName, in, out, cOpts...)
@@ -81,50 +91,40 @@ func (c *teamServiceClient) GetTeamByNickname(ctx context.Context, in *NewTeamRe
 	return out, nil
 }
 
-func (c *teamServiceClient) NewTeam(ctx context.Context, in *NewTeamRequest, opts ...grpc.CallOption) (*Team, error) {
+func (c *teamServiceClient) CreateFromFaceit(ctx context.Context, in *NewTeamFromFaceitRequest, opts ...grpc.CallOption) (*Team, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(Team)
-	err := c.cc.Invoke(ctx, TeamService_NewTeam_FullMethodName, in, out, cOpts...)
+	err := c.cc.Invoke(ctx, TeamService_CreateFromFaceit_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *teamServiceClient) FindTeamByPlayerId(ctx context.Context, in *NewTeamRequest, opts ...grpc.CallOption) (*TeamList, error) {
+func (c *teamServiceClient) Update(ctx context.Context, in *NewTeamFromFaceitRequest, opts ...grpc.CallOption) (*Team, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(Team)
+	err := c.cc.Invoke(ctx, TeamService_Update_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *teamServiceClient) FindTeamsByPlayerId(ctx context.Context, in *GetTeamByPlayerIdRequest, opts ...grpc.CallOption) (*TeamList, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(TeamList)
-	err := c.cc.Invoke(ctx, TeamService_FindTeamByPlayerId_FullMethodName, in, out, cOpts...)
+	err := c.cc.Invoke(ctx, TeamService_FindTeamsByPlayerId_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *teamServiceClient) GetTeamFromFaceit(ctx context.Context, in *NewTeamRequest, opts ...grpc.CallOption) (*Team, error) {
+func (c *teamServiceClient) GetTeamFromFaceit(ctx context.Context, in *GetTeamFromFaceitRequest, opts ...grpc.CallOption) (*Team, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(Team)
 	err := c.cc.Invoke(ctx, TeamService_GetTeamFromFaceit_FullMethodName, in, out, cOpts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *teamServiceClient) GetTeamWithEseaStanding(ctx context.Context, in *NewTeamRequest, opts ...grpc.CallOption) (*Team, error) {
-	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(Team)
-	err := c.cc.Invoke(ctx, TeamService_GetTeamWithEseaStanding_FullMethodName, in, out, cOpts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *teamServiceClient) GetRanks(ctx context.Context, in *Empty, opts ...grpc.CallOption) (*TeamList, error) {
-	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(TeamList)
-	err := c.cc.Invoke(ctx, TeamService_GetRanks_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -135,14 +135,14 @@ func (c *teamServiceClient) GetRanks(ctx context.Context, in *Empty, opts ...grp
 // All implementations must embed UnimplementedTeamServiceServer
 // for forward compatibility.
 type TeamServiceServer interface {
-	GetTeams(context.Context, *GetTeamsRequest) (*TeamList, error)
-	GetTeamById(context.Context, *NewTeamRequest) (*Team, error)
-	GetTeamByNickname(context.Context, *NewTeamRequest) (*Team, error)
-	NewTeam(context.Context, *NewTeamRequest) (*Team, error)
-	FindTeamByPlayerId(context.Context, *NewTeamRequest) (*TeamList, error)
-	GetTeamFromFaceit(context.Context, *NewTeamRequest) (*Team, error)
-	GetTeamWithEseaStanding(context.Context, *NewTeamRequest) (*Team, error)
-	GetRanks(context.Context, *Empty) (*TeamList, error)
+	GetAllTeams(context.Context, *Empty) (*TeamList, error)
+	GetActiveTeams(context.Context, *Empty) (*TeamList, error)
+	GetTeamById(context.Context, *GetTeamByIdRequest) (*Team, error)
+	GetTeamByNickname(context.Context, *GetTeamByNicknameRequest) (*Team, error)
+	CreateFromFaceit(context.Context, *NewTeamFromFaceitRequest) (*Team, error)
+	Update(context.Context, *NewTeamFromFaceitRequest) (*Team, error)
+	FindTeamsByPlayerId(context.Context, *GetTeamByPlayerIdRequest) (*TeamList, error)
+	GetTeamFromFaceit(context.Context, *GetTeamFromFaceitRequest) (*Team, error)
 	mustEmbedUnimplementedTeamServiceServer()
 }
 
@@ -153,29 +153,29 @@ type TeamServiceServer interface {
 // pointer dereference when methods are called.
 type UnimplementedTeamServiceServer struct{}
 
-func (UnimplementedTeamServiceServer) GetTeams(context.Context, *GetTeamsRequest) (*TeamList, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method GetTeams not implemented")
+func (UnimplementedTeamServiceServer) GetAllTeams(context.Context, *Empty) (*TeamList, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetAllTeams not implemented")
 }
-func (UnimplementedTeamServiceServer) GetTeamById(context.Context, *NewTeamRequest) (*Team, error) {
+func (UnimplementedTeamServiceServer) GetActiveTeams(context.Context, *Empty) (*TeamList, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetActiveTeams not implemented")
+}
+func (UnimplementedTeamServiceServer) GetTeamById(context.Context, *GetTeamByIdRequest) (*Team, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetTeamById not implemented")
 }
-func (UnimplementedTeamServiceServer) GetTeamByNickname(context.Context, *NewTeamRequest) (*Team, error) {
+func (UnimplementedTeamServiceServer) GetTeamByNickname(context.Context, *GetTeamByNicknameRequest) (*Team, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetTeamByNickname not implemented")
 }
-func (UnimplementedTeamServiceServer) NewTeam(context.Context, *NewTeamRequest) (*Team, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method NewTeam not implemented")
+func (UnimplementedTeamServiceServer) CreateFromFaceit(context.Context, *NewTeamFromFaceitRequest) (*Team, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method CreateFromFaceit not implemented")
 }
-func (UnimplementedTeamServiceServer) FindTeamByPlayerId(context.Context, *NewTeamRequest) (*TeamList, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method FindTeamByPlayerId not implemented")
+func (UnimplementedTeamServiceServer) Update(context.Context, *NewTeamFromFaceitRequest) (*Team, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Update not implemented")
 }
-func (UnimplementedTeamServiceServer) GetTeamFromFaceit(context.Context, *NewTeamRequest) (*Team, error) {
+func (UnimplementedTeamServiceServer) FindTeamsByPlayerId(context.Context, *GetTeamByPlayerIdRequest) (*TeamList, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method FindTeamsByPlayerId not implemented")
+}
+func (UnimplementedTeamServiceServer) GetTeamFromFaceit(context.Context, *GetTeamFromFaceitRequest) (*Team, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetTeamFromFaceit not implemented")
-}
-func (UnimplementedTeamServiceServer) GetTeamWithEseaStanding(context.Context, *NewTeamRequest) (*Team, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method GetTeamWithEseaStanding not implemented")
-}
-func (UnimplementedTeamServiceServer) GetRanks(context.Context, *Empty) (*TeamList, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method GetRanks not implemented")
 }
 func (UnimplementedTeamServiceServer) mustEmbedUnimplementedTeamServiceServer() {}
 func (UnimplementedTeamServiceServer) testEmbeddedByValue()                     {}
@@ -198,26 +198,44 @@ func RegisterTeamServiceServer(s grpc.ServiceRegistrar, srv TeamServiceServer) {
 	s.RegisterService(&TeamService_ServiceDesc, srv)
 }
 
-func _TeamService_GetTeams_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(GetTeamsRequest)
+func _TeamService_GetAllTeams_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(Empty)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(TeamServiceServer).GetTeams(ctx, in)
+		return srv.(TeamServiceServer).GetAllTeams(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: TeamService_GetTeams_FullMethodName,
+		FullMethod: TeamService_GetAllTeams_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(TeamServiceServer).GetTeams(ctx, req.(*GetTeamsRequest))
+		return srv.(TeamServiceServer).GetAllTeams(ctx, req.(*Empty))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _TeamService_GetActiveTeams_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(Empty)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(TeamServiceServer).GetActiveTeams(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: TeamService_GetActiveTeams_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(TeamServiceServer).GetActiveTeams(ctx, req.(*Empty))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
 func _TeamService_GetTeamById_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(NewTeamRequest)
+	in := new(GetTeamByIdRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -229,13 +247,13 @@ func _TeamService_GetTeamById_Handler(srv interface{}, ctx context.Context, dec 
 		FullMethod: TeamService_GetTeamById_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(TeamServiceServer).GetTeamById(ctx, req.(*NewTeamRequest))
+		return srv.(TeamServiceServer).GetTeamById(ctx, req.(*GetTeamByIdRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
 func _TeamService_GetTeamByNickname_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(NewTeamRequest)
+	in := new(GetTeamByNicknameRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -247,49 +265,67 @@ func _TeamService_GetTeamByNickname_Handler(srv interface{}, ctx context.Context
 		FullMethod: TeamService_GetTeamByNickname_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(TeamServiceServer).GetTeamByNickname(ctx, req.(*NewTeamRequest))
+		return srv.(TeamServiceServer).GetTeamByNickname(ctx, req.(*GetTeamByNicknameRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _TeamService_NewTeam_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(NewTeamRequest)
+func _TeamService_CreateFromFaceit_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(NewTeamFromFaceitRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(TeamServiceServer).NewTeam(ctx, in)
+		return srv.(TeamServiceServer).CreateFromFaceit(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: TeamService_NewTeam_FullMethodName,
+		FullMethod: TeamService_CreateFromFaceit_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(TeamServiceServer).NewTeam(ctx, req.(*NewTeamRequest))
+		return srv.(TeamServiceServer).CreateFromFaceit(ctx, req.(*NewTeamFromFaceitRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _TeamService_FindTeamByPlayerId_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(NewTeamRequest)
+func _TeamService_Update_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(NewTeamFromFaceitRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(TeamServiceServer).FindTeamByPlayerId(ctx, in)
+		return srv.(TeamServiceServer).Update(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: TeamService_FindTeamByPlayerId_FullMethodName,
+		FullMethod: TeamService_Update_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(TeamServiceServer).FindTeamByPlayerId(ctx, req.(*NewTeamRequest))
+		return srv.(TeamServiceServer).Update(ctx, req.(*NewTeamFromFaceitRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _TeamService_FindTeamsByPlayerId_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetTeamByPlayerIdRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(TeamServiceServer).FindTeamsByPlayerId(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: TeamService_FindTeamsByPlayerId_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(TeamServiceServer).FindTeamsByPlayerId(ctx, req.(*GetTeamByPlayerIdRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
 func _TeamService_GetTeamFromFaceit_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(NewTeamRequest)
+	in := new(GetTeamFromFaceitRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -301,43 +337,7 @@ func _TeamService_GetTeamFromFaceit_Handler(srv interface{}, ctx context.Context
 		FullMethod: TeamService_GetTeamFromFaceit_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(TeamServiceServer).GetTeamFromFaceit(ctx, req.(*NewTeamRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _TeamService_GetTeamWithEseaStanding_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(NewTeamRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(TeamServiceServer).GetTeamWithEseaStanding(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: TeamService_GetTeamWithEseaStanding_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(TeamServiceServer).GetTeamWithEseaStanding(ctx, req.(*NewTeamRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _TeamService_GetRanks_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(Empty)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(TeamServiceServer).GetRanks(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: TeamService_GetRanks_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(TeamServiceServer).GetRanks(ctx, req.(*Empty))
+		return srv.(TeamServiceServer).GetTeamFromFaceit(ctx, req.(*GetTeamFromFaceitRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -350,8 +350,12 @@ var TeamService_ServiceDesc = grpc.ServiceDesc{
 	HandlerType: (*TeamServiceServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
-			MethodName: "GetTeams",
-			Handler:    _TeamService_GetTeams_Handler,
+			MethodName: "GetAllTeams",
+			Handler:    _TeamService_GetAllTeams_Handler,
+		},
+		{
+			MethodName: "GetActiveTeams",
+			Handler:    _TeamService_GetActiveTeams_Handler,
 		},
 		{
 			MethodName: "GetTeamById",
@@ -362,24 +366,20 @@ var TeamService_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _TeamService_GetTeamByNickname_Handler,
 		},
 		{
-			MethodName: "NewTeam",
-			Handler:    _TeamService_NewTeam_Handler,
+			MethodName: "CreateFromFaceit",
+			Handler:    _TeamService_CreateFromFaceit_Handler,
 		},
 		{
-			MethodName: "FindTeamByPlayerId",
-			Handler:    _TeamService_FindTeamByPlayerId_Handler,
+			MethodName: "Update",
+			Handler:    _TeamService_Update_Handler,
+		},
+		{
+			MethodName: "FindTeamsByPlayerId",
+			Handler:    _TeamService_FindTeamsByPlayerId_Handler,
 		},
 		{
 			MethodName: "GetTeamFromFaceit",
 			Handler:    _TeamService_GetTeamFromFaceit_Handler,
-		},
-		{
-			MethodName: "GetTeamWithEseaStanding",
-			Handler:    _TeamService_GetTeamWithEseaStanding_Handler,
-		},
-		{
-			MethodName: "GetRanks",
-			Handler:    _TeamService_GetRanks_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

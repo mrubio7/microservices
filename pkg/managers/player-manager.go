@@ -33,7 +33,7 @@ func (m *PlayerManager) Create(player *model.PlayerModel) (*model.PlayerModel, e
 }
 
 func (m *PlayerManager) Update(player *model.PlayerModel) error {
-	return m.repoPlayers.Update(player, "faceit_id", player.FaceitId)
+	return m.repoPlayers.Update(player)
 }
 
 func (m *PlayerManager) GetByNickname(nickname string) (*model.PlayerModel, error) {
@@ -106,7 +106,7 @@ func (m *PlayerManager) CreateLookingForTeamPlayer(lft *model.LookingForTeamMode
 }
 
 func (m *PlayerManager) UpdateLookingForTeamPlayer(lft *model.LookingForTeamModel) error {
-	return m.repoLFT.Update(lft, "faceit_id", lft.FaceitId)
+	return m.repoLFT.Update(lft)
 }
 
 func (m *PlayerManager) DeleteLookingForTeamPlayer(faceitId string) error {

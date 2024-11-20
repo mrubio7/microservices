@@ -7,7 +7,7 @@ import (
 )
 
 func TestMain(m *testing.M) {
-	schemas := []string{"matches", "players", "users"}
+	schemas := []string{"matches", "players", "users", "teams"}
 
 	testutil.SetupTestDBs(schemas)
 

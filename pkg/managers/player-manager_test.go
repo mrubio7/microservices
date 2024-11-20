@@ -20,6 +20,10 @@ func TestPlayerCreate(t *testing.T) {
 	createdPlayer, err := manager.Create(&fakePlayer)
 	assert.Nil(t, err, "Error should be nil")
 	assert.Equal(t, fakePlayer.FaceitId, createdPlayer.FaceitId, "FaceitId should match")
+
+	player, err := manager.GetByFaceitId(createdPlayer.FaceitId)
+	assert.Nil(t, err, "Error should be nil")
+	assert.Equal(t, createdPlayer.Stats.Elo, player.Stats.Elo, "FaceitId should match")
 }
 
 func TestPlayerUpdate(t *testing.T) {
