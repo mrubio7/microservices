@@ -50,7 +50,7 @@ func (api *Api) Start() {
 	api.router.PUT("/api/v2/user", userHandler.Update, authMiddleware)
 	api.router.GET("/api/v2/user/streams", userHandler.GetStreams, cacheMiddleware)
 
-	api.router.GET("/api/v2/auth/faceit/callback", userHandler.AuthCallback_Faceit)
+	api.router.GET("/api/v2/auth/callback/faceit", userHandler.AuthCallback_Faceit)
 	api.router.POST("/api/v2/auth", userHandler.Login, authMiddleware)
 	api.router.DELETE("/api/v2/auth", userHandler.Logout, authMiddleware)
 
