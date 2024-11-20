@@ -5,9 +5,11 @@ import (
 	matches_mapper "ibercs/pkg/mapper/matches"
 	players_mapper "ibercs/pkg/mapper/players"
 	teams_mapper "ibercs/pkg/mapper/teams"
+	users_mapper "ibercs/pkg/mapper/users"
 	pb_matches "ibercs/proto/matches"
 	pb_players "ibercs/proto/players"
 	pb_teams "ibercs/proto/teams"
+	pb_users "ibercs/proto/users"
 )
 
 func RegisterMappers() {
@@ -56,6 +58,17 @@ func RegisterMappers() {
 	Register(Mapper[*pb_teams.Team, model.TeamModel]{
 		From: teams_mapper.TeamMapper{}.Model,
 		To:   teams_mapper.TeamMapper{}.Proto,
+	})
+
+	// Mapper para User -> Proto
+	Register(Mapper[model.UserModel, *pb_users.User]{
+		From: users_mapper.UserMapper{}.Proto,
+		To:   users_mapper.UserMapper{}.Model,
+	})
+	// Mapper para Proto -> User
+	Register(Mapper[*pb_users.User, model.UserModel]{
+		From: users_mapper.UserMapper{}.Model,
+		To:   users_mapper.UserMapper{}.Proto,
 	})
 
 }

@@ -40,7 +40,7 @@ func New(cfg config.MicroserviceConfig, cfgThirdParty config.ThirdPartyApiTokens
 	}
 }
 
-func (s *Server) GetById(ctx context.Context, req *pb.GetUserByIdRequest) (*pb.User, error) {
+func (s *Server) GetUserById(ctx context.Context, req *pb.GetUserByIdRequest) (*pb.User, error) {
 	user, err := s.UserManager.GetByID(int(req.Id))
 	if err != nil {
 		logger.Error("User %s not found: %s", req.Id, err.Error())
@@ -53,7 +53,7 @@ func (s *Server) GetById(ctx context.Context, req *pb.GetUserByIdRequest) (*pb.U
 	return res, nil
 }
 
-func (s *Server) GetByFaceitId(ctx context.Context, req *pb.GetUserRequest) (*pb.User, error) {
+func (s *Server) GetUserByFaceitId(ctx context.Context, req *pb.GetUserRequest) (*pb.User, error) {
 	user, err := s.UserManager.GetByFaceitId(req.Id)
 	if err != nil {
 		logger.Error("User %s not found: %s", req.Id, err.Error())
