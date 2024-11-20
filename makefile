@@ -1,4 +1,4 @@
-.PHONY: proto clean run w-players ms-players ms-teams ms-users ms-tournaments ms-matches
+.PHONY: proto clean run test w-players ms-players ms-teams ms-users ms-tournaments ms-matches
 
 proto:
 	protoc --go_out=.. --go-grpc_out=.. proto/*.proto
@@ -11,7 +11,10 @@ clean:
 run:
 	go build -o cmd/api_gateway/api-gateway.exe cmd/api_gateway/main.go
 	./cmd/api_gateway/api-gateway.exe
-	
+
+# TESTS
+test: 
+	go test -v ./...
 
 # WORKERS
 worker:
