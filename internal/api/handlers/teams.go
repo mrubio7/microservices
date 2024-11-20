@@ -15,7 +15,7 @@ type Team_Handlers struct {
 	teams_client pb.TeamServiceClient
 }
 
-func NewTeamHandlers(client pb.TeamServiceClient) *Team_Handlers {
+func NewTeamsHandlers(client pb.TeamServiceClient) *Team_Handlers {
 	return &Team_Handlers{
 		teams_client: client,
 	}

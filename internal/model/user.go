@@ -14,9 +14,17 @@ type UserModel struct {
 	IsProfessional bool        `gorm:"not null; default:false"`
 }
 
+func (UserModel) TableName() string {
+	return "users.users"
+}
+
 type UserSessionModel struct {
 	UserID    int    `gorm:"primaryKey; not null"`
 	SessionID string `gorm:"not null"`
+}
+
+func (UserSessionModel) TableName() string {
+	return "users.sessions"
 }
 
 func GenerateSessionId() string {

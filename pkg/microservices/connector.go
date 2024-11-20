@@ -26,6 +26,6 @@ func New[T any](cfgHost, cfgPort string, newClientFunc func(conn grpc.ClientConn
 	}
 
 	grpcClient := newClientFunc(conn)
-	logger.Trace("gRPC server at %s%s connected successfully", cfgHost, cfgPort)
+	logger.Trace("gRPC server at %s connected successfully", cfgHost)
 	return &grpcClient
 }

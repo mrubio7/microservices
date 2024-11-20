@@ -21,6 +21,10 @@ type TeamModel struct {
 	Tournaments JSONStringArray `gorm:"type:json;null"`
 }
 
+func (TeamModel) TableName() string {
+	return "teams.teams"
+}
+
 // Define a custom type
 type JSONStringArray []string
 
@@ -43,6 +47,10 @@ type TeamStatsModel struct {
 	Winrate       float32        `gorm:"not null"`
 	RecentResults JSONInt32Slice `gorm:"type:json;not null"`
 	MapStats      JSONMapStats   `gorm:"type:json;not null"`
+}
+
+func (TeamStatsModel) TableName() string {
+	return "teams.team_stats"
 }
 
 type JSONInt32Slice []int32
