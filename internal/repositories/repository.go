@@ -31,6 +31,15 @@ func (r *GenericRepository[T]) Delete(field string, value interface{}) error {
 	return r.db.Where(field+" = ?", value).Delete(&entity).Error
 }
 
+func (r *GenericRepository[T]) GetByID(id int32) (*T, error) {
+	var entity T
+	err := r.db.Model(&entity).First(&entity, id).Error
+	if err != nil {
+		return nil, err
+	}
+	return &entity, nil
+}
+
 func (r *GenericRepository[T]) Get(modifiers ...QueryModifier) (*T, error) {
 	var entity T
 	query := r.db.Model(&entity)

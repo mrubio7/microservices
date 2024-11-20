@@ -71,6 +71,13 @@ func (d *Database) Automigrate() {
 		if err := d.db.AutoMigrate(&model.LookingForTeamModel{}); err != nil {
 			log.Fatalf("Failed to automigrate: %v", err)
 		}
+	case "users":
+		if err := d.db.AutoMigrate(&model.UserModel{}); err != nil {
+			log.Fatalf("Failed to automigrate: %v", err)
+		}
+		if err := d.db.AutoMigrate(&model.UserSessionModel{}); err != nil {
+			log.Fatalf("Failed to automigrate: %v", err)
+		}
 	}
 
 }

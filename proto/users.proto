@@ -19,14 +19,14 @@ message User {
 message Empty {}
 
 service UserService {
-    rpc GetUser (GetUserRequest) returns (User);
+    rpc GetUserById (GetUserByIdRequest) returns (User);
     rpc GetUserByFaceitId (GetUserRequest) returns (User);
     rpc GetUserByPlayerNickname (GetUserRequest) returns (User);
     rpc UpdateUser (User) returns (User);
     rpc NewUser (NewUserRequest) returns (User);
-    rpc NewSession (NewSessionRequest) returns (NewSessionResponse);
-    rpc DeleteSession (NewSessionRequest) returns (NewSessionResponse);
-    rpc GetSession (GetSessionRequest) returns (NewSessionResponse);
+    rpc NewSession (NewSessionRequest) returns (SessionResponse);
+    rpc DeleteSession (NewSessionRequest) returns (Empty);
+    rpc GetSession (GetSessionRequest) returns (SessionResponse);
     rpc GetAllStreams (Empty) returns (StreamsResponse);
 }
 
@@ -49,12 +49,16 @@ message GetSessionRequest{
     string token = 2;
 }
 
-message NewSessionResponse {
+message SessionResponse {
     string response = 1;
 }
 
 message NewUserRequest {
     string FaceitId = 1;
+}
+
+message GetUserByIdRequest {
+    int32 Id = 1;
 }
 
 message GetUserRequest {

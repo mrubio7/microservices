@@ -40,10 +40,19 @@ func (api *Api) Start() {
 
 	matchHandler := handlers.NewMatchesHandlers(*api.router.MatchesServer)
 	playerHandler := handlers.NewPlayersHandlers(*api.router.PlayersServer)
+	userHandler := handlers.NewUsersHandlers(*api.router.UsersServer)
 
 	api.router.gin.Use(middlewares.CORSMiddleware())
 	cacheMiddleware := middlewares.Cache(cache, consts.CACHE_DURATION)
 	authMiddleware := middlewares.Auth(api.db)
+
+	api.router.GET("/api/v2/user", userHandler.Get, cacheMiddleware) // query param: id or faceit_id
+	api.router.PUT("/api/v2/user", userHandler.Update, authMiddleware)
+	api.router.GET("/api/v2/user/streams", userHandler.GetStreams, cacheMiddleware)
+
+	api.router.GET("/api/v2/auth/faceit/callback", userHandler.AuthCallback_Faceit)
+	api.router.POST("/api/v2/auth", userHandler.Login, authMiddleware)
+	api.router.DELETE("/api/v2/auth", userHandler.Logout, authMiddleware)
 
 	api.router.GET("/api/v2/match", matchHandler.Get, cacheMiddleware)      // query param: id
 	api.router.GET("/api/v2/matches", matchHandler.GetAll, cacheMiddleware) // query param: team_id

@@ -115,7 +115,7 @@ func getUserInfo(accessToken string) (*model.UserModel, error) {
 	}
 
 	user := &model.UserModel{
-		FaceitID: userInfo.GUID,
+		FaceitId: userInfo.GUID,
 		Name:     userInfo.Nickname,
 	}
 

@@ -12,17 +12,17 @@ import (
 )
 
 type Players_Handlers struct {
-	matches_client pb_players.PlayerServiceClient
+	players_client pb_players.PlayerServiceClient
 }
 
 func NewPlayersHandlers(client pb_players.PlayerServiceClient) *Players_Handlers {
 	return &Players_Handlers{
-		matches_client: client,
+		players_client: client,
 	}
 }
 
 func (h *Players_Handlers) GetAll(c *gin.Context) {
-	players, err := h.matches_client.GetAllPlayers(c, &pb_players.Empty{})
+	players, err := h.players_client.GetAllPlayers(c, &pb_players.Empty{})
 	if err != nil {
 		logger.Error(err.Error())
 		c.JSON(http.StatusInternalServerError, response.BuildError("Error getting players"))
@@ -43,7 +43,7 @@ func (h *Players_Handlers) Get(c *gin.Context) {
 	}
 
 	if nickname != "" {
-		res, err := h.matches_client.GetPlayerByNickname(c, &pb_players.GetPlayerByNicknameRequest{Nickname: nickname})
+		res, err := h.players_client.GetPlayerByNickname(c, &pb_players.GetPlayerByNicknameRequest{Nickname: nickname})
 		if err != nil {
 			logger.Error(err.Error())
 			c.JSON(http.StatusBadRequest, response.BuildError("Error getting player by nickname"))
@@ -58,7 +58,7 @@ func (h *Players_Handlers) Get(c *gin.Context) {
 			c.JSON(http.StatusBadRequest, response.BuildError("No valid IDs provided"))
 			return
 		}
-		res, err := h.matches_client.GetPlayersByFaceitId(c, &pb_players.GetPlayerRequest{FaceitId: ids})
+		res, err := h.players_client.GetPlayersByFaceitId(c, &pb_players.GetPlayerRequest{FaceitId: ids})
 		if err != nil {
 			logger.Error(err.Error())
 			c.JSON(http.StatusBadRequest, response.BuildError("Error getting players by ids"))
@@ -71,7 +71,7 @@ func (h *Players_Handlers) Get(c *gin.Context) {
 
 // Prominent players
 func (h *Players_Handlers) GetProminentPlayers(c *gin.Context) {
-	players, err := h.matches_client.GetProminentPlayers(c, &pb_players.Empty{})
+	players, err := h.players_client.GetProminentPlayers(c, &pb_players.Empty{})
 	if err != nil {
 		logger.Error(err.Error())
 		c.JSON(http.StatusInternalServerError, response.BuildError("Error getting prominent players"))
@@ -83,7 +83,7 @@ func (h *Players_Handlers) GetProminentPlayers(c *gin.Context) {
 
 // Looking for team
 func (h *Players_Handlers) GetLookingForTeamPlayers(c *gin.Context) {
-	players, err := h.matches_client.GetAllLookingForTeam(c, &pb_players.Empty{})
+	players, err := h.players_client.GetAllLookingForTeam(c, &pb_players.Empty{})
 	if err != nil {
 		logger.Error(err.Error())
 		c.JSON(http.StatusInternalServerError, response.BuildError("Error getting looking for team players"))
@@ -115,7 +115,7 @@ func (h *Players_Handlers) CreateLookingForTeam(c *gin.Context) {
 		return
 	}
 
-	res, err := h.matches_client.CreateLookingForTeam(c, pbReq)
+	res, err := h.players_client.CreateLookingForTeam(c, pbReq)
 	if err != nil {
 		logger.Error(err.Error())
 		c.JSON(http.StatusInternalServerError, response.BuildError("Error creating looking for team"))
@@ -147,7 +147,7 @@ func (h *Players_Handlers) UpdateLookingForTeam(c *gin.Context) {
 		return
 	}
 
-	res, err := h.matches_client.UpdateLookingForTeam(c, pbReq)
+	res, err := h.players_client.UpdateLookingForTeam(c, pbReq)
 	if err != nil {
 		logger.Error(err.Error())
 		c.JSON(http.StatusInternalServerError, response.BuildError("Error updating looking for team"))
@@ -179,7 +179,7 @@ func (h *Players_Handlers) DeleteLookingForTeam(c *gin.Context) {
 		return
 	}
 
-	_, err = h.matches_client.DeleteLookingForTeam(c, pb)
+	_, err = h.players_client.DeleteLookingForTeam(c, pb)
 	if err != nil {
 		logger.Error(err.Error())
 		c.JSON(http.StatusInternalServerError, response.BuildError("Error deleting looking for team"))

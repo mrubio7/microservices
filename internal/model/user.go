@@ -1,8 +1,10 @@
 package model
 
+import "github.com/google/uuid"
+
 type UserModel struct {
 	ID             int         `gorm:"primaryKey;autoIncrement"`
-	FaceitID       string      `gorm:"unique;index"`
+	FaceitId       string      `gorm:"unique;index"`
 	Name           string      `gorm:"not null"`
 	Description    string      `gorm:"null"`
 	Twitter        string      `gorm:"null"`
@@ -15,4 +17,8 @@ type UserModel struct {
 type UserSessionModel struct {
 	UserID    int    `gorm:"primaryKey; not null"`
 	SessionID string `gorm:"not null"`
+}
+
+func GenerateSessionId() string {
+	return uuid.New().String()
 }
