@@ -28,12 +28,68 @@ func NewRouter(cfg config.ConfigV2) *Router {
 	}
 
 	r.registerMatchesServer(cfg.MicroserviceMatches)
-	// r.registerPlayersServer(cfg.MicroservicePlayers)
-	// r.registerTeamsServer(cfg.MicroserviceTeams)
-	// r.registerUsersServer(cfg.MicroserviceUsers)
-	// r.registerTournamentsServer(cfg.MicroserviceTournaments)
+	r.registerPlayersServer(cfg.MicroservicePlayers)
+	r.registerTeamsServer(cfg.MicroserviceTeams)
+	r.registerUsersServer(cfg.MicroserviceUsers)
+	r.registerTournamentsServer(cfg.MicroserviceTournaments)
 
 	return r
+}
+
+func (r *Router) GET(path string, handler gin.HandlerFunc, middlewares ...gin.HandlerFunc) {
+	r.gin.Handle("GET", path, func(c *gin.Context) {
+		// Ejecuta todos los middlewares
+		for _, middleware := range middlewares {
+			middleware(c)
+			if c.IsAborted() {
+				return // Si alguno aborta, no se ejecuta el handler
+			}
+		}
+		// Ejecuta el handler original
+		handler(c)
+	})
+}
+
+func (r *Router) POST(path string, handler gin.HandlerFunc, middlewares ...gin.HandlerFunc) {
+	r.gin.Handle("POST", path, func(c *gin.Context) {
+		// Ejecuta todos los middlewares
+		for _, middleware := range middlewares {
+			middleware(c)
+			if c.IsAborted() {
+				return // Si alguno aborta, no se ejecuta el handler
+			}
+		}
+		// Ejecuta el handler original
+		handler(c)
+	})
+}
+
+func (r *Router) PUT(path string, handler gin.HandlerFunc, middlewares ...gin.HandlerFunc) {
+	r.gin.Handle("PUT", path, func(c *gin.Context) {
+		// Ejecuta todos los middlewares
+		for _, middleware := range middlewares {
+			middleware(c)
+			if c.IsAborted() {
+				return // Si alguno aborta, no se ejecuta el handler
+			}
+		}
+		// Ejecuta el handler original
+		handler(c)
+	})
+}
+
+func (r *Router) DELETE(path string, handler gin.HandlerFunc, middlewares ...gin.HandlerFunc) {
+	r.gin.Handle("DELETE", path, func(c *gin.Context) {
+		// Ejecuta todos los middlewares
+		for _, middleware := range middlewares {
+			middleware(c)
+			if c.IsAborted() {
+				return // Si alguno aborta, no se ejecuta el handler
+			}
+		}
+		// Ejecuta el handler original
+		handler(c)
+	})
 }
 
 func (r *Router) Listen() {

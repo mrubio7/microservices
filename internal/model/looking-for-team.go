@@ -9,10 +9,13 @@ type LookingForTeamModel struct {
 	TimeTable    string          `gorm:"not null"`
 	OldTeams     string          `gorm:"not null"`
 	PlayingYears int32           `gorm:"not null"`
-	Location     string          `gorm:"null"`
 	BornDate     time.Time       `gorm:"not null"`
 	Description  string          `gorm:"not null"`
 	CreatedAt    int64           `gorm:"not null"`
 	UpdatedAt    int64           `gorm:"not null"`
 	Player       PlayerModel     `gorm:"-"`
+}
+
+func (LookingForTeamModel) TableName() string {
+	return "players.looking_for_team"
 }

@@ -33,4 +33,16 @@ func RegisterMappers() {
 		To:   players_mapper.PlayerMapper{}.Proto,
 	})
 
+	// Mapper para ProminentPlayerModel -> Proto
+	Register(Mapper[model.PlayerProminentModel, *pb_players.ProminentPlayer]{
+		From: players_mapper.PlayerProminentMapper{}.Proto,
+		To:   players_mapper.PlayerProminentMapper{}.Model,
+	})
+
+	// Mapper para Proto -> ProminentPlayerModel
+	Register(Mapper[*pb_players.ProminentPlayer, model.PlayerProminentModel]{
+		From: players_mapper.PlayerProminentMapper{}.Model,
+		To:   players_mapper.PlayerProminentMapper{}.Proto,
+	})
+
 }

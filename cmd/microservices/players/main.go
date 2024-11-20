@@ -18,7 +18,7 @@ func main() {
 		panic(err)
 	}
 
-	port := cfg.MicroserviceMatches.Port_gRPC
+	port := cfg.MicroservicePlayers.Port_gRPC
 	listener, err := net.Listen("tcp", port)
 	if err != nil {
 		logger.Error("Cannot create tcp connection: %s", err.Error())
@@ -28,7 +28,7 @@ func main() {
 	}
 
 	grpcServer := grpc.NewServer()
-	microservicePlayers := microservice_players.New(cfg.MicroserviceMatches, cfg.ThirdPartyApiTokens)
+	microservicePlayers := microservice_players.New(cfg.MicroservicePlayers, cfg.MicroserviceUsers, cfg.ThirdPartyApiTokens)
 
 	pb.RegisterPlayerServiceServer(grpcServer, microservicePlayers)
 

@@ -98,3 +98,28 @@ func TestGetProminentPlayers(t *testing.T) {
 	assert.Equal(t, createdProminent.Year, prominent.Year, "Year should match")
 	assert.Equal(t, createdProminent.Week, prominent.Week, "Week should match")
 }
+
+func TestLookingForTeam(t *testing.T) {
+	db := testutil.GetTestDB("players")
+
+	manager := managers.NewPlayerManager(db)
+
+	fakeLFT := faker.GenerateLookingForTeam(time.Now().Unix())
+
+	createdLFT, err := manager.CreateLookingForTeamPlayer(&fakeLFT)
+	assert.Nil(t, err, "Error should be nil")
+	assert.Equal(t, fakeLFT.FaceitId, createdLFT.FaceitId, "FaceitId should match")
+
+	lft, err := manager.GetLookingForTeamPlayers()
+	assert.Nil(t, err, "Error should be nil")
+	assert.Len(t, lft, 1, "Looking for team should not be empty")
+
+	fakeLFT.OldTeams = "New Team"
+	err = manager.UpdateLookingForTeamPlayer(&fakeLFT)
+	assert.Nil(t, err, "Error should be nil")
+
+	updatedLFT, err := manager.GetLookingForTeamPlayers()
+	assert.Nil(t, err, "Error should be nil")
+
+	assert.Equal(t, updatedLFT[0].OldTeams, fakeLFT.OldTeams, "OldTeams should match")
+}

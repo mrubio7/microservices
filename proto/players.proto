@@ -33,13 +33,12 @@ message PlayerLookingForTeam {
     repeated string InGameRole = 2;
     string TimeTable = 3;
     string OldTeams = 4;
-    string Location = 5;
-    int32 PlayingYears = 6;
-    int64 BornDate = 7;
-    string Description = 8;
-    int64 CreatedAt = 9;
-    int64 UpdatedAt = 10;
-    Player Player = 11;
+    int32 PlayingYears = 5;
+    int64 BornDate = 6;
+    string Description = 7;
+    int64 CreatedAt = 8;
+    int64 UpdatedAt = 9;
+    Player Player = 10;
 }
 
 message PlayerLookingForTeamList {
@@ -49,12 +48,13 @@ message PlayerLookingForTeamList {
 message Empty {}
 
 service PlayerService {
-    rpc GetPlayer (GetPlayerRequest) returns (PlayerList);
+    rpc GetPlayersByFaceitId (GetPlayerRequest) returns (PlayerList);
     rpc GetPlayerByNickname (GetPlayerByNicknameRequest) returns (Player);
-    rpc GetPlayers (Empty) returns (PlayerList);
+    rpc GetAllPlayers (Empty) returns (PlayerList);
     rpc GetProminentPlayers (Empty) returns (ProminentPlayerList);
     rpc NewPlayer (NewPlayerRequest) returns (Player);
-    rpc UpdateLookingForTeam (NewPlayerLookingForTeam) returns (PlayerLookingForTeam);
+    rpc CreateLookingForTeam (CreatePlayerLookingForTeamRequest) returns (PlayerLookingForTeam);
+    rpc UpdateLookingForTeam (CreatePlayerLookingForTeamRequest) returns (PlayerLookingForTeam);
     rpc GetAllLookingForTeam (Empty) returns (PlayerLookingForTeamList);
     rpc DeleteLookingForTeam (DeleteLookingForTeamRequest) returns (Empty);
 }
@@ -64,7 +64,7 @@ message DeleteLookingForTeamRequest {
     int32 UserId = 2;
 }
 
-message NewPlayerLookingForTeam {
+message CreatePlayerLookingForTeamRequest {
     repeated string InGameRole = 2;
     string TimeTable = 3;
     string OldTeams = 4;
@@ -72,7 +72,7 @@ message NewPlayerLookingForTeam {
     string Description = 6;
     string Location = 7;
     int32 UserId = 8;
-    string PlayerId = 9;
+    string FaceitId = 9;
 }
 
 message GetPlayerRequest {
