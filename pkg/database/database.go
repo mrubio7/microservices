@@ -85,6 +85,22 @@ func (d *Database) Automigrate() {
 		if err := d.db.AutoMigrate(&model.TeamStatsModel{}); err != nil {
 			log.Fatalf("Failed to automigrate: %v", err)
 		}
+	case "tournaments":
+		if err := d.db.AutoMigrate(&model.OrganizerModel{}); err != nil {
+			log.Fatalf("Failed to automigrate: %v", err)
+		}
+		if err := d.db.AutoMigrate(&model.TournamentModel{}); err != nil {
+			log.Fatalf("Failed to automigrate: %v", err)
+		}
+		if err := d.db.AutoMigrate(&model.EseaLeagueModel{}); err != nil {
+			log.Fatalf("Failed to automigrate: %v", err)
+		}
+		if err := d.db.AutoMigrate(&model.EseaDivisionModel{}); err != nil {
+			log.Fatalf("Failed to automigrate: %v", err)
+		}
+		if err := d.db.AutoMigrate(&model.EseaStandingModel{}); err != nil {
+			log.Fatalf("Failed to automigrate: %v", err)
+		}
 	}
 
 }

@@ -1,4 +1,4 @@
-package teams_mapper
+package users_mapper
 
 import (
 	"ibercs/internal/model"

@@ -5,10 +5,12 @@ import (
 	matches_mapper "ibercs/pkg/mapper/matches"
 	players_mapper "ibercs/pkg/mapper/players"
 	teams_mapper "ibercs/pkg/mapper/teams"
+	tournaments_mapper "ibercs/pkg/mapper/tournaments"
 	users_mapper "ibercs/pkg/mapper/users"
 	pb_matches "ibercs/proto/matches"
 	pb_players "ibercs/proto/players"
 	pb_teams "ibercs/proto/teams"
+	pb_tournaments "ibercs/proto/tournaments"
 	pb_users "ibercs/proto/users"
 )
 
@@ -86,6 +88,30 @@ func RegisterMappers() {
 	Register(Mapper[*pb_users.User, model.UserModel]{
 		From: users_mapper.UserMapper{}.Model,
 		To:   users_mapper.UserMapper{}.Proto,
+	})
+
+	// Tournament
+	// Mapper para TournamentModel -> Proto
+	Register(Mapper[model.TournamentModel, *pb_tournaments.Tournament]{
+		From: tournaments_mapper.TournamentMapper{}.Proto,
+		To:   tournaments_mapper.TournamentMapper{}.Model,
+	})
+	// Mapper para Proto -> TournamentModel
+	Register(Mapper[*pb_tournaments.Tournament, model.TournamentModel]{
+		From: tournaments_mapper.TournamentMapper{}.Model,
+		To:   tournaments_mapper.TournamentMapper{}.Proto,
+	})
+
+	// Organizer
+	// Mapper para OrganizerModel -> Proto
+	Register(Mapper[model.OrganizerModel, *pb_tournaments.Organizer]{
+		From: tournaments_mapper.OrganizerMapper{}.Proto,
+		To:   tournaments_mapper.OrganizerMapper{}.Model,
+	})
+	// Mapper para Proto -> OrganizerModel
+	Register(Mapper[*pb_tournaments.Organizer, model.OrganizerModel]{
+		From: tournaments_mapper.OrganizerMapper{}.Model,
+		To:   tournaments_mapper.OrganizerMapper{}.Proto,
 	})
 
 }

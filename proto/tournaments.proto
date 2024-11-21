@@ -12,48 +12,38 @@ message Tournament {
     string Name = 4;
     int64 RegisterDate = 5;
     int64 StartDate = 6;
-    int32 CurrentTeams = 7;
-    int32 Slots = 8;
-    string JoinPolicy = 9;
-    repeated string GeoCountries = 10;
-    int32 MinLevel = 11;
-    int32 MaxLevel = 12;
-    string Status = 13;
-    string BackgroundImage = 14;
-    string CoverImage = 15;
-    string Avatar = 16;
-    repeated string TeamsId = 17;
+    string JoinPolicy = 7;
+    repeated string GeoCountries = 8;
+    int32 MinLevel = 9;
+    int32 MaxLevel = 10;
+    string Status = 11;
+    string BackgroundImage = 12;
+    string CoverImage = 13;
+    string Avatar = 14;
+    repeated string TeamsId = 15;
 }
 
 message Organizer {
     int32 Id = 1;
     string FaceitId = 2;
     string Name = 3;
+    string Twitter = 4;
+    string Twitch = 6;
+    string Avatar = 5;
+    string Type = 7;
 }
 
 message Empty {}
-
-message EseaLeague {
-    string FaceitId = 1;
-    string Name = 2;
-    repeated teams.Team Teams = 3;
-}
-
-message EseaDetails {
-    Tournament Tournament = 1;
-    repeated EseaLeague EseaLeague = 2;
-}
 
 service TournamentService {
     rpc NewOrganizer (NewOrganizerRequest) returns (Organizer);
     rpc NewTournament (NewTournamentRequest) returns (Tournament);
     rpc GetAllTorunaments (Empty) returns (TournamentList);
-    rpc GetTournament (GetTournamentByIdRequest) returns (Tournament);
-    rpc GetEseaDetails (GetEseaDetailsRequest) returns (EseaDetails);
-}
+    rpc GetTournamentByFaceitId (GetTournamentByIdRequest) returns (Tournament);
 
-message GetEseaDetailsRequest {
-    optional string season = 1;
+    // ESEA
+    rpc GetLiveEseaDetails (Empty) returns (Esea);
+    rpc GetEseaDetailsBySeason (GetEseaLeagueBySeasonNumberRequest) returns (Esea);
 }
 
 message GetTournamentByIdRequest {
@@ -72,4 +62,38 @@ message NewTournamentRequest {
 
 message TournamentList {
     repeated Tournament Tournaments = 1;
+}
+
+// ESEA
+message Esea {
+    string FaceitId = 1;
+    string Name = 2;
+    int32 Season = 3;
+    bool Playoffs = 4;
+    string PlayoffsData = 5;
+    repeated EseaDivision Divisions = 6;
+}
+
+message EseaDivision {
+    string FaceitId = 1;
+    string EseaLeagueFaceitId = 2;
+    string Name = 3;
+    repeated EseaStanding Standings = 4;
+}
+
+message EseaStanding {
+    bool IsDisqualified = 1;
+    int32 RankStart = 2;
+    int32 RankEnd = 3;
+    int32 Points = 4;
+    int32 MatchesPlayed = 5;
+    int32 MatchesWon = 6;
+    int32 MatchesLost = 7;
+    int32 MatchesTied = 8;
+    int32 BuchholzScore = 9;
+    teams.Team Team = 10;
+}
+
+message GetEseaLeagueBySeasonNumberRequest {
+    int32 Season = 1;
 }

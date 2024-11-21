@@ -30,11 +30,11 @@ func registerPlayerClient(cfg config.MicroserviceConfig) *pb_players.PlayerServi
 
 func New(cfg config.MicroserviceConfig, cfgThirdParty config.ThirdPartyApiTokens) *Server {
 	db := database.NewDatabase(cfg.Database)
-	playerManager := managers.NewUserManager(db.GetDB())
+	userManager := managers.NewUserManager(db.GetDB())
 	faceit := faceit.New(cfgThirdParty.FaceitApiToken)
 
 	return &Server{
-		UserManager:   playerManager,
+		UserManager:   userManager,
 		FaceitService: faceit,
 		PlayerServer:  *registerPlayerClient(cfg),
 	}

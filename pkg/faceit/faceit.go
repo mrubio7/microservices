@@ -212,8 +212,6 @@ func (c *FaceitClient) GetChampionshipById(championshipId string) *model.Tournam
 		CoverImage:      champ.CoverImage,
 		RegisterDate:    time.UnixMilli(int64(champ.SubscriptionEnd)),
 		StartDate:       time.UnixMilli(int64(champ.ChampionshipStart)),
-		CurrentTeams:    champ.CurrentSubscriptions,
-		Slots:           champ.Slots,
 		Avatar:          champ.Avatar,
 		Status:          champ.Avatar,
 		JoinPolicy:      champ.JoinChecks.JoinPolicy,
@@ -245,8 +243,6 @@ func (c *FaceitClient) GetAllChampionshipFromOrganizer(organizerId string, offse
 			CoverImage:      c.CoverImage,
 			RegisterDate:    time.UnixMilli(int64(c.SubscriptionEnd)),
 			StartDate:       time.UnixMilli(int64(c.ChampionshipStart)),
-			CurrentTeams:    c.CurrentSubscriptions,
-			Slots:           c.Slots,
 			Avatar:          c.Avatar,
 			Status:          c.Status,
 			JoinPolicy:      c.JoinChecks.JoinPolicy,
@@ -366,10 +362,8 @@ func (c *FaceitClient) GetESEADivisionBySeasonId_PRODUCTION(seasonId string, nam
 			for _, division := range region.Divisions {
 				for _, stage := range division.Stages {
 					eseaDivisions = append(eseaDivisions, model.EseaDivisionModel{
-						FaceitId:     stage.Conferences[0].ChampionshipID,
-						ConferenceId: stage.Conferences[0].ID,
-						TournamentId: seasonId,
-						Name:         fmt.Sprintf("%s %s - %s", name, division.Name, stage.Name),
+						FaceitId: stage.Conferences[0].ChampionshipID,
+						Name:     fmt.Sprintf("%s %s - %s", name, division.Name, stage.Name),
 					})
 				}
 			}
@@ -428,7 +422,7 @@ func (c *FaceitClient) GetESEADivisionStanding_PRODUCTION(seasonId string) []mod
 			}
 
 			// Manejar posibles valores nulos o tipos incorrectos
-			faceitID, _ := standing["premade_team_id"].(string)
+			teamFaceitID, _ := standing["premade_team_id"].(string)
 			points, _ := standing["points"].(float64)
 			matchesPlayed, _ := standing["matches"].(float64)
 			matchesWon, _ := standing["won"].(float64)
@@ -440,14 +434,14 @@ func (c *FaceitClient) GetESEADivisionStanding_PRODUCTION(seasonId string) []mod
 			isDisqualified, _ := standing["is_disqualified"].(bool)
 
 			standings = append(standings, model.EseaStandingModel{
-				FaceitId:       faceitID,
+				TeamFaceitId:   teamFaceitID,
 				Points:         int(points),
 				MatchesPlayed:  int(matchesPlayed),
 				MatchesWon:     int(matchesWon),
 				MatchesLost:    int(matchesLost),
 				MatchesTied:    int(matchesTied),
 				BuchholzScore:  int(buchholzScore),
-				TournamentId:   seasonId,
+				DivisionId:     seasonId,
 				RankStart:      int(rankStart),
 				RankEnd:        int(rankEnd),
 				IsDisqualified: isDisqualified,
