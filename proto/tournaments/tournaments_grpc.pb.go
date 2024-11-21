@@ -21,7 +21,7 @@ const _ = grpc.SupportPackageIsVersion9
 const (
 	TournamentService_NewOrganizer_FullMethodName            = "/tournaments.TournamentService/NewOrganizer"
 	TournamentService_NewTournament_FullMethodName           = "/tournaments.TournamentService/NewTournament"
-	TournamentService_GetAllTorunaments_FullMethodName       = "/tournaments.TournamentService/GetAllTorunaments"
+	TournamentService_GetAllTournaments_FullMethodName       = "/tournaments.TournamentService/GetAllTournaments"
 	TournamentService_GetTournamentByFaceitId_FullMethodName = "/tournaments.TournamentService/GetTournamentByFaceitId"
 	TournamentService_GetLiveEseaDetails_FullMethodName      = "/tournaments.TournamentService/GetLiveEseaDetails"
 	TournamentService_GetEseaDetailsBySeason_FullMethodName  = "/tournaments.TournamentService/GetEseaDetailsBySeason"
@@ -33,7 +33,7 @@ const (
 type TournamentServiceClient interface {
 	NewOrganizer(ctx context.Context, in *NewOrganizerRequest, opts ...grpc.CallOption) (*Organizer, error)
 	NewTournament(ctx context.Context, in *NewTournamentRequest, opts ...grpc.CallOption) (*Tournament, error)
-	GetAllTorunaments(ctx context.Context, in *Empty, opts ...grpc.CallOption) (*TournamentList, error)
+	GetAllTournaments(ctx context.Context, in *Empty, opts ...grpc.CallOption) (*TournamentList, error)
 	GetTournamentByFaceitId(ctx context.Context, in *GetTournamentByIdRequest, opts ...grpc.CallOption) (*Tournament, error)
 	// ESEA
 	GetLiveEseaDetails(ctx context.Context, in *Empty, opts ...grpc.CallOption) (*Esea, error)
@@ -68,10 +68,10 @@ func (c *tournamentServiceClient) NewTournament(ctx context.Context, in *NewTour
 	return out, nil
 }
 
-func (c *tournamentServiceClient) GetAllTorunaments(ctx context.Context, in *Empty, opts ...grpc.CallOption) (*TournamentList, error) {
+func (c *tournamentServiceClient) GetAllTournaments(ctx context.Context, in *Empty, opts ...grpc.CallOption) (*TournamentList, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(TournamentList)
-	err := c.cc.Invoke(ctx, TournamentService_GetAllTorunaments_FullMethodName, in, out, cOpts...)
+	err := c.cc.Invoke(ctx, TournamentService_GetAllTournaments_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -114,7 +114,7 @@ func (c *tournamentServiceClient) GetEseaDetailsBySeason(ctx context.Context, in
 type TournamentServiceServer interface {
 	NewOrganizer(context.Context, *NewOrganizerRequest) (*Organizer, error)
 	NewTournament(context.Context, *NewTournamentRequest) (*Tournament, error)
-	GetAllTorunaments(context.Context, *Empty) (*TournamentList, error)
+	GetAllTournaments(context.Context, *Empty) (*TournamentList, error)
 	GetTournamentByFaceitId(context.Context, *GetTournamentByIdRequest) (*Tournament, error)
 	// ESEA
 	GetLiveEseaDetails(context.Context, *Empty) (*Esea, error)
@@ -135,8 +135,8 @@ func (UnimplementedTournamentServiceServer) NewOrganizer(context.Context, *NewOr
 func (UnimplementedTournamentServiceServer) NewTournament(context.Context, *NewTournamentRequest) (*Tournament, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method NewTournament not implemented")
 }
-func (UnimplementedTournamentServiceServer) GetAllTorunaments(context.Context, *Empty) (*TournamentList, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method GetAllTorunaments not implemented")
+func (UnimplementedTournamentServiceServer) GetAllTournaments(context.Context, *Empty) (*TournamentList, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetAllTournaments not implemented")
 }
 func (UnimplementedTournamentServiceServer) GetTournamentByFaceitId(context.Context, *GetTournamentByIdRequest) (*Tournament, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetTournamentByFaceitId not implemented")
@@ -204,20 +204,20 @@ func _TournamentService_NewTournament_Handler(srv interface{}, ctx context.Conte
 	return interceptor(ctx, in, info, handler)
 }
 
-func _TournamentService_GetAllTorunaments_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _TournamentService_GetAllTournaments_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(Empty)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(TournamentServiceServer).GetAllTorunaments(ctx, in)
+		return srv.(TournamentServiceServer).GetAllTournaments(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: TournamentService_GetAllTorunaments_FullMethodName,
+		FullMethod: TournamentService_GetAllTournaments_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(TournamentServiceServer).GetAllTorunaments(ctx, req.(*Empty))
+		return srv.(TournamentServiceServer).GetAllTournaments(ctx, req.(*Empty))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -292,8 +292,8 @@ var TournamentService_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _TournamentService_NewTournament_Handler,
 		},
 		{
-			MethodName: "GetAllTorunaments",
-			Handler:    _TournamentService_GetAllTorunaments_Handler,
+			MethodName: "GetAllTournaments",
+			Handler:    _TournamentService_GetAllTournaments_Handler,
 		},
 		{
 			MethodName: "GetTournamentByFaceitId",

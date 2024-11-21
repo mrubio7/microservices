@@ -38,7 +38,7 @@ message Empty {}
 service TournamentService {
     rpc NewOrganizer (NewOrganizerRequest) returns (Organizer);
     rpc NewTournament (NewTournamentRequest) returns (Tournament);
-    rpc GetAllTorunaments (Empty) returns (TournamentList);
+    rpc GetAllTournaments (Empty) returns (TournamentList);
     rpc GetTournamentByFaceitId (GetTournamentByIdRequest) returns (Tournament);
 
     // ESEA
