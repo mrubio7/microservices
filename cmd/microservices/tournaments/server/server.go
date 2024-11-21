@@ -48,7 +48,7 @@ func (s *Server) CreateOrganizer(ctx context.Context, req *pb.NewOrganizerReques
 	}
 
 	organizer := s.FaceitService.GetOrganizerById(req.FaceitId)
-	if organizer == nil {
+	if organizer.FaceitId == "" {
 		err := status.Errorf(codes.NotFound, "organizer with FaceitID %s doesn't exist", req.FaceitId)
 		logger.Error(err.Error())
 		return nil, err

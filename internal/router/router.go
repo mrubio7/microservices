@@ -1,4 +1,4 @@
-package api
+package router
 
 import (
 	"ibercs/pkg/config"
@@ -34,6 +34,10 @@ func NewRouter(cfg config.ConfigV2) *Router {
 	r.registerTournamentsServer(cfg.MicroserviceTournaments)
 
 	return r
+}
+
+func (r *Router) Use(middlewares ...gin.HandlerFunc) {
+	r.gin.Use(middlewares...)
 }
 
 func (r *Router) GET(path string, handler gin.HandlerFunc, middlewares ...gin.HandlerFunc) {

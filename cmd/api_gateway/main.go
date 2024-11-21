@@ -1,13 +1,10 @@
 package main
 
 import (
-	"ibercs/internal/api"
-	"ibercs/pkg/logger"
+	"ibercs/cmd/api_gateway/api"
 )
 
 func main() {
-	logger.Initialize()
-
 	app := api.New()
 
 	app.Start()

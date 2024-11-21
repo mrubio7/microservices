@@ -1,7 +1,7 @@
 package handlers
 
 import (
-	"ibercs/internal/api/requests"
+	"ibercs/cmd/api_gateway/api/requests"
 	"ibercs/pkg/logger"
 	"ibercs/pkg/response"
 	pb "ibercs/proto/tournaments"
@@ -37,7 +37,7 @@ func (h *Tournament_Handlers) CreateOrganizer(c *gin.Context) {
 		return
 	}
 
-	res, err := h.tournament_client.NewOrganizer(c, payload)
+	res, err := h.tournament_client.CreateOrganizer(c, payload)
 	if err != nil {
 		logger.Error(err.Error())
 		c.JSON(http.StatusBadRequest, response.BuildError("Error creating organizer"))

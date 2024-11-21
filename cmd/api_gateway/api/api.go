@@ -1,8 +1,9 @@
 package api
 
 import (
-	"ibercs/internal/api/handlers"
-	"ibercs/internal/api/middlewares"
+	"ibercs/cmd/api_gateway/api/handlers"
+	"ibercs/cmd/api_gateway/api/middlewares"
+	"ibercs/internal/router"
 	"ibercs/pkg/cache"
 	"ibercs/pkg/config"
 	"ibercs/pkg/consts"
@@ -16,7 +17,7 @@ import (
 type Api struct {
 	db     *gorm.DB
 	cfg    config.ConfigV2
-	router *Router
+	router *router.Router
 }
 
 func New() *Api {
@@ -33,7 +34,7 @@ func New() *Api {
 
 func (api *Api) Start() {
 	logger.Debug("Initializing API...")
-	api.router = NewRouter(api.cfg)
+	api.router = router.NewRouter(api.cfg)
 	api.db = database.NewDatabase(api.cfg.MicroserviceUsers.Database).GetDB()
 
 	cache := cache.NewCache()
@@ -44,7 +45,7 @@ func (api *Api) Start() {
 	teamHandler := handlers.NewTeamsHandlers(*api.router.TeamsServer)
 	tournamentHandler := handlers.NewTournamentsHandlers(*api.router.TournamentsServer)
 
-	api.router.gin.Use(middlewares.CORSMiddleware())
+	api.router.Use(middlewares.CORSMiddleware())
 	cacheMiddleware := middlewares.Cache(cache, consts.CACHE_DURATION)
 	authMiddleware := middlewares.Auth(api.db)
 
@@ -69,6 +70,7 @@ func (api *Api) Start() {
 	api.router.GET("/api/v2/teams/active", teamHandler.GetActiveTeams, cacheMiddleware)
 
 	api.router.GET("/api/v2/tournaments", tournamentHandler.GetAll, cacheMiddleware)
+	api.router.POST("/api/v2/organizer", tournamentHandler.CreateOrganizer, authMiddleware)
 	api.router.GET("/api/v2/esea", tournamentHandler.GetEseaLeagues, cacheMiddleware)
 
 	api.router.GET("/api/v2/match", matchHandler.Get, cacheMiddleware)      // query param: id

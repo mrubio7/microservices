@@ -36,7 +36,7 @@ message Organizer {
 message Empty {}
 
 service TournamentService {
-    rpc NewOrganizer (NewOrganizerRequest) returns (Organizer);
+    rpc CreateOrganizer (NewOrganizerRequest) returns (Organizer);
     rpc NewTournament (NewTournamentRequest) returns (Tournament);
     rpc GetAllTournaments (Empty) returns (TournamentList);
     rpc GetTournamentByFaceitId (GetTournamentByIdRequest) returns (Tournament);

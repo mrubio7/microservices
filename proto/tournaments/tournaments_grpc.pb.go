@@ -19,7 +19,7 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	TournamentService_NewOrganizer_FullMethodName            = "/tournaments.TournamentService/NewOrganizer"
+	TournamentService_CreateOrganizer_FullMethodName         = "/tournaments.TournamentService/CreateOrganizer"
 	TournamentService_NewTournament_FullMethodName           = "/tournaments.TournamentService/NewTournament"
 	TournamentService_GetAllTournaments_FullMethodName       = "/tournaments.TournamentService/GetAllTournaments"
 	TournamentService_GetTournamentByFaceitId_FullMethodName = "/tournaments.TournamentService/GetTournamentByFaceitId"
@@ -31,7 +31,7 @@ const (
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type TournamentServiceClient interface {
-	NewOrganizer(ctx context.Context, in *NewOrganizerRequest, opts ...grpc.CallOption) (*Organizer, error)
+	CreateOrganizer(ctx context.Context, in *NewOrganizerRequest, opts ...grpc.CallOption) (*Organizer, error)
 	NewTournament(ctx context.Context, in *NewTournamentRequest, opts ...grpc.CallOption) (*Tournament, error)
 	GetAllTournaments(ctx context.Context, in *Empty, opts ...grpc.CallOption) (*TournamentList, error)
 	GetTournamentByFaceitId(ctx context.Context, in *GetTournamentByIdRequest, opts ...grpc.CallOption) (*Tournament, error)
@@ -48,10 +48,10 @@ func NewTournamentServiceClient(cc grpc.ClientConnInterface) TournamentServiceCl
 	return &tournamentServiceClient{cc}
 }
 
-func (c *tournamentServiceClient) NewOrganizer(ctx context.Context, in *NewOrganizerRequest, opts ...grpc.CallOption) (*Organizer, error) {
+func (c *tournamentServiceClient) CreateOrganizer(ctx context.Context, in *NewOrganizerRequest, opts ...grpc.CallOption) (*Organizer, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(Organizer)
-	err := c.cc.Invoke(ctx, TournamentService_NewOrganizer_FullMethodName, in, out, cOpts...)
+	err := c.cc.Invoke(ctx, TournamentService_CreateOrganizer_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -112,7 +112,7 @@ func (c *tournamentServiceClient) GetEseaDetailsBySeason(ctx context.Context, in
 // All implementations must embed UnimplementedTournamentServiceServer
 // for forward compatibility.
 type TournamentServiceServer interface {
-	NewOrganizer(context.Context, *NewOrganizerRequest) (*Organizer, error)
+	CreateOrganizer(context.Context, *NewOrganizerRequest) (*Organizer, error)
 	NewTournament(context.Context, *NewTournamentRequest) (*Tournament, error)
 	GetAllTournaments(context.Context, *Empty) (*TournamentList, error)
 	GetTournamentByFaceitId(context.Context, *GetTournamentByIdRequest) (*Tournament, error)
@@ -129,8 +129,8 @@ type TournamentServiceServer interface {
 // pointer dereference when methods are called.
 type UnimplementedTournamentServiceServer struct{}
 
-func (UnimplementedTournamentServiceServer) NewOrganizer(context.Context, *NewOrganizerRequest) (*Organizer, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method NewOrganizer not implemented")
+func (UnimplementedTournamentServiceServer) CreateOrganizer(context.Context, *NewOrganizerRequest) (*Organizer, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method CreateOrganizer not implemented")
 }
 func (UnimplementedTournamentServiceServer) NewTournament(context.Context, *NewTournamentRequest) (*Tournament, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method NewTournament not implemented")
@@ -168,20 +168,20 @@ func RegisterTournamentServiceServer(s grpc.ServiceRegistrar, srv TournamentServ
 	s.RegisterService(&TournamentService_ServiceDesc, srv)
 }
 
-func _TournamentService_NewOrganizer_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _TournamentService_CreateOrganizer_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(NewOrganizerRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(TournamentServiceServer).NewOrganizer(ctx, in)
+		return srv.(TournamentServiceServer).CreateOrganizer(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: TournamentService_NewOrganizer_FullMethodName,
+		FullMethod: TournamentService_CreateOrganizer_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(TournamentServiceServer).NewOrganizer(ctx, req.(*NewOrganizerRequest))
+		return srv.(TournamentServiceServer).CreateOrganizer(ctx, req.(*NewOrganizerRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -284,8 +284,8 @@ var TournamentService_ServiceDesc = grpc.ServiceDesc{
 	HandlerType: (*TournamentServiceServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
-			MethodName: "NewOrganizer",
-			Handler:    _TournamentService_NewOrganizer_Handler,
+			MethodName: "CreateOrganizer",
+			Handler:    _TournamentService_CreateOrganizer_Handler,
 		},
 		{
 			MethodName: "NewTournament",

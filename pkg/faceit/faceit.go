@@ -195,6 +195,7 @@ func (c *FaceitClient) GetOrganizerById(organizerId string) *model.OrganizerMode
 		Twitter:  organizer.Twitter,
 		Twitch:   organizer.Twitch,
 		Avatar:   organizer.Avatar,
+		Type:     model.ORGANIZER_TYPE_ORGANIZER,
 	}
 }
 

@@ -11,6 +11,10 @@ type OrganizerModel struct {
 	Type     string `gorm:"not null"`
 }
 
+func (OrganizerModel) TableName() string {
+	return "tournaments.organizer"
+}
+
 const (
 	ORGANIZER_TYPE_ESEA      = "ESEA"
 	ORGANIZER_TYPE_ORGANIZER = "ORGANIZER"
