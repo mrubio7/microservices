@@ -10,14 +10,14 @@ import (
 )
 
 type PlayerManager struct {
-	repoPlayers          *repositories.PlayersRepository
+	repoPlayers          *repositories.GenericRepository[model.PlayerModel]
 	repoProminentWeek    *repositories.GenericRepository[model.ProminentWeekModel]
 	repoProminentPlayers *repositories.GenericRepository[model.PlayerProminentModel]
 	repoLFT              *repositories.GenericRepository[model.LookingForTeamModel]
 }
 
 func NewPlayerManager(database *gorm.DB) *PlayerManager {
-	players := repositories.NewPlayersRepository(database)
+	players := repositories.NewGenericRepository[model.PlayerModel](database)
 	prominent := repositories.NewGenericRepository[model.ProminentWeekModel](database)
 	lft := repositories.NewGenericRepository[model.LookingForTeamModel](database)
 

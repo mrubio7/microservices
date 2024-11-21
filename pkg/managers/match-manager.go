@@ -9,11 +9,11 @@ import (
 )
 
 type MatchManager struct {
-	repo *repositories.MatchRepository
+	repo *repositories.GenericRepository[model.MatchModel]
 }
 
 func NewMatchManager(database *gorm.DB) *MatchManager {
-	repo := repositories.NewMatchRepository(database)
+	repo := repositories.NewGenericRepository[model.MatchModel](database)
 
 	return &MatchManager{repo: repo}
 }
