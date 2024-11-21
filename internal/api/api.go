@@ -42,6 +42,7 @@ func (api *Api) Start() {
 	playerHandler := handlers.NewPlayersHandlers(*api.router.PlayersServer)
 	userHandler := handlers.NewUsersHandlers(*api.router.UsersServer)
 	teamHandler := handlers.NewTeamsHandlers(*api.router.TeamsServer)
+	tournamentHandler := handlers.NewTournamentsHandlers(*api.router.TournamentsServer)
 
 	api.router.gin.Use(middlewares.CORSMiddleware())
 	cacheMiddleware := middlewares.Cache(cache, consts.CACHE_DURATION)
@@ -66,6 +67,9 @@ func (api *Api) Start() {
 	api.router.GET("/api/v2/team", teamHandler.Get, cacheMiddleware) // query param: id or nickname
 	api.router.GET("/api/v2/teams", teamHandler.GetAll, cacheMiddleware)
 	api.router.GET("/api/v2/teams/active", teamHandler.GetActiveTeams, cacheMiddleware)
+
+	api.router.GET("/api/v2/tournaments", tournamentHandler.GetAll, cacheMiddleware)
+	api.router.GET("/api/v2/esea", tournamentHandler.GetEseaLeagues, cacheMiddleware)
 
 	api.router.GET("/api/v2/match", matchHandler.Get, cacheMiddleware)      // query param: id
 	api.router.GET("/api/v2/matches", matchHandler.GetAll, cacheMiddleware) // query param: team_id
