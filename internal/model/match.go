@@ -23,7 +23,7 @@ type MatchModel struct {
 	TournamentFaceitId string          `gorm:"not null"`
 	TournamentName     string          `gorm:"not null"`
 	Tournament         TournamentModel `gorm:"-"`
-	Map                JSONStringArray `gorm:"type:jsonb; not null"`
+	Map                JSONStringArray `gorm:"type:jsonb; null"`
 	Status             string          `gorm:"not null"`
 }
 

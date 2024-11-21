@@ -10,8 +10,8 @@ func init() {
 }
 
 type Mapper[T any, U any] struct {
-	From func(T) U
-	To   func(U) T
+	From func(T, ...interface{}) U
+	To   func(U, ...interface{}) T
 }
 
 var registry = make(map[string]interface{})
@@ -24,12 +24,12 @@ func Register[T any, U any](mapper Mapper[T, U]) {
 	registry[key[T, U]()] = mapper
 }
 
-func Convert[From any, To any](input From) To {
+func Convert[From any, To any](input From, params ...interface{}) To {
 	mapperKey := key[From, To]()
 	mapper, ok := registry[mapperKey]
 	if !ok {
 		panic(fmt.Sprintf("No mapper registered for types: %s", mapperKey))
 	}
 	typedMapper := mapper.(Mapper[From, To])
-	return typedMapper.From(input)
+	return typedMapper.From(input, params...)
 }

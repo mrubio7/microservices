@@ -41,7 +41,7 @@ func (m *PlayerManager) GetByNickname(nickname string) (*model.PlayerModel, erro
 }
 
 func (m *PlayerManager) GetAll() ([]model.PlayerModel, error) {
-	return m.repoPlayers.Find()
+	return m.repoPlayers.Find(repositories.Preload("Stats"))
 }
 
 func (m *PlayerManager) GetByFaceitId(faceitId string) (*model.PlayerModel, error) {

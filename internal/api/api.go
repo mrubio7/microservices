@@ -56,7 +56,7 @@ func (api *Api) Start() {
 
 	api.router.GET("/api/v2/player", playerHandler.Get, cacheMiddleware) // query param: ids or nickname
 	api.router.GET("/api/v2/players", playerHandler.GetAll, cacheMiddleware)
-	api.router.GET("/api/v2/players/looking-for-team", playerHandler.GetLookingForTeamPlayers, cacheMiddleware)
+	api.router.GET("/api/v2/players/looking-for-team", playerHandler.GetLookingForTeamPlayers)
 	api.router.POST("/api/v2/players/looking-for-team", playerHandler.CreateLookingForTeam, authMiddleware)
 	api.router.PUT("/api/v2/players/looking-for-team", playerHandler.UpdateLookingForTeam, authMiddleware)
 	api.router.DELETE("/api/v2/players/looking-for-team", playerHandler.DeleteLookingForTeam, authMiddleware)

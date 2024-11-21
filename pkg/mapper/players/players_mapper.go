@@ -8,7 +8,7 @@ import (
 
 type PlayerMapper struct{}
 
-func (PlayerMapper) Proto(model model.PlayerModel) *pb.Player {
+func (PlayerMapper) Proto(model model.PlayerModel, _ ...interface{}) *pb.Player {
 	return &pb.Player{
 		Id:       int32(model.ID),
 		Nickname: model.Nickname,
@@ -28,7 +28,7 @@ func (PlayerMapper) Proto(model model.PlayerModel) *pb.Player {
 	}
 }
 
-func (PlayerMapper) Model(proto *pb.Player) model.PlayerModel {
+func (PlayerMapper) Model(proto *pb.Player, _ ...interface{}) model.PlayerModel {
 	return model.PlayerModel{
 		ID:       int32(proto.Id),
 		Nickname: proto.Nickname,
@@ -50,7 +50,7 @@ func (PlayerMapper) Model(proto *pb.Player) model.PlayerModel {
 
 type PlayerProminentMapper struct{}
 
-func (PlayerProminentMapper) Proto(model model.PlayerProminentModel) *pb.ProminentPlayer {
+func (PlayerProminentMapper) Proto(model model.PlayerProminentModel, _ ...interface{}) *pb.ProminentPlayer {
 	return &pb.ProminentPlayer{
 		Id:       int32(model.ID),
 		Score:    model.Score,
@@ -61,7 +61,7 @@ func (PlayerProminentMapper) Proto(model model.PlayerProminentModel) *pb.Promine
 	}
 }
 
-func (PlayerProminentMapper) Model(proto *pb.ProminentPlayer) model.PlayerProminentModel {
+func (PlayerProminentMapper) Model(proto *pb.ProminentPlayer, _ ...interface{}) model.PlayerProminentModel {
 	return model.PlayerProminentModel{
 		ID:       int32(proto.Id),
 		Avatar:   proto.Avatar,
@@ -74,7 +74,7 @@ func (PlayerProminentMapper) Model(proto *pb.ProminentPlayer) model.PlayerPromin
 
 type PlayerLookingForTeamMapper struct{}
 
-func (PlayerLookingForTeamMapper) Proto(model model.LookingForTeamModel) *pb.PlayerLookingForTeam {
+func (PlayerLookingForTeamMapper) Proto(model model.LookingForTeamModel, _ ...interface{}) *pb.PlayerLookingForTeam {
 	return &pb.PlayerLookingForTeam{
 		Id:           int32(model.Id),
 		InGameRole:   model.InGameRole,
@@ -88,7 +88,7 @@ func (PlayerLookingForTeamMapper) Proto(model model.LookingForTeamModel) *pb.Pla
 	}
 }
 
-func (PlayerLookingForTeamMapper) Model(proto *pb.PlayerLookingForTeam) model.LookingForTeamModel {
+func (PlayerLookingForTeamMapper) Model(proto *pb.PlayerLookingForTeam, _ ...interface{}) model.LookingForTeamModel {
 	return model.LookingForTeamModel{
 		Id:           int32(proto.Id),
 		InGameRole:   proto.InGameRole,
@@ -104,7 +104,16 @@ func (PlayerLookingForTeamMapper) Model(proto *pb.PlayerLookingForTeam) model.Lo
 
 type CreatePlayerLookingForTeamMapper struct{}
 
-func (CreatePlayerLookingForTeamMapper) Proto(model model.LookingForTeamModel, userId int32) *pb.CreatePlayerLookingForTeamRequest {
+func (CreatePlayerLookingForTeamMapper) Proto(model model.LookingForTeamModel, params ...interface{}) *pb.CreatePlayerLookingForTeamRequest {
+	// Verifica y extrae el parámetro adicional (userId)
+	if len(params) == 0 {
+		panic("userId is required")
+	}
+	userId, ok := params[0].(int32)
+	if !ok {
+		panic("userId must be of type int32")
+	}
+
 	return &pb.CreatePlayerLookingForTeamRequest{
 		InGameRole:   model.InGameRole,
 		TimeTable:    model.TimeTable,
@@ -116,8 +125,9 @@ func (CreatePlayerLookingForTeamMapper) Proto(model model.LookingForTeamModel, u
 	}
 }
 
-func (CreatePlayerLookingForTeamMapper) Model(proto *pb.CreatePlayerLookingForTeamRequest) model.LookingForTeamModel {
+func (CreatePlayerLookingForTeamMapper) Model(proto *pb.CreatePlayerLookingForTeamRequest, _ ...interface{}) model.LookingForTeamModel {
 	return model.LookingForTeamModel{
+		Id:           int32(proto.UserId),
 		InGameRole:   proto.InGameRole,
 		FaceitId:     proto.FaceitId,
 		TimeTable:    proto.TimeTable,

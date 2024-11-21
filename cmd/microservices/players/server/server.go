@@ -59,8 +59,8 @@ func (s *Server) GetPlayersByFaceitId(ctx context.Context, req *pb.GetPlayerRequ
 			return nil, err
 		}
 
-		pbPlayer := mapper.Convert[*model.PlayerModel, pb.Player](p)
-		playersRes[i] = &pbPlayer
+		pbPlayer := mapper.Convert[model.PlayerModel, *pb.Player](*p)
+		playersRes[i] = pbPlayer
 	}
 
 	return &pb.PlayerList{Players: playersRes}, nil
@@ -80,9 +80,9 @@ func (s *Server) GetPlayerByNickname(ctx context.Context, req *pb.GetPlayerByNic
 		logger.Warning("Error updating player: %s", err.Error())
 	}
 
-	pbPlayer := mapper.Convert[*model.PlayerModel, pb.Player](playerUpdated)
+	pbPlayer := mapper.Convert[model.PlayerModel, *pb.Player](*playerUpdated)
 
-	return &pbPlayer, nil
+	return pbPlayer, nil
 }
 
 func (s *Server) GetAllPlayers(ctx context.Context, _ *pb.Empty) (*pb.PlayerList, error) {
@@ -95,8 +95,8 @@ func (s *Server) GetAllPlayers(ctx context.Context, _ *pb.Empty) (*pb.PlayerList
 
 	playersRes := make([]*pb.Player, len(players))
 	for i, p := range players {
-		pbPlayer := mapper.Convert[*model.PlayerModel, pb.Player](&p)
-		playersRes[i] = &pbPlayer
+		pbPlayer := mapper.Convert[model.PlayerModel, *pb.Player](p)
+		playersRes[i] = pbPlayer
 	}
 
 	return &pb.PlayerList{Players: playersRes}, nil
@@ -124,15 +124,15 @@ func (s *Server) GetProminentPlayers(ctx context.Context, _ *pb.Empty) (*pb.Prom
 
 	prominentPlayersRes := make([]*pb.ProminentPlayer, len(prominentWeek.Players))
 	for i, p := range prominentWeek.Players {
-		pbPlayer := mapper.Convert[*model.PlayerProminentModel, pb.ProminentPlayer](&p)
-		prominentPlayersRes[i] = &pbPlayer
+		pbPlayer := mapper.Convert[model.PlayerProminentModel, *pb.ProminentPlayer](p)
+		prominentPlayersRes[i] = pbPlayer
 	}
 
 	return &pb.ProminentPlayerList{Players: prominentPlayersRes}, nil
 }
 
 // LookingForTeam
-func (s *Server) GetLookingForTeamPlayers(ctx context.Context, _ *pb.Empty) (*pb.PlayerLookingForTeamList, error) {
+func (s *Server) GetAllLookingForTeam(ctx context.Context, _ *pb.Empty) (*pb.PlayerLookingForTeamList, error) {
 	players, err := s.PlayerManager.GetLookingForTeamPlayers()
 	if err != nil {
 		logger.Error("Error getting players: %s", err.Error())
@@ -142,8 +142,8 @@ func (s *Server) GetLookingForTeamPlayers(ctx context.Context, _ *pb.Empty) (*pb
 
 	playersRes := make([]*pb.PlayerLookingForTeam, len(players))
 	for i, p := range players {
-		pbPlayer := mapper.Convert[*model.LookingForTeamModel, pb.PlayerLookingForTeam](&p)
-		playersRes[i] = &pbPlayer
+		pbPlayer := mapper.Convert[model.LookingForTeamModel, *pb.PlayerLookingForTeam](p)
+		playersRes[i] = pbPlayer
 	}
 
 	return &pb.PlayerLookingForTeamList{LookingForTeam: playersRes}, nil
@@ -157,6 +157,7 @@ func (s *Server) CreateLookingForTeam(ctx context.Context, req *pb.CreatePlayerL
 		PlayingYears: req.PlayingYears,
 		FaceitId:     req.FaceitId,
 		Description:  req.Description,
+		Id:           req.UserId,
 	}
 
 	lft, err := s.PlayerManager.CreateLookingForTeamPlayer(lookingForTeam)
@@ -175,9 +176,10 @@ func (s *Server) UpdateLookingForTeam(ctx context.Context, req *pb.CreatePlayerL
 	lookingForTeam := mapper.Convert[*pb.CreatePlayerLookingForTeamRequest, model.LookingForTeamModel](req)
 
 	user, err := s.UserServer.GetUserByFaceitId(ctx, &pb_users.GetUserRequest{Id: lookingForTeam.FaceitId})
-	if user == nil {
-		logger.Error("Error creating looking for team")
-		return nil, status.Errorf(codes.Internal, "Error creating looking for team")
+	if err != nil {
+		logger.Error("Error getting user: %s", err.Error())
+		err := status.Errorf(codes.NotFound, "user not found")
+		return nil, err
 	}
 
 	if user.Player.FaceitId != lookingForTeam.FaceitId {

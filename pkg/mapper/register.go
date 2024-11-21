@@ -48,6 +48,23 @@ func RegisterMappers() {
 		To:   players_mapper.PlayerProminentMapper{}.Proto,
 	})
 
+	// Mapper para LookingForTeamModel -> Proto
+	Register(Mapper[model.LookingForTeamModel, *pb_players.PlayerLookingForTeam]{
+		From: players_mapper.PlayerLookingForTeamMapper{}.Proto,
+		To:   players_mapper.PlayerLookingForTeamMapper{}.Model,
+	})
+	// Mapper para Proto -> LookingForTeamModel
+	Register(Mapper[*pb_players.PlayerLookingForTeam, model.LookingForTeamModel]{
+		From: players_mapper.PlayerLookingForTeamMapper{}.Model,
+		To:   players_mapper.PlayerLookingForTeamMapper{}.Proto,
+	})
+
+	// Mapper para CreatePlayerLookingForTeamRequest -> LookingForTeamModel
+	Register(Mapper[*pb_players.CreatePlayerLookingForTeamRequest, model.LookingForTeamModel]{
+		From: players_mapper.CreatePlayerLookingForTeamMapper{}.Model,
+		To:   players_mapper.CreatePlayerLookingForTeamMapper{}.Proto,
+	})
+
 	// Team
 	// Mapper para TeamModel -> Proto
 	Register(Mapper[model.TeamModel, *pb_teams.Team]{

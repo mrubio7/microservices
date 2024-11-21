@@ -7,7 +7,7 @@ import (
 
 type TeamMapper struct{}
 
-func (TeamMapper) Proto(entity model.TeamModel) *pb.Team {
+func (TeamMapper) Proto(entity model.TeamModel, _ ...interface{}) *pb.Team {
 	mapStats := make(map[string]*pb.TeamMapStats, len(entity.Stats.MapStats))
 
 	for _, m := range entity.Stats.MapStats {
@@ -40,7 +40,7 @@ func (TeamMapper) Proto(entity model.TeamModel) *pb.Team {
 	}
 }
 
-func (TeamMapper) Model(proto *pb.Team) model.TeamModel {
+func (TeamMapper) Model(proto *pb.Team, _ ...interface{}) model.TeamModel {
 	jsonMapStats := model.JSONMapStats{}
 	for _, m := range proto.Stats.MapStats {
 		jsonMapStats[m.MapName] = model.TeamMapStats{

@@ -8,7 +8,7 @@ import (
 
 type UserMapper struct{}
 
-func (UserMapper) Proto(entity model.UserModel) *pb.User {
+func (UserMapper) Proto(entity model.UserModel, _ ...interface{}) *pb.User {
 	return &pb.User{
 		ID:          int32(entity.ID),
 		PlayerID:    entity.FaceitId,
@@ -21,7 +21,7 @@ func (UserMapper) Proto(entity model.UserModel) *pb.User {
 	}
 }
 
-func (UserMapper) Model(proto *pb.User) model.UserModel {
+func (UserMapper) Model(proto *pb.User, _ ...interface{}) model.UserModel {
 	return model.UserModel{
 		ID:          int(proto.ID),
 		FaceitId:    proto.PlayerID,
