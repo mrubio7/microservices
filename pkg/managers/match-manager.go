@@ -4,6 +4,7 @@ import (
 	"errors"
 	"ibercs/internal/model"
 	"ibercs/internal/repositories"
+	"time"
 
 	"gorm.io/gorm"
 )
@@ -27,7 +28,21 @@ func (m *MatchManager) Update(match *model.MatchModel) error {
 }
 
 func (m *MatchManager) GetMatchByFaceitId(faceitId string) (*model.MatchModel, error) {
-	return m.repo.Get(repositories.Where("faceit_id", faceitId))
+	return m.repo.Get(repositories.Where("faceit_id = ?", faceitId))
+}
+
+func (m *MatchManager) GetUpcomingMatches() ([]model.MatchModel, error) {
+	return m.repo.Find(repositories.Where("status != ?", "FINISHED"), repositories.Where("status != ?", "CANCELLED"))
+}
+
+func (m *MatchManager) GetTodayMatches() ([]model.MatchModel, error) {
+	currentDate := time.Now().Format("2006-01-02")
+	return m.repo.Find(repositories.Where("DATE(timestamp) = ?", currentDate))
+}
+
+func (m *MatchManager) GetYesterdayMatches() ([]model.MatchModel, error) {
+	currentDate := time.Now().AddDate(0, 0, -1).Format("2006-01-02")
+	return m.repo.Find(repositories.Where("DATE(timestamp) = ?", currentDate))
 }
 
 func (m *MatchManager) GetMatchesByTeamId(teamId string) ([]model.MatchModel, error) {

@@ -9,9 +9,10 @@ import (
 	"ibercs/pkg/managers"
 	"ibercs/pkg/response"
 	"net/http"
+	"reflect"
 
 	"github.com/gin-gonic/gin"
-	"github.com/jackc/pgx/v5/pgconn"
+	"gorm.io/gorm"
 )
 
 func FindMatches(c *gin.Context) {
@@ -78,13 +79,28 @@ func workerFindMatches(tournamentManager *managers.TournamentManager, matchManag
 				match.IsTeamAKnown = teamIds[match.TeamAFaceitId]
 				match.IsTeamBKnown = teamIds[match.TeamBFaceitId]
 
-				_, err := matchManager.Create(&match)
+				matchExist, err := matchManager.GetMatchByFaceitId(match.FaceitId)
 				if err != nil {
-					if pgErr, ok := err.(*pgconn.PgError); ok && pgErr.Code == "23505" {
+					if err == gorm.ErrRecordNotFound {
+						_, err := matchManager.Create(&match)
+						if err != nil {
+							logger.Error("Unable to create match %s: %s", match.FaceitId, err.Error())
+							continue
+						}
+					}
+					logger.Error("Unable to create match %s: %s", match.FaceitId, err.Error())
+					continue
+				}
+
+				match.ID = matchExist.ID // For compare
+				if !reflect.DeepEqual(match, *matchExist) {
+					err := matchManager.Update(&match)
+					if err != nil {
+						logger.Error("Unable to update match %s: %s", match.FaceitId, err.Error())
 						continue
 					}
-					logger.Error("Unable to create tournament %s: %s", tournament.Name, err.Error())
 				}
+
 				newMatches += 1
 			}
 		}

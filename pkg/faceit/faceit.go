@@ -494,6 +494,13 @@ func (c *FaceitClient) GetMatchesFromTournamentId(faceitId string, tournamentNam
 				datetime = time.Unix(int64(m.StartedAt), 0)
 			}
 
+			var maps []string
+			if len(m.Voting.Map.Pick) > 3 {
+				maps = []string{"undefined"}
+			} else {
+				maps = m.Voting.Map.Pick
+			}
+
 			res = append(res, model.MatchModel{
 				FaceitId:           m.MatchId,
 				TournamentFaceitId: faceitId,
@@ -504,7 +511,7 @@ func (c *FaceitClient) GetMatchesFromTournamentId(faceitId string, tournamentNam
 				TeamBName:          m.Teams["faction2"].Name,
 				BestOf:             int32(m.BestOf),
 				Timestamp:          datetime,
-				Map:                nil,
+				Map:                maps,
 				Status:             m.Status,
 				ScoreTeamA:         int32(m.Results.Score["faction1"]),
 				ScoreTeamB:         int32(m.Results.Score["faction2"]),
@@ -517,6 +524,45 @@ func (c *FaceitClient) GetMatchesFromTournamentId(faceitId string, tournamentNam
 			return res
 		}
 	}
+}
+
+func (c *FaceitClient) GetMatchDetails(faceitId string) *model.MatchModel {
+	m, err := c.client.GetMatchByID(faceitId, nil)
+	if err != nil {
+		return nil
+	}
+
+	var datetime time.Time
+
+	if strings.Contains(m.CompetitionName, "ESEA") {
+		datetime = time.Unix(int64(m.ScheduledAt), 0)
+	} else {
+		datetime = time.Unix(int64(m.StartedAt), 0)
+	}
+
+	var maps []string
+	if len(m.Voting.Map.Pick) > 3 {
+		maps = []string{"undefined"}
+	} else {
+		maps = m.Voting.Map.Pick
+	}
+
+	return &model.MatchModel{
+		FaceitId:           m.MatchId,
+		TournamentFaceitId: faceitId,
+		TournamentName:     m.CompetitionName,
+		TeamAFaceitId:      m.Teams["faction1"].FactionId,
+		TeamAName:          m.Teams["faction1"].Name,
+		TeamBFaceitId:      m.Teams["faction2"].FactionId,
+		TeamBName:          m.Teams["faction2"].Name,
+		BestOf:             int32(m.BestOf),
+		Timestamp:          datetime,
+		Map:                maps,
+		Status:             m.Status,
+		ScoreTeamA:         int32(m.Results.Score["faction1"]),
+		ScoreTeamB:         int32(m.Results.Score["faction2"]),
+	}
+
 }
 
 func convertToTournamentModel(season map[string]any) *model.TournamentModel {
