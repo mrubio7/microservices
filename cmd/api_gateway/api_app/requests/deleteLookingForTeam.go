@@ -16,7 +16,7 @@ func (req DeleteLookingForTeam) validate() error {
 	)
 }
 
-func (req DeleteLookingForTeam) ToProto(identity int) (*pb_players.DeleteLookingForTeamRequest, error) {
+func (req DeleteLookingForTeam) ToProto(identity int32) (*pb_players.DeleteLookingForTeamRequest, error) {
 	err := req.validate()
 	if err != nil {
 		return nil, err

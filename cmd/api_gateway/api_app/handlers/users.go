@@ -75,7 +75,7 @@ func (h *Users_Handlers) Update(c *gin.Context) {
 		return
 	}
 
-	userToUpdate, err := h.users_client.GetUserById(c, &pb_users.GetUserByIdRequest{Id: int32(identity.(int))})
+	userToUpdate, err := h.users_client.GetUserById(c, &pb_users.GetUserByIdRequest{Id: identity.(int32)})
 	if err != nil {
 		c.JSON(http.StatusBadRequest, response.BuildError("Error getting user"))
 		return
@@ -106,7 +106,7 @@ func (h *Users_Handlers) Login(c *gin.Context) {
 		return
 	}
 
-	res, err := h.users_client.GetUserById(c, &pb_users.GetUserByIdRequest{Id: int32(identity.(int))})
+	res, err := h.users_client.GetUserById(c, &pb_users.GetUserByIdRequest{Id: identity.(int32)})
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, response.BuildError("Error getting user"))
 		return
@@ -122,7 +122,7 @@ func (h *Users_Handlers) Logout(c *gin.Context) {
 		return
 	}
 
-	_, err := h.users_client.DeleteSession(c, &pb_users.NewSessionRequest{Id: int32(identity.(int))})
+	_, err := h.users_client.DeleteSession(c, &pb_users.NewSessionRequest{Id: identity.(int32)})
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, response.BuildError("Internal error"))
 		return

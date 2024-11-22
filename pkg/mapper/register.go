@@ -79,6 +79,7 @@ func RegisterMappers() {
 		To:   teams_mapper.TeamMapper{}.Proto,
 	})
 
+	// User
 	// Mapper para User -> Proto
 	Register(Mapper[model.UserModel, *pb_users.User]{
 		From: users_mapper.UserMapper{}.Proto,
@@ -88,6 +89,18 @@ func RegisterMappers() {
 	Register(Mapper[*pb_users.User, model.UserModel]{
 		From: users_mapper.UserMapper{}.Model,
 		To:   users_mapper.UserMapper{}.Proto,
+	})
+
+	//Session
+	// Mapper para Session -> Proto
+	Register(Mapper[model.UserSessionModel, *pb_users.SessionResponse]{
+		From: users_mapper.SessionMapper{}.Proto,
+		To:   users_mapper.SessionMapper{}.Model,
+	})
+	// Mapper para Proto -> Session
+	Register(Mapper[*pb_users.SessionResponse, model.UserSessionModel]{
+		From: users_mapper.SessionMapper{}.Model,
+		To:   users_mapper.SessionMapper{}.Proto,
 	})
 
 	// Tournament

@@ -20,6 +20,10 @@ func NewStateManager(database *gorm.DB) *StateManager {
 	}
 }
 
+func (m *StateManager) Get() (*model.StateModel, error) {
+	return m.repoState.Get(repositories.Where("id = ?", 1))
+}
+
 func (m *StateManager) Update_PlayersLastUpdate() error {
 	state, err := m.repoState.Get()
 	if err != nil {

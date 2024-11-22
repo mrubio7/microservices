@@ -7,6 +7,8 @@ import (
 	"strings"
 
 	"github.com/gin-gonic/gin"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 )
 
 func Auth(usersServer users.UserServiceClient) gin.HandlerFunc {
@@ -22,6 +24,12 @@ func Auth(usersServer users.UserServiceClient) gin.HandlerFunc {
 
 		session, err := usersServer.GetSessionById(ctx, &users.GetSessionByIdRequest{Token: idToken})
 		if err != nil {
+			status, _ := status.FromError(err)
+			if status.Code() == codes.Unavailable {
+				ctx.JSON(http.StatusUnauthorized, response.BuildError("User service unavailable"))
+				ctx.Abort()
+				return
+			}
 			ctx.JSON(http.StatusUnauthorized, response.BuildError("Unauthorized"))
 			ctx.Abort()
 			return

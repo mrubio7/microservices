@@ -108,7 +108,7 @@ func (h *Players_Handlers) CreateLookingForTeam(c *gin.Context) {
 		return
 	}
 
-	pbReq, err := req.ToProto(int32(identity.(int)))
+	pbReq, err := req.ToProto(identity.(int32))
 	if err != nil {
 		logger.Error(err.Error())
 		c.JSON(http.StatusBadRequest, response.BuildError("Error converting NewLookingForTeam to proto"))
@@ -140,7 +140,7 @@ func (h *Players_Handlers) UpdateLookingForTeam(c *gin.Context) {
 		return
 	}
 
-	pbReq, err := req.ToProto(int32(identity.(int)))
+	pbReq, err := req.ToProto(identity.(int32))
 	if err != nil {
 		logger.Error(err.Error())
 		c.JSON(http.StatusBadRequest, response.BuildError("Error converting NewLookingForTeam to proto"))
@@ -172,7 +172,7 @@ func (h *Players_Handlers) DeleteLookingForTeam(c *gin.Context) {
 		return
 	}
 
-	pb, err := req.ToProto(identity.(int))
+	pb, err := req.ToProto(identity.(int32))
 	if err != nil {
 		logger.Error(err.Error())
 		c.JSON(http.StatusBadRequest, response.BuildError("Error converting NewLookingForTeam to proto"))

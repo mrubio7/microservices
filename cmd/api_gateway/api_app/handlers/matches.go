@@ -111,3 +111,22 @@ func (h *Matches_Handlers) SetStreamMatch(c *gin.Context) {
 
 	c.JSON(http.StatusOK, response.BuildOk("Ok", res))
 }
+
+func (h *Matches_Handlers) GetMatchesByTeamId(c *gin.Context) {
+	teamId := c.Query("team_id")
+
+	if teamId == "" {
+		logger.Error("tried to get an empty id")
+		c.JSON(http.StatusBadRequest, response.BuildError("Invalid ID"))
+		return
+	}
+
+	matches, err := h.matches_client.GetMatchesByTeamId(c, &pb_matches.GetMatchRequest{FaceitId: teamId})
+	if err != nil {
+		logger.Error("Error getting matches by team id")
+		c.JSON(http.StatusInternalServerError, response.BuildError("Error getting matches"))
+		return
+	}
+
+	c.JSON(http.StatusOK, response.BuildOk("Ok", matches))
+}

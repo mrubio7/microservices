@@ -33,3 +33,19 @@ func (UserMapper) Model(proto *pb.User, _ ...interface{}) model.UserModel {
 		Player:      players_mapper.PlayerMapper{}.Model(proto.Player),
 	}
 }
+
+type SessionMapper struct{}
+
+func (SessionMapper) Proto(entity model.UserSessionModel, _ ...interface{}) *pb.SessionResponse {
+	return &pb.SessionResponse{
+		Token:  entity.SessionID,
+		UserId: int32(entity.UserID),
+	}
+}
+
+func (SessionMapper) Model(proto *pb.SessionResponse, _ ...interface{}) model.UserSessionModel {
+	return model.UserSessionModel{
+		UserID:    int(proto.UserId),
+		SessionID: proto.Token,
+	}
+}

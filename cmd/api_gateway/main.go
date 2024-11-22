@@ -17,6 +17,7 @@ func main() {
 	routes.RegisterTeamRoutes()
 	routes.RegisterTournamentRoutes()
 	routes.RegisterMatchRoutes()
+	routes.RegisterStateRoutes()
 
 	app.Start()
 }

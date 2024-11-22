@@ -18,6 +18,7 @@ type (
 		MicroserviceUsers       MicroserviceConfig
 		MicroserviceTournaments MicroserviceConfig
 		MicroserviceMatches     MicroserviceConfig
+		StateDb                 DatabaseConfig
 	}
 
 	ThirdPartyApiTokens struct {
@@ -153,6 +154,14 @@ func Load() (ConfigV2, error) {
 	config := ConfigV2{
 		ThirdPartyApiTokens: ThirdPartyApiTokens{
 			FaceitApiToken: os.Getenv("FACEIT_API_TOKEN"),
+		},
+		StateDb: DatabaseConfig{
+			Host:     os.Getenv("DB_HOST"),
+			DbName:   os.Getenv("DB_NAME"),
+			Port:     os.Getenv("DB_PORT"),
+			User:     os.Getenv("DB_USER"),
+			Password: os.Getenv("DB_PASSWORD"),
+			Scheme:   os.Getenv("STATE_DB_SCHEME"),
 		},
 		MicroservicePlayers: MicroserviceConfig{
 			Database: DatabaseConfig{

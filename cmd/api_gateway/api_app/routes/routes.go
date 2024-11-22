@@ -29,7 +29,7 @@ func (r routes) RegisterUserRoutes() {
 
 	r.router.GET("/api/v2/user", userHandler.Get, r.cacheMiddleware) // query param: id or faceit_id
 	r.router.PUT("/api/v2/user", userHandler.Update, r.authMiddleware)
-	r.router.GET("/api/v2/user/streams", userHandler.GetStreams, r.cacheMiddleware)
+	r.router.GET("/api/v2/users/streams", userHandler.GetStreams, r.cacheMiddleware)
 
 	//Auth
 	r.router.GET("/api/v2/auth/callback/faceit", userHandler.AuthCallback_Faceit)
@@ -56,6 +56,7 @@ func (r routes) RegisterTeamRoutes() {
 	r.router.GET("/api/v2/team", teamHandler.Get, r.cacheMiddleware) // query param: id or nickname
 	r.router.GET("/api/v2/teams", teamHandler.GetAll, r.cacheMiddleware)
 	r.router.GET("/api/v2/teams/active", teamHandler.GetActiveTeams, r.cacheMiddleware)
+	r.router.GET("/api/v2/team/player", teamHandler.FindTeamByPlayerId)
 }
 
 func (r routes) RegisterTournamentRoutes() {
@@ -72,4 +73,13 @@ func (r routes) RegisterMatchRoutes() {
 	r.router.GET("/api/v2/match", matchHandler.Get, r.cacheMiddleware)      // query param: id
 	r.router.GET("/api/v2/matches", matchHandler.GetAll, r.cacheMiddleware) // query param: team_id
 	r.router.GET("/api/v2/matches/range", matchHandler.GetRange, r.cacheMiddleware)
+	r.router.POST("/api/v2/match/stream", matchHandler.SetStreamMatch)
+	r.router.GET("/api/v2/matches/team", matchHandler.GetMatchesByTeamId, r.cacheMiddleware)
+}
+
+func (r routes) RegisterStateRoutes() {
+	stateHandler := handlers.NewStateHandlers()
+
+	r.router.GET("/api/v2/state", stateHandler.GetState)
+	r.router.GET("/api/v2/state/players-update", stateHandler.GetState)
 }
