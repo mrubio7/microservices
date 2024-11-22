@@ -97,7 +97,20 @@ func (s *Server) Update(ctx context.Context, req *pb.User) (*pb.User, error) {
 }
 
 // Sessions
-func (s *Server) GetSessionByUserId(ctx context.Context, req *pb.GetUserByIdRequest) (*pb.SessionResponse, error) {
+func (s *Server) GetSessionById(ctx context.Context, req *pb.GetSessionByIdRequest) (*pb.SessionResponse, error) {
+	session, err := s.UserManager.GetSessionById(req.Token)
+	if err != nil {
+		logger.Error("Session for user %s not found: %s", req.Token, err.Error())
+		err := status.Errorf(codes.NotFound, "session not found")
+		return nil, err
+	}
+
+	res := mapper.Convert[model.UserSessionModel, *pb.SessionResponse](*session)
+
+	return res, nil
+}
+
+func (s *Server) GetSessionByUserId(ctx context.Context, req *pb.GetSessionByUserIdRequest) (*pb.SessionResponse, error) {
 	session, err := s.UserManager.GetSessionByUserId(int(req.Id))
 	if err != nil {
 		logger.Error("Session for user %s not found: %s", req.Id, err.Error())

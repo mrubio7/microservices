@@ -26,7 +26,8 @@ service UserService {
     rpc NewUser (NewUserRequest) returns (User);
     rpc NewSession (NewSessionRequest) returns (SessionResponse);
     rpc DeleteSession (NewSessionRequest) returns (Empty);
-    rpc GetSession (GetSessionRequest) returns (SessionResponse);
+    rpc GetSessionById (GetSessionByIdRequest) returns (SessionResponse);
+    rpc GetSessionByUserId (GetSessionByUserIdRequest) returns (SessionResponse);
     rpc GetAllStreams (Empty) returns (StreamsResponse);
 }
 
@@ -44,13 +45,17 @@ message NewSessionRequest{
     int32 id = 1;
 }
 
-message GetSessionRequest{
+message GetSessionByIdRequest{
+    string token = 1;
+}
+
+message GetSessionByUserIdRequest{
     int32 id = 1;
-    string token = 2;
 }
 
 message SessionResponse {
-    string response = 1;
+    string token = 1;
+    int32 userId = 2;
 }
 
 message NewUserRequest {

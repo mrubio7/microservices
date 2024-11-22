@@ -13,7 +13,7 @@ import (
 
 func main() {
 	logger.Initialize()
-	cfg, err := config.LoadV2()
+	cfg, err := config.Load()
 	if err != nil {
 		panic(err)
 	}

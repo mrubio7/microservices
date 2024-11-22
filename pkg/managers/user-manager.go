@@ -44,6 +44,10 @@ func (m *UserManager) Update(user *model.UserModel) (*model.UserModel, error) {
 }
 
 // Sessions
+func (m *UserManager) GetSessionById(sessionId string) (*model.UserSessionModel, error) {
+	return m.repoSessions.Get(repositories.Where("session_id", sessionId))
+}
+
 func (m *UserManager) GetSessionByUserId(userId int) (*model.UserSessionModel, error) {
 	return m.repoSessions.Get(repositories.Where("user_id", userId))
 }

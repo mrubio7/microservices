@@ -1,7 +1,7 @@
 package handlers
 
 import (
-	"ibercs/cmd/api_gateway/api/requests"
+	"ibercs/cmd/api_gateway/api_app/requests"
 	"ibercs/pkg/logger"
 	"ibercs/pkg/response"
 	pb "ibercs/proto/teams"

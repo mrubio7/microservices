@@ -18,8 +18,8 @@ test:
 
 # WORKERS
 worker:
-	go build -o cmd/workers/worker.exe cmd/workers/worker.go
-	./cmd/workers/worker.exe
+	go build -o cmd/worker/worker.exe cmd/worker/main.go
+	./cmd/worker/worker.exe
 
 
 # MICROSERVICES

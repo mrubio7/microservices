@@ -1,7 +1,7 @@
 package handlers
 
 import (
-	"ibercs/cmd/api_gateway/api/requests"
+	"ibercs/cmd/api_gateway/api_app/requests"
 	"ibercs/pkg/faceit"
 	"ibercs/pkg/logger"
 	"ibercs/pkg/response"
@@ -99,22 +99,10 @@ func (h *Users_Handlers) Update(c *gin.Context) {
 // Access
 func (h *Users_Handlers) Login(c *gin.Context) {
 	identity, identityExist := c.Get("identity")
-	token, tokenExist := c.Get("token")
+	_, tokenExist := c.Get("token")
 
 	if !identityExist || !tokenExist {
 		c.JSON(http.StatusUnauthorized, response.BuildError("Unauthorized"))
-		return
-	}
-
-	payload := &pb_users.GetSessionRequest{Id: int32(identity.(int)), Token: token.(string)}
-	session, err := h.users_client.GetSession(c, payload)
-	if err != nil {
-		c.JSON(http.StatusUnauthorized, response.BuildError("Unauthorized"))
-		return
-	}
-
-	if session.Response != token.(string) {
-		c.JSON(http.StatusBadRequest, response.BuildError("Invalid user"))
 		return
 	}
 
@@ -200,7 +188,7 @@ func (h *Users_Handlers) AuthCallback_Faceit(c *gin.Context) {
 		Session string
 	}{
 		User:    res,
-		Session: session.Response,
+		Session: session.Token,
 	}
 
 	c.JSON(http.StatusOK, response.BuildOk("Ok", responseData))

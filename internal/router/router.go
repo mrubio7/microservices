@@ -22,16 +22,18 @@ type Router struct {
 	MatchesServer     *pb_matches.MatchesServiceClient
 }
 
-func NewRouter(cfg config.ConfigV2) *Router {
+func NewRouter(cfg config.ConfigV2, grpcConnections bool) *Router {
 	r := &Router{
 		gin: gin.Default(),
 	}
 
-	r.registerMatchesServer(cfg.MicroserviceMatches)
-	r.registerPlayersServer(cfg.MicroservicePlayers)
-	r.registerTeamsServer(cfg.MicroserviceTeams)
-	r.registerUsersServer(cfg.MicroserviceUsers)
-	r.registerTournamentsServer(cfg.MicroserviceTournaments)
+	if grpcConnections {
+		r.registerMatchesServer(cfg.MicroserviceMatches)
+		r.registerPlayersServer(cfg.MicroservicePlayers)
+		r.registerTeamsServer(cfg.MicroserviceTeams)
+		r.registerUsersServer(cfg.MicroserviceUsers)
+		r.registerTournamentsServer(cfg.MicroserviceTournaments)
+	}
 
 	return r
 }

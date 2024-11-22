@@ -38,6 +38,14 @@ type (
 		Host_gRPC string
 		Port_gRPC string
 	}
+
+	WorkerConfig struct {
+		TournamentsDb DatabaseConfig
+		MatchesDb     DatabaseConfig
+		UsersDb       DatabaseConfig
+		PlayersDb     DatabaseConfig
+		TeamsDb       DatabaseConfig
+	}
 )
 
 func LoadTestDatabaseConfig(ctx context.Context, testContainer testcontainers.Container, scheme string) DatabaseConfig {
@@ -60,7 +68,65 @@ func LoadTestDatabaseConfig(ctx context.Context, testContainer testcontainers.Co
 	}
 }
 
-func LoadV2() (ConfigV2, error) {
+func LoadWorker() (WorkerConfig, error) {
+	logger.Debug("Loading config v2...")
+
+	env := os.Getenv("ENV")
+	if env == "" {
+		err := godotenv.Load()
+		if err != nil {
+			log.Fatal("Error al cargar el archivo .env")
+		}
+	}
+
+	config := WorkerConfig{
+		TournamentsDb: DatabaseConfig{
+			Host:     os.Getenv("DB_HOST"),
+			DbName:   os.Getenv("DB_NAME"),
+			Port:     os.Getenv("DB_PORT"),
+			User:     os.Getenv("DB_USER"),
+			Password: os.Getenv("DB_PASSWORD"),
+			Scheme:   os.Getenv("MICROSERVICE_TOURNAMENTS_DB_SCHEME"),
+		},
+		MatchesDb: DatabaseConfig{
+			Host:     os.Getenv("DB_HOST"),
+			DbName:   os.Getenv("DB_NAME"),
+			Port:     os.Getenv("DB_PORT"),
+			User:     os.Getenv("DB_USER"),
+			Password: os.Getenv("DB_PASSWORD"),
+			Scheme:   os.Getenv("MICROSERVICE_MATCHES_DB_SCHEME"),
+		},
+		UsersDb: DatabaseConfig{
+			Host:     os.Getenv("DB_HOST"),
+			DbName:   os.Getenv("DB_NAME"),
+			Port:     os.Getenv("DB_PORT"),
+			User:     os.Getenv("DB_USER"),
+			Password: os.Getenv("DB_PASSWORD"),
+			Scheme:   os.Getenv("MICROSERVICE_USERS_DB_SCHEME"),
+		},
+		PlayersDb: DatabaseConfig{
+			Host:     os.Getenv("DB_HOST"),
+			DbName:   os.Getenv("DB_NAME"),
+			Port:     os.Getenv("DB_PORT"),
+			User:     os.Getenv("DB_USER"),
+			Password: os.Getenv("DB_PASSWORD"),
+			Scheme:   os.Getenv("MICROSERVICE_PLAYERS_DB_SCHEME"),
+		},
+		TeamsDb: DatabaseConfig{
+			Host:     os.Getenv("DB_HOST"),
+			DbName:   os.Getenv("DB_NAME"),
+			Port:     os.Getenv("DB_PORT"),
+			User:     os.Getenv("DB_USER"),
+			Password: os.Getenv("DB_PASSWORD"),
+			Scheme:   os.Getenv("MICROSERVICE_TEAMS_DB_SCHEME"),
+		},
+	}
+
+	logger.Debug("Config loaded successfully")
+	return config, nil
+}
+
+func Load() (ConfigV2, error) {
 	logger.Debug("Loading config v2...")
 
 	env := os.Getenv("ENV")
