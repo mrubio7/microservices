@@ -37,15 +37,18 @@ func TestPlayerUpdate(t *testing.T) {
 	assert.Nil(t, err, "Error should be nil")
 	assert.Equal(t, fakePlayer.FaceitId, createdPlayer.FaceitId, "FaceitId should match")
 
-	createdPlayer.Nickname = "New Nickname"
+	player, err := manager.GetByNickname(fakePlayer.Nickname)
+	assert.Nil(t, err, "Error should be nil")
 
-	err = manager.Update(createdPlayer)
+	player.Avatar = "NewAvatar"
+
+	err = manager.Update(player)
 	assert.Nil(t, err, "Error should be nil")
 
 	updatedPlayer, err := manager.GetByFaceitId(createdPlayer.FaceitId)
 	assert.Nil(t, err, "Error should be nil")
 
-	assert.Equal(t, createdPlayer.FaceitId, updatedPlayer.FaceitId, "FaceitId should match")
+	assert.Equal(t, player.Avatar, updatedPlayer.Avatar, "FaceitId should match")
 }
 
 func TestGetByNickname(t *testing.T) {

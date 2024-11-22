@@ -37,7 +37,7 @@ func (m *PlayerManager) Update(player *model.PlayerModel) error {
 }
 
 func (m *PlayerManager) GetByNickname(nickname string) (*model.PlayerModel, error) {
-	return m.repoPlayers.Get(repositories.Preload("Stats"), repositories.Where("nickname", nickname))
+	return m.repoPlayers.Get(repositories.Preload("Stats"), repositories.Where("nickname = ?", nickname))
 }
 
 func (m *PlayerManager) GetAll() ([]model.PlayerModel, error) {
@@ -45,7 +45,7 @@ func (m *PlayerManager) GetAll() ([]model.PlayerModel, error) {
 }
 
 func (m *PlayerManager) GetByFaceitId(faceitId string) (*model.PlayerModel, error) {
-	return m.repoPlayers.Get(repositories.Preload("Stats"), repositories.Where("faceit_id", faceitId))
+	return m.repoPlayers.Get(repositories.Preload("Stats"), repositories.Where("faceit_id = ?", faceitId))
 }
 
 // Prominent players

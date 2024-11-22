@@ -23,7 +23,8 @@ func (r *GenericRepository[T]) Create(entity *T) (*T, error) {
 }
 
 func (r *GenericRepository[T]) Update(entity *T) error {
-	return r.db.Session(&gorm.Session{FullSaveAssociations: true}).Save(entity).Error
+	return r.db.Session(&gorm.Session{FullSaveAssociations: true}).
+		Model(entity).Updates(entity).Error
 }
 
 func (r *GenericRepository[T]) Delete(field string, value interface{}) error {

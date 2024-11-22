@@ -1,12 +1,12 @@
 package model
 
 type PlayerModel struct {
-	ID       int32            `gorm:"primaryKey;autoIncrement"`
+	Id       int32            `gorm:"primaryKey;autoIncrement"`
 	Nickname string           `gorm:"not null"`
 	FaceitId string           `gorm:"unique;index"`
 	SteamId  string           `gorm:"null"`
 	Avatar   string           `gorm:"null"`
-	Stats    PlayerStatsModel `gorm:"foreignKey:ID;constraint:OnUpdate:CASCADE,OnDelete:CASCADE"`
+	Stats    PlayerStatsModel `gorm:"foreignKey:Id;references:Id;constraint:OnUpdate:CASCADE,OnDelete:CASCADE"`
 }
 
 func (PlayerModel) TableName() string {
@@ -14,7 +14,7 @@ func (PlayerModel) TableName() string {
 }
 
 type PlayerStatsModel struct {
-	ID                     int32   `gorm:"primaryKey;autoIncrement:false"`
+	Id                     int32   `gorm:"primaryKey;autoIncrement:false"`
 	KrRatio                float32 `gorm:"type:numeric(8,2)"`
 	KdRatio                float32 `gorm:"type:numeric(8,2)"`
 	KillsAverage           float32 `gorm:"type:numeric(8,2)"`

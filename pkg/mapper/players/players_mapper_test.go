@@ -19,5 +19,5 @@ func TestPlayerMapper(t *testing.T) {
 	playerModelAgain := mapper.Convert[*pb.Player, model.PlayerModel](playerProto)
 
 	assert.Equal(t, playerProto.FaceitId, playerModelAgain.FaceitId, "FaceitId should match")
-	assert.Equal(t, playerProto.Id, int32(playerModelAgain.ID), "ID should match")
+	assert.Equal(t, playerProto.Id, int32(playerModelAgain.Id), "ID should match")
 }

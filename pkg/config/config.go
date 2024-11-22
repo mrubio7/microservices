@@ -40,11 +40,13 @@ type (
 	}
 
 	WorkerConfig struct {
-		TournamentsDb DatabaseConfig
-		MatchesDb     DatabaseConfig
-		UsersDb       DatabaseConfig
-		PlayersDb     DatabaseConfig
-		TeamsDb       DatabaseConfig
+		ThirdPartyApiTokens ThirdPartyApiTokens
+		TournamentsDb       DatabaseConfig
+		MatchesDb           DatabaseConfig
+		UsersDb             DatabaseConfig
+		PlayersDb           DatabaseConfig
+		TeamsDb             DatabaseConfig
+		StateDb             DatabaseConfig
 	}
 )
 
@@ -80,6 +82,9 @@ func LoadWorker() (WorkerConfig, error) {
 	}
 
 	config := WorkerConfig{
+		ThirdPartyApiTokens: ThirdPartyApiTokens{
+			FaceitApiToken: os.Getenv("FACEIT_API_TOKEN"),
+		},
 		TournamentsDb: DatabaseConfig{
 			Host:     os.Getenv("DB_HOST"),
 			DbName:   os.Getenv("DB_NAME"),
@@ -119,6 +124,14 @@ func LoadWorker() (WorkerConfig, error) {
 			User:     os.Getenv("DB_USER"),
 			Password: os.Getenv("DB_PASSWORD"),
 			Scheme:   os.Getenv("MICROSERVICE_TEAMS_DB_SCHEME"),
+		},
+		StateDb: DatabaseConfig{
+			Host:     os.Getenv("DB_HOST"),
+			DbName:   os.Getenv("DB_NAME"),
+			Port:     os.Getenv("DB_PORT"),
+			User:     os.Getenv("DB_USER"),
+			Password: os.Getenv("DB_PASSWORD"),
+			Scheme:   os.Getenv("STATE_DB_SCHEME"),
 		},
 	}
 

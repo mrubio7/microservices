@@ -10,7 +10,7 @@ type PlayerMapper struct{}
 
 func (PlayerMapper) Proto(model model.PlayerModel, _ ...interface{}) *pb.Player {
 	return &pb.Player{
-		Id:       int32(model.ID),
+		Id:       int32(model.Id),
 		Nickname: model.Nickname,
 		FaceitId: model.FaceitId,
 		SteamId:  model.SteamId,
@@ -30,7 +30,7 @@ func (PlayerMapper) Proto(model model.PlayerModel, _ ...interface{}) *pb.Player 
 
 func (PlayerMapper) Model(proto *pb.Player, _ ...interface{}) model.PlayerModel {
 	return model.PlayerModel{
-		ID:       int32(proto.Id),
+		Id:       int32(proto.Id),
 		Nickname: proto.Nickname,
 		FaceitId: proto.FaceitId,
 		SteamId:  proto.SteamId,

@@ -10,13 +10,13 @@ func GeneratePlayer(seed int64) model.PlayerModel {
 	gofakeit.Seed(seed)
 
 	return model.PlayerModel{
-		ID:       int32(gofakeit.Number(0, 16)),
+		Id:       int32(gofakeit.Number(0, 16)),
 		FaceitId: gofakeit.UUID(),
 		Nickname: gofakeit.Animal(),
 		SteamId:  gofakeit.UUID(),
 		Avatar:   gofakeit.URL(),
 		Stats: model.PlayerStatsModel{
-			ID:                     int32(gofakeit.Number(0, 16)),
+			Id:                     int32(gofakeit.Number(0, 16)),
 			KrRatio:                gofakeit.Float32Range(0.5, 1.5),
 			KdRatio:                gofakeit.Float32Range(0.5, 1.5),
 			KillsAverage:           gofakeit.Float32Range(0.5, 1.5),
