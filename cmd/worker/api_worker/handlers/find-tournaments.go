@@ -9,6 +9,7 @@ import (
 	"ibercs/pkg/managers"
 	"ibercs/pkg/response"
 	"net/http"
+	"slices"
 
 	"github.com/gin-gonic/gin"
 	"github.com/jackc/pgx/v5/pgconn"
@@ -58,6 +59,10 @@ func workerFindTournaments(tournamentManager *managers.TournamentManager, faceit
 		tournaments := faceitClient.GetAllChampionshipFromOrganizer(organizer.FaceitId)
 
 		for _, tournament := range tournaments {
+			if !slices.Contains(tournament.GeoCountries, "ES") || tournament.JoinPolicy != "public" {
+				continue
+			}
+
 			_, err := tournamentManager.CreateTournament(&tournament)
 			if err != nil {
 				if pgErr, ok := err.(*pgconn.PgError); ok && pgErr.Code == "23505" {
