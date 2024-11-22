@@ -101,6 +101,10 @@ func (d *Database) Automigrate() {
 		if err := d.db.AutoMigrate(&model.EseaStandingModel{}); err != nil {
 			log.Fatalf("Failed to automigrate: %v", err)
 		}
+	case "state":
+		if err := d.db.AutoMigrate(&model.StateModel{}); err != nil {
+			log.Fatalf("Failed to automigrate: %v", err)
+		}
 	}
 
 }

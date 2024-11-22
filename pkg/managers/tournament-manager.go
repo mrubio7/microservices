@@ -30,6 +30,10 @@ func (m *TournamentManager) GetAllTournaments() ([]model.TournamentModel, error)
 	return m.repoTournaments.Find()
 }
 
+func (m *TournamentManager) GetAllTournamentsActive() ([]model.TournamentModel, error) {
+	return m.repoTournaments.Find(repositories.Where("status != ?", "finished"), repositories.Where("status != ?", "cancelled"))
+}
+
 func (m *TournamentManager) CreateTournament(tournament *model.TournamentModel) (*model.TournamentModel, error) {
 	return m.repoTournaments.Create(tournament)
 }
@@ -41,6 +45,10 @@ func (m *TournamentManager) UpdateTournament(tournament *model.TournamentModel) 
 // Organizers
 func (m *TournamentManager) GetOrganizerByFaceitId(faceitId string) (*model.OrganizerModel, error) {
 	return m.repoOrganizers.Get(repositories.Where("faceit_id = ?", faceitId))
+}
+
+func (m *TournamentManager) GetAllOrganizers() ([]model.OrganizerModel, error) {
+	return m.repoOrganizers.Find(repositories.Where("type != ?", "ESEA"))
 }
 
 func (m *TournamentManager) CreateOrganizer(organizer *model.OrganizerModel) (*model.OrganizerModel, error) {

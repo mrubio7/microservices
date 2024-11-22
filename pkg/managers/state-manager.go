@@ -31,3 +31,27 @@ func (m *StateManager) Update_PlayersLastUpdate() error {
 
 	return m.repoState.Update(state)
 }
+
+func (m *StateManager) Update_TournamentLastFind() error {
+	state, err := m.repoState.Get()
+	if err != nil {
+		return err
+	}
+
+	state.TournamentsLastFind.Time = time.Now()
+	state.TournamentsLastFind.Valid = true
+
+	return m.repoState.Update(state)
+}
+
+func (m *StateManager) Update_MatchLastFind() error {
+	state, err := m.repoState.Get()
+	if err != nil {
+		return err
+	}
+
+	state.MatchesLastFind.Time = time.Now()
+	state.MatchesLastFind.Valid = true
+
+	return m.repoState.Update(state)
+}

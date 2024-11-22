@@ -33,7 +33,7 @@ func UpdatePlayers(c *gin.Context) {
 	playersDatabase := database.NewDatabase(cfg.PlayersDb)
 	playerManager := managers.NewPlayerManager(playersDatabase.GetDB())
 
-	err = worker(playerManager, faceitClient)
+	err = workerPlayersUpdate(playerManager, faceitClient)
 	if err != nil {
 		logger.Error(err.Error())
 		c.JSON(http.StatusInternalServerError, response.BuildError("Error while update players"))
@@ -49,7 +49,7 @@ func UpdatePlayers(c *gin.Context) {
 	c.JSON(http.StatusOK, response.BuildOk("Players updated", nil))
 }
 
-func worker(playerManager *managers.PlayerManager, faceitClient *faceit.FaceitClient) error {
+func workerPlayersUpdate(playerManager *managers.PlayerManager, faceitClient *faceit.FaceitClient) error {
 	players, err := playerManager.GetAll()
 	if err != nil {
 		return err

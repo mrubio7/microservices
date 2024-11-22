@@ -222,35 +222,46 @@ func (c *FaceitClient) GetChampionshipById(championshipId string) *model.Tournam
 	}
 }
 
-func (c *FaceitClient) GetAllChampionshipFromOrganizer(organizerId string, offset, limit int) []model.TournamentModel {
-	params := map[string]interface{}{
-		"offset":  strconv.Itoa(offset),
-		"limit":   strconv.Itoa(limit),
-		"country": "es",
-	}
-
-	champs, err := c.client.GetOrganizerChampionships(organizerId, params)
-	if err != nil {
-		return nil
-	}
-
+func (c *FaceitClient) GetAllChampionshipFromOrganizer(organizerId string) []model.TournamentModel {
 	var tournaments []model.TournamentModel
-	for _, c := range champs.Items {
-		tournaments = append(tournaments, model.TournamentModel{
-			FaceitId:        c.ChampionshipId,
-			OrganizerId:     c.OrganizerId,
-			BackgroundImage: c.BackgroundImage,
-			Name:            c.Name,
-			CoverImage:      c.CoverImage,
-			RegisterDate:    time.UnixMilli(int64(c.SubscriptionEnd)),
-			StartDate:       time.UnixMilli(int64(c.ChampionshipStart)),
-			Avatar:          c.Avatar,
-			Status:          c.Status,
-			JoinPolicy:      c.JoinChecks.JoinPolicy,
-			GeoCountries:    c.JoinChecks.WhitelistGeoCountries,
-			MinLevel:        c.JoinChecks.MinSkillLevel,
-			MaxLevel:        c.JoinChecks.MaxSkillLevel,
-		})
+	var offset int = 0
+	var limit int = 40
+
+	for {
+		params := map[string]interface{}{
+			"offset":  strconv.Itoa(offset),
+			"limit":   strconv.Itoa(limit),
+			"country": "es",
+		}
+
+		champs, err := c.client.GetOrganizerChampionships(organizerId, params)
+		if err != nil {
+			return nil
+		}
+
+		if len(champs.Items) == 0 {
+			break
+		}
+
+		for _, c := range champs.Items {
+			tournaments = append(tournaments, model.TournamentModel{
+				FaceitId:        c.ChampionshipId,
+				OrganizerId:     c.OrganizerId,
+				BackgroundImage: c.BackgroundImage,
+				Name:            c.Name,
+				CoverImage:      c.CoverImage,
+				RegisterDate:    time.UnixMilli(int64(c.SubscriptionEnd)),
+				StartDate:       time.UnixMilli(int64(c.ChampionshipStart)),
+				Avatar:          c.Avatar,
+				Status:          c.Status,
+				JoinPolicy:      c.JoinChecks.JoinPolicy,
+				GeoCountries:    c.JoinChecks.WhitelistGeoCountries,
+				MinLevel:        c.JoinChecks.MinSkillLevel,
+				MaxLevel:        c.JoinChecks.MaxSkillLevel,
+			})
+		}
+
+		offset += limit
 	}
 
 	return tournaments

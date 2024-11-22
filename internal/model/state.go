@@ -5,8 +5,10 @@ import (
 )
 
 type StateModel struct {
-	ID                int32        `gorm:"primaryKey"`
-	PlayersLastUpdate sql.NullTime `gorm:"null"`
+	ID                  int32        `gorm:"primaryKey"`
+	PlayersLastUpdate   sql.NullTime `gorm:"null"`
+	TournamentsLastFind sql.NullTime `gorm:"null"`
+	MatchesLastFind     sql.NullTime `gorm:"null"`
 }
 
 func (StateModel) TableName() string {

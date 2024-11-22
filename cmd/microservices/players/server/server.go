@@ -45,14 +45,14 @@ func New(cfg, usersCfg config.MicroserviceConfig, cfgThirdParty config.ThirdPart
 func (s *Server) GetPlayersByFaceitId(ctx context.Context, req *pb.GetPlayerRequest) (*pb.PlayerList, error) {
 	playersRes := make([]*pb.Player, len(req.FaceitId))
 
-	for i, p := range req.FaceitId {
-		playerUpdated := s.FaceitService.GetPlayerAverageDetails(p, consts.LAST_MATCHES_NUMBER)
+	for i, id := range req.FaceitId {
+		playerUpdated := s.FaceitService.GetPlayerAverageDetails(id, consts.LAST_MATCHES_NUMBER)
 		err := s.PlayerManager.Update(playerUpdated)
 		if err != nil {
 			logger.Warning("Error updating player: %s", err.Error())
 		}
 
-		p, err := s.PlayerManager.GetByFaceitId(p)
+		p, err := s.PlayerManager.GetByFaceitId(id)
 		if err != nil {
 			logger.Error("Error getting player: %s", err.Error())
 			err := status.Errorf(codes.NotFound, "player not found")
