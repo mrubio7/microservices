@@ -62,3 +62,7 @@ func (m *EseaManager) UpdateStanding(standing model.EseaStandingModel) error {
 
 	return nil
 }
+
+func (m *EseaManager) UpdateDivision(division model.EseaDivisionModel) error {
+	return m.repoEseaDivisions.Update(&division)
+}
