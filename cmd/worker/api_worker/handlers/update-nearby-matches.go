@@ -32,7 +32,7 @@ func UpdateNearbyMatches(c *gin.Context) {
 	matchesNumber, err := workerUpdateNearMatches(matchManager, faceitClient)
 	if err != nil {
 		if err == gorm.ErrRecordNotFound {
-			c.JSON(http.StatusOK, response.BuildOk(fmt.Sprintf("There are no matches to update"), nil))
+			c.JSON(http.StatusOK, response.BuildOk("There are no matches to update", nil))
 			return
 		}
 		logger.Error(err.Error())
