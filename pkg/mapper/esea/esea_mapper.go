@@ -1,7 +1,9 @@
 package esea_mapper
 
 import (
+	"encoding/json"
 	"ibercs/internal/model"
+	"ibercs/pkg/logger"
 	teams_mapper "ibercs/pkg/mapper/teams"
 	pb "ibercs/proto/tournaments"
 )
@@ -31,12 +33,10 @@ func (EseaMapper) Model(proto *pb.Esea, _ ...interface{}) model.EseaLeagueModel 
 	}
 
 	return model.EseaLeagueModel{
-		Name:         proto.Name,
-		FaceitId:     proto.FaceitId,
-		Season:       proto.Season,
-		Playoffs:     proto.Playoffs,
-		PlayoffsData: model.JSONString(proto.PlayoffsData),
-		Divisions:    divisions,
+		Name:      proto.Name,
+		FaceitId:  proto.FaceitId,
+		Season:    proto.Season,
+		Divisions: divisions,
 	}
 }
 
@@ -49,11 +49,20 @@ func (EseaDivisionMapper) Proto(entity model.EseaDivisionModel, _ ...interface{}
 		standings = append(standings, EseaStandingMapper{}.Proto(standing))
 	}
 
+	var jsonData string
+	err := json.Unmarshal([]byte(entity.PlayoffsData), &jsonData)
+	if err != nil {
+		logger.Error("Error mapping playoffs data")
+		return nil
+	}
+
 	return &pb.EseaDivision{
 		FaceitId:           entity.FaceitId,
 		EseaLeagueFaceitId: entity.EseaLeagueFaceitId,
 		Name:               entity.Name,
 		Standings:          standings,
+		Playoffs:           entity.Playoffs,
+		PlayoffsData:       jsonData,
 	}
 }
 
@@ -69,6 +78,8 @@ func (EseaDivisionMapper) Model(proto *pb.EseaDivision, _ ...interface{}) model.
 		Name:               proto.Name,
 		EseaLeagueFaceitId: proto.EseaLeagueFaceitId,
 		Standings:          standings,
+		Playoffs:           proto.Playoffs,
+		PlayoffsData:       model.JSONString(proto.PlayoffsData),
 	}
 }
 

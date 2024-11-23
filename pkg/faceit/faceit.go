@@ -9,6 +9,7 @@ import (
 	"io"
 	"log"
 	"net/http"
+	"regexp"
 	"strconv"
 	"strings"
 	"time"
@@ -306,7 +307,7 @@ func (c *FaceitClient) GetTeamsInTournament(tournamentId string) []model.TeamMod
 	return res
 }
 
-func (c *FaceitClient) GetESEASeasons_PRODUCTION() []model.TournamentModel {
+func (c *FaceitClient) GetESEASeasons_PRODUCTION() []model.EseaLeagueModel {
 	// Realiza la solicitud HTTP
 	res, err := http.Get("https://www.faceit.com/api/team-leagues/v1/get_league_seasons?league_id=a14b8616-45b9-4581-8637-4dfd0b5f6af8")
 	if err != nil {
@@ -327,15 +328,15 @@ func (c *FaceitClient) GetESEASeasons_PRODUCTION() []model.TournamentModel {
 		return nil
 	}
 
-	tournaments := make([]model.TournamentModel, 2)
+	tournaments := make([]model.EseaLeagueModel, 2)
 
 	payload := rb["payload"].(map[string]any)
 
 	currentSeason := payload["current_season"].(map[string]any)
-	tournaments[0] = *convertToTournamentModel(currentSeason)
+	tournaments[0] = *convertToEseaModel(currentSeason)
 
 	nextSeason := payload["next_season"].(map[string]any)
-	tournaments[1] = *convertToTournamentModel(nextSeason)
+	tournaments[1] = *convertToEseaModel(nextSeason)
 
 	return tournaments
 }
@@ -374,8 +375,8 @@ func (c *FaceitClient) GetESEADivisionBySeasonId_PRODUCTION(seasonId string, nam
 			for _, division := range region.Divisions {
 				for _, stage := range division.Stages {
 					eseaDivisions = append(eseaDivisions, model.EseaDivisionModel{
-						FaceitId: stage.Conferences[0].ChampionshipID,
-						Name:     fmt.Sprintf("%s %s - %s", name, division.Name, stage.Name),
+						FaceitId: stage.Conferences[0].ID,
+						Name:     fmt.Sprintf("%s %s", name, division.Name),
 					})
 				}
 			}
@@ -395,41 +396,41 @@ func (c *FaceitClient) GetESEADivisionStanding_PRODUCTION(seasonId string) []mod
 	for {
 		res, err := http.Get(fmt.Sprintf("https://www.faceit.com/api/team-leagues/v2/standings?entityId=%s&entityType=conference&offset=%d&limit=%d", seasonId, offset, limit))
 		if err != nil {
-			log.Printf("Error getting ESEA Seasons: %s", err.Error())
+			logger.Error("Error getting ESEA Seasons: %s", err.Error())
 			return nil
 		}
 		defer res.Body.Close()
 
 		body, err := io.ReadAll(res.Body)
 		if err != nil {
-			log.Printf("Error reading response body: %s", err.Error())
+			logger.Error("Error reading response body: %s", err.Error())
 			return nil
 		}
 
 		var rb map[string]interface{}
 		if err := json.Unmarshal(body, &rb); err != nil {
-			log.Printf("Error unmarshaling response body: %s", err.Error())
+			logger.Error("Error unmarshaling response body: %s", err.Error())
 			return nil
 		}
 
 		// Acceder al payload
 		payload, ok := rb["payload"].(map[string]interface{})
 		if !ok {
-			log.Printf("Error: payload is not a map")
+			logger.Error("Error payload is not a map")
 			return nil
 		}
 
 		// Acceder a standings como un arreglo
 		standingsData, ok := payload["standings"].([]interface{})
 		if !ok {
-			log.Printf("Error: standings is not an array")
+			logger.Error("Error standings is not an array")
 			return nil
 		}
 
 		for _, s := range standingsData {
 			standing, ok := s.(map[string]interface{})
 			if !ok {
-				log.Printf("Error: standing is not a map")
+				logger.Error("Error standing is not a map")
 				continue
 			}
 
@@ -565,8 +566,8 @@ func (c *FaceitClient) GetMatchDetails(faceitId string) *model.MatchModel {
 
 }
 
-func convertToTournamentModel(season map[string]any) *model.TournamentModel {
-	registerDate, err := time.Parse("2006-01-02T15:04:05Z", season["time_start"].(string))
+func convertToEseaModel(season map[string]any) *model.EseaLeagueModel {
+	startDate, err := time.Parse("2006-01-02T15:04:05Z", season["time_start"].(string))
 	if err != nil {
 		logger.Error("Error parsing register date")
 		return nil
@@ -582,24 +583,28 @@ func convertToTournamentModel(season map[string]any) *model.TournamentModel {
 	switch {
 	case time.Now().After(endDate):
 		status = "finished"
-	case time.Now().Before(endDate) && time.Now().After(registerDate):
+	case time.Now().Before(endDate) && time.Now().After(startDate):
 		status = "live"
 	case time.Now().Before(endDate):
 		status = "join"
 	}
 
-	return &model.TournamentModel{
-		OrganizerId:     "a14b8616-45b9-4581-8637-4dfd0b5f6af8",
-		FaceitId:        season["season_id"].(string),
-		Name:            fmt.Sprintf("ESEA %s", season["season_name"]),
-		BackgroundImage: season["header_image_url"].(string),
-		CoverImage:      season["thumbnail_url"].(string),
-		RegisterDate:    registerDate,
-		StartDate:       registerDate,
-		MaxLevel:        10,
-		MinLevel:        1,
-		Status:          status,
-		JoinPolicy:      "esea pass",
-		GeoCountries:    []string{},
+	re := regexp.MustCompile(`\d+`)
+	matches := re.FindStringSubmatch(season["season_name"].(string))
+	if len(matches) == 0 {
+		return nil
+	}
+
+	seasonNumber, err := strconv.Atoi(matches[0])
+	if err != nil {
+		return nil
+	}
+
+	return &model.EseaLeagueModel{
+		FaceitId:  season["season_id"].(string),
+		Season:    int32(seasonNumber),
+		Name:      season["season_name"].(string),
+		StartDate: startDate,
+		Status:    status,
 	}
 }

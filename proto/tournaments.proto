@@ -69,9 +69,7 @@ message Esea {
     string FaceitId = 1;
     string Name = 2;
     int32 Season = 3;
-    bool Playoffs = 4;
-    string PlayoffsData = 5;
-    repeated EseaDivision Divisions = 6;
+    repeated EseaDivision Divisions = 4;
 }
 
 message EseaDivision {
@@ -79,6 +77,8 @@ message EseaDivision {
     string EseaLeagueFaceitId = 2;
     string Name = 3;
     repeated EseaStanding Standings = 4;
+    bool Playoffs = 5;
+    string PlayoffsData = 6;
 }
 
 message EseaStanding {

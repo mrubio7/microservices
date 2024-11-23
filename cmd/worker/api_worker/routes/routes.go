@@ -16,6 +16,7 @@ func New(router *router.Router) *routes {
 }
 
 func (r routes) RegisterUpdates() {
+	r.router.POST("/find/esea", handlers.FindEseaLeague)
 	r.router.POST("/find/tournaments", handlers.FindTournaments)
 	r.router.POST("/find/matches", handlers.FindMatches)
 	r.router.POST("/update/matches/nearby", handlers.UpdateNearbyMatches)

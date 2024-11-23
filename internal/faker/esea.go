@@ -10,11 +10,9 @@ func GenerateEseaLeague(seed int64) model.EseaLeagueModel {
 	gofakeit.Seed(seed)
 
 	return model.EseaLeagueModel{
-		FaceitId:     gofakeit.UUID(),
-		Name:         gofakeit.Company(),
-		Season:       int32(gofakeit.Number(0, 16)),
-		Playoffs:     gofakeit.Bool(),
-		PlayoffsData: model.JSONString(gofakeit.UUID()),
+		FaceitId: gofakeit.UUID(),
+		Name:     gofakeit.Company(),
+		Season:   int32(gofakeit.Number(0, 16)),
 		Divisions: []model.EseaDivisionModel{
 			GenerateEseaDivision(seed),
 			GenerateEseaDivision(seed),
@@ -27,15 +25,13 @@ func GenerateEseaDivision(seed int64) model.EseaDivisionModel {
 
 	return model.EseaDivisionModel{
 		FaceitId: gofakeit.UUID(),
-		TeamsId: model.JSONStringArray{
-			gofakeit.UUID(),
-			gofakeit.UUID(),
-		},
-		Name: gofakeit.Company(),
+		Name:     gofakeit.Company(),
 		Standings: []model.EseaStandingModel{
 			GenerateEseaStanding(seed),
 			GenerateEseaStanding(seed),
 		},
+		Playoffs:     gofakeit.Bool(),
+		PlayoffsData: model.JSONString(gofakeit.UUID()),
 	}
 }
 

@@ -4,16 +4,17 @@ import (
 	"database/sql/driver"
 	"encoding/json"
 	"fmt"
+	"time"
 )
 
 type EseaLeagueModel struct {
-	Id           int32               `gorm:"primaryKey;autoIncrement"`
-	FaceitId     string              `gorm:"unique;not null"`
-	Name         string              `gorm:"not null"`
-	Season       int32               `gorm:"not null"`
-	Playoffs     bool                `gorm:"not null"`
-	PlayoffsData JSONString          `gorm:"not null"`
-	Divisions    []EseaDivisionModel `gorm:"foreignKey:EseaLeagueId;constraint:OnUpdate:CASCADE,OnDelete:CASCADE"`
+	Id        int32               `gorm:"primaryKey;autoIncrement"`
+	FaceitId  string              `gorm:"unique;not null"`
+	Name      string              `gorm:"not null"`
+	Season    int32               `gorm:"not null"`
+	Divisions []EseaDivisionModel `gorm:"foreignKey:EseaLeagueId;constraint:OnUpdate:CASCADE,OnDelete:CASCADE"`
+	StartDate time.Time           `gorm:"not null"`
+	Status    string              `gorm:"not null"`
 }
 
 func (EseaLeagueModel) TableName() string {
@@ -39,8 +40,9 @@ type EseaDivisionModel struct {
 	EseaLeagueId       int32               `gorm:"not null;index"`
 	EseaLeagueFaceitId string              `gorm:"not null"`
 	FaceitId           string              `gorm:"not null"`
-	TeamsId            JSONStringArray     `gorm:"type:jsonb;null"`
 	Name               string              `gorm:"not null"`
+	Playoffs           bool                `gorm:"not null; default:false"`
+	PlayoffsData       JSONString          `gorm:"type:jsonb; null"`
 	Standings          []EseaStandingModel `gorm:"foreignKey:DivisionId;constraint:OnUpdate:CASCADE,OnDelete:CASCADE"`
 }
 
