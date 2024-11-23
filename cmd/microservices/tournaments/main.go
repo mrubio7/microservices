@@ -28,7 +28,7 @@ func main() {
 	}
 
 	grpcServer := grpc.NewServer()
-	microserviceTournaments := microservice_tournaments.New(cfg.MicroserviceTournaments, cfg.ThirdPartyApiTokens)
+	microserviceTournaments := microservice_tournaments.New(cfg.MicroserviceTournaments, cfg.MicroserviceTeams, cfg.ThirdPartyApiTokens)
 
 	pb.RegisterTournamentServiceServer(grpcServer, microserviceTournaments)
 

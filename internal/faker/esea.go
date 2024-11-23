@@ -39,7 +39,7 @@ func GenerateEseaStanding(seed int64) model.EseaStandingModel {
 	gofakeit.Seed(seed)
 
 	return model.EseaStandingModel{
-		Team:           GenerateTeam(seed),
+		TeamFaceitId:   gofakeit.UUID(),
 		IsDisqualified: gofakeit.Bool(),
 		TournamentName: gofakeit.Company(),
 		RankStart:      gofakeit.Number(0, 16),

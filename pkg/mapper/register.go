@@ -2,6 +2,7 @@ package mapper
 
 import (
 	"ibercs/internal/model"
+	esea_mapper "ibercs/pkg/mapper/esea"
 	matches_mapper "ibercs/pkg/mapper/matches"
 	players_mapper "ibercs/pkg/mapper/players"
 	teams_mapper "ibercs/pkg/mapper/teams"
@@ -91,7 +92,7 @@ func RegisterMappers() {
 		To:   users_mapper.UserMapper{}.Proto,
 	})
 
-	//Session
+	// Session
 	// Mapper para Session -> Proto
 	Register(Mapper[model.UserSessionModel, *pb_users.SessionResponse]{
 		From: users_mapper.SessionMapper{}.Proto,
@@ -113,6 +114,40 @@ func RegisterMappers() {
 	Register(Mapper[*pb_tournaments.Tournament, model.TournamentModel]{
 		From: tournaments_mapper.TournamentMapper{}.Model,
 		To:   tournaments_mapper.TournamentMapper{}.Proto,
+	})
+
+	// Esea
+	// Maper para EseaLeagueModel -> Proto
+	Register(Mapper[model.EseaLeagueModel, *pb_tournaments.Esea]{
+		From: esea_mapper.EseaMapper{}.Proto,
+		To:   esea_mapper.EseaMapper{}.Model,
+	})
+	// Mapper para Proto -> EseaLeagueModel
+	Register(Mapper[*pb_tournaments.Esea, model.EseaLeagueModel]{
+		From: esea_mapper.EseaMapper{}.Model,
+		To:   esea_mapper.EseaMapper{}.Proto,
+	})
+
+	// Mapper para EseaDivisionModel -> Proto
+	Register(Mapper[model.EseaDivisionModel, *pb_tournaments.EseaDivision]{
+		From: esea_mapper.EseaDivisionMapper{}.Proto,
+		To:   esea_mapper.EseaDivisionMapper{}.Model,
+	})
+	// Mapper para Proto -> EseaDivisionModel
+	Register(Mapper[*pb_tournaments.EseaDivision, model.EseaDivisionModel]{
+		From: esea_mapper.EseaDivisionMapper{}.Model,
+		To:   esea_mapper.EseaDivisionMapper{}.Proto,
+	})
+
+	// Mapper para EseaStandingModel -> Proto
+	Register(Mapper[model.EseaStandingModel, *pb_tournaments.EseaStanding]{
+		From: esea_mapper.EseaStandingMapper{}.Proto,
+		To:   esea_mapper.EseaStandingMapper{}.Model,
+	})
+	// Mapper para Proto -> EseaStandingModel
+	Register(Mapper[*pb_tournaments.EseaStanding, model.EseaStandingModel]{
+		From: esea_mapper.EseaStandingMapper{}.Model,
+		To:   esea_mapper.EseaStandingMapper{}.Proto,
 	})
 
 	// Organizer

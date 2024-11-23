@@ -1,20 +1,18 @@
 package esea_mapper
 
 import (
-	"encoding/json"
 	"ibercs/internal/model"
-	"ibercs/pkg/logger"
-	teams_mapper "ibercs/pkg/mapper/teams"
+	pb_teams "ibercs/proto/teams"
 	pb "ibercs/proto/tournaments"
 )
 
 type EseaMapper struct{}
 
-func (EseaMapper) Proto(entity model.EseaLeagueModel, _ ...interface{}) *pb.Esea {
+func (EseaMapper) Proto(entity model.EseaLeagueModel, params ...interface{}) *pb.Esea {
 	divisions := make([]*pb.EseaDivision, 0)
 
 	for _, division := range entity.Divisions {
-		divisions = append(divisions, EseaDivisionMapper{}.Proto(division))
+		divisions = append(divisions, EseaDivisionMapper{}.Proto(division, params[0].(map[string]*pb_teams.Team)))
 	}
 
 	return &pb.Esea{
@@ -42,18 +40,11 @@ func (EseaMapper) Model(proto *pb.Esea, _ ...interface{}) model.EseaLeagueModel 
 
 type EseaDivisionMapper struct{}
 
-func (EseaDivisionMapper) Proto(entity model.EseaDivisionModel, _ ...interface{}) *pb.EseaDivision {
+func (EseaDivisionMapper) Proto(entity model.EseaDivisionModel, params ...interface{}) *pb.EseaDivision {
 	standings := make([]*pb.EseaStanding, 0)
 
 	for _, standing := range entity.Standings {
-		standings = append(standings, EseaStandingMapper{}.Proto(standing))
-	}
-
-	var jsonData string
-	err := json.Unmarshal([]byte(entity.PlayoffsData), &jsonData)
-	if err != nil {
-		logger.Error("Error mapping playoffs data")
-		return nil
+		standings = append(standings, EseaStandingMapper{}.Proto(standing, params[0].(map[string]*pb_teams.Team)))
 	}
 
 	return &pb.EseaDivision{
@@ -62,7 +53,7 @@ func (EseaDivisionMapper) Proto(entity model.EseaDivisionModel, _ ...interface{}
 		Name:               entity.Name,
 		Standings:          standings,
 		Playoffs:           entity.Playoffs,
-		PlayoffsData:       jsonData,
+		PlayoffsData:       string(entity.PlayoffsData),
 	}
 }
 
@@ -85,7 +76,9 @@ func (EseaDivisionMapper) Model(proto *pb.EseaDivision, _ ...interface{}) model.
 
 type EseaStandingMapper struct{}
 
-func (EseaStandingMapper) Proto(entity model.EseaStandingModel, _ ...interface{}) *pb.EseaStanding {
+func (EseaStandingMapper) Proto(entity model.EseaStandingModel, params ...interface{}) *pb.EseaStanding {
+	teamsMap := params[0].(map[string]*pb_teams.Team)
+
 	return &pb.EseaStanding{
 		IsDisqualified: entity.IsDisqualified,
 		RankStart:      int32(entity.RankStart),
@@ -96,7 +89,8 @@ func (EseaStandingMapper) Proto(entity model.EseaStandingModel, _ ...interface{}
 		MatchesLost:    int32(entity.MatchesLost),
 		MatchesTied:    int32(entity.MatchesTied),
 		BuchholzScore:  int32(entity.BuchholzScore),
-		Team:           teams_mapper.TeamMapper{}.Proto(entity.Team),
+		TeamFaceitId:   entity.TeamFaceitId,
+		Team:           teamsMap[entity.TeamFaceitId],
 	}
 }
 
@@ -111,6 +105,6 @@ func (EseaStandingMapper) Model(proto *pb.EseaStanding, _ ...interface{}) model.
 		MatchesLost:    int(proto.MatchesLost),
 		MatchesTied:    int(proto.MatchesTied),
 		BuchholzScore:  int(proto.BuchholzScore),
-		Team:           teams_mapper.TeamMapper{}.Model(proto.Team),
+		TeamFaceitId:   proto.TeamFaceitId,
 	}
 }

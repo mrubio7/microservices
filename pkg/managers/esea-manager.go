@@ -30,13 +30,7 @@ func NewEseaManager(database *gorm.DB) *EseaManager {
 }
 
 func (m *EseaManager) GetEseaLeagueLive() (*model.EseaLeagueModel, error) {
-	tournament, err := m.repoEseaLeague.Get(repositories.Where("type = ?", "ESEA"), repositories.Where("status = ?", "live"))
-	if err != nil {
-		logger.Error("Error getting tournament, don't exist or is not live: %s", err.Error())
-		return nil, err
-	}
-
-	return m.repoEseaLeague.Get(repositories.Where("faceit_id = ?", tournament.FaceitId))
+	return m.repoEseaLeague.Get(repositories.Preload("Divisions"), repositories.Preload("Divisions.Standings"), repositories.Where("status = ?", "live"))
 }
 
 func (m *EseaManager) GetEseaLeagueBySeasonNumber(seasonNumber int32) (*model.EseaLeagueModel, error) {

@@ -91,7 +91,8 @@ message EseaStanding {
     int32 MatchesLost = 7;
     int32 MatchesTied = 8;
     int32 BuchholzScore = 9;
-    teams.Team Team = 10;
+    string TeamFaceitId = 10;
+    teams.Team Team = 11;
 }
 
 message GetEseaLeagueBySeasonNumberRequest {

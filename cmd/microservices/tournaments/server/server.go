@@ -9,6 +9,8 @@ import (
 	"ibercs/pkg/logger"
 	"ibercs/pkg/managers"
 	"ibercs/pkg/mapper"
+	"ibercs/pkg/microservices"
+	pb_teams "ibercs/proto/teams"
 	pb "ibercs/proto/tournaments"
 
 	"google.golang.org/grpc/codes"
@@ -17,12 +19,13 @@ import (
 
 type Server struct {
 	pb.UnimplementedTournamentServiceServer
+	TeamsServer       pb_teams.TeamServiceClient
 	TournamentManager *managers.TournamentManager
 	EseaManager       *managers.EseaManager
 	FaceitService     *faceit.FaceitClient
 }
 
-func New(cfg config.MicroserviceConfig, cfgThirdParty config.ThirdPartyApiTokens) *Server {
+func New(cfg config.MicroserviceConfig, cfgTeams config.MicroserviceConfig, cfgThirdParty config.ThirdPartyApiTokens) *Server {
 	db := database.NewDatabase(cfg.Database)
 	tournamentManager := managers.NewTournamentManager(db.GetDB())
 	eseaManager := managers.NewEseaManager(db.GetDB())
@@ -32,7 +35,12 @@ func New(cfg config.MicroserviceConfig, cfgThirdParty config.ThirdPartyApiTokens
 		TournamentManager: tournamentManager,
 		EseaManager:       eseaManager,
 		FaceitService:     faceit,
+		TeamsServer:       *registerTeamsClient(cfgTeams),
 	}
+}
+
+func registerTeamsClient(cfg config.MicroserviceConfig) *pb_teams.TeamServiceClient {
+	return microservices.New(cfg.Host_gRPC, cfg.Port_gRPC, pb_teams.NewTeamServiceClient)
 }
 
 func (s *Server) CreateOrganizer(ctx context.Context, req *pb.NewOrganizerRequest) (*pb.Organizer, error) {
@@ -141,7 +149,19 @@ func (s *Server) GetLiveEseaDetails(ctx context.Context, _ *pb.Empty) (*pb.Esea,
 		return nil, err
 	}
 
-	res := mapper.Convert[model.EseaLeagueModel, *pb.Esea](*eseaDetails)
+	teams, err := s.TeamsServer.GetActiveTeams(ctx, nil)
+	if err != nil {
+		logger.Error("Error getting active teams: %v", err)
+		err := status.Errorf(codes.Internal, "Error getting active teams: %v", err)
+		return nil, err
+	}
+
+	teamsMap := make(map[string]*pb_teams.Team, len(teams.Teams))
+	for _, t := range teams.Teams {
+		teamsMap[t.FaceitId] = t
+	}
+
+	res := mapper.Convert[model.EseaLeagueModel, *pb.Esea](*eseaDetails, teamsMap)
 
 	return res, nil
 }
