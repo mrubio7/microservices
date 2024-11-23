@@ -29,19 +29,19 @@ func (m *TeamManager) GetAll() ([]model.TeamModel, error) {
 }
 
 func (m *TeamManager) GetActiveTeams() ([]model.TeamModel, error) {
-	return m.repoTeams.Find(repositories.Where("active", true))
+	return m.repoTeams.Find(repositories.Preload("Stats"), repositories.Where("active = ?", true))
 }
 
 func (m *TeamManager) GetById(id int) (*model.TeamModel, error) {
-	return m.repoTeams.Get(repositories.Preload("Stats"), repositories.Where("id", id))
+	return m.repoTeams.Get(repositories.Preload("Stats"), repositories.Where("id = ?", id))
 }
 
 func (m *TeamManager) GetByFaceitId(faceitId string) (*model.TeamModel, error) {
-	return m.repoTeams.Get(repositories.Preload("Stats"), repositories.Where("faceit_id", faceitId))
+	return m.repoTeams.Get(repositories.Preload("Stats"), repositories.Where("faceit_id = ?", faceitId))
 }
 
 func (m *TeamManager) GetByNickname(nickname string) (*model.TeamModel, error) {
-	return m.repoTeams.Get(repositories.Preload("Stats"), repositories.Where("nickname", nickname))
+	return m.repoTeams.Get(repositories.Preload("Stats"), repositories.Where("nickname = ?", nickname))
 }
 
 func (m *TeamManager) GetByPlayerId(playerId string) ([]model.TeamModel, error) {

@@ -51,8 +51,8 @@ message Empty {}
 service TeamService {
     rpc GetAllTeams (Empty) returns (TeamList);
     rpc GetActiveTeams (Empty) returns (TeamList);
-    rpc GetTeamById (GetTeamByIdRequest) returns (Team);
-    rpc GetTeamByNickname (GetTeamByNicknameRequest) returns (Team);
+    rpc GetById (GetTeamByIdRequest) returns (Team);
+    rpc GetByNickname (GetTeamByNicknameRequest) returns (Team);
     rpc CreateFromFaceit (NewTeamFromFaceitRequest) returns (Team);
     rpc Update(NewTeamFromFaceitRequest) returns (Team);
     rpc FindTeamsByPlayerId(GetTeamByPlayerIdRequest) returns (TeamList);

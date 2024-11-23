@@ -13,10 +13,10 @@ import (
 	"ibercs/pkg/microservices"
 	pb "ibercs/proto/players"
 	pb_users "ibercs/proto/users"
-	"time"
 
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
+	"gorm.io/gorm"
 )
 
 type Server struct {
@@ -104,20 +104,20 @@ func (s *Server) GetAllPlayers(ctx context.Context, _ *pb.Empty) (*pb.PlayerList
 
 // ProminentPlayers
 func (s *Server) GetProminentPlayers(ctx context.Context, _ *pb.Empty) (*pb.ProminentPlayerList, error) {
-	year, week := time.Now().ISOWeek()
+	var prominentWeek *model.ProminentWeekModel
 
 	prominentWeek, err := s.PlayerManager.GetProminentPlayers()
 	if err != nil {
-		logger.Error("Error getting players: %s", err.Error())
-		err := status.Errorf(codes.NotFound, "players not found")
-		return nil, err
-	}
-
-	if prominentWeek.Year != int16(year) || prominentWeek.Week != int16(week) {
-		prominentWeek, err = s.PlayerManager.GenerateProminentPlayers()
-		if err != nil {
-			logger.Error("Error generating prominent players: %s", err.Error())
-			err := status.Errorf(codes.Internal, "error generating prominent players")
+		if err == gorm.ErrRecordNotFound {
+			prominentWeek, err = s.PlayerManager.GenerateProminentPlayers()
+			if err != nil {
+				logger.Error("Error generating prominent players: %s", err.Error())
+				err := status.Errorf(codes.Internal, "error generating prominent players")
+				return nil, err
+			}
+		} else {
+			logger.Error("Error getting players: %s", err.Error())
+			err := status.Errorf(codes.NotFound, "players not found")
 			return nil, err
 		}
 	}

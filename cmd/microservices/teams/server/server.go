@@ -73,7 +73,7 @@ func (s *Server) GetActiveTeams(ctx context.Context, _ *pb.Empty) (*pb.TeamList,
 	return &pb.TeamList{Teams: res}, nil
 }
 
-func (s *Server) GetByFaceitId(ctx context.Context, req *pb.GetTeamByIdRequest) (*pb.Team, error) {
+func (s *Server) GetById(ctx context.Context, req *pb.GetTeamByIdRequest) (*pb.Team, error) {
 	team, err := s.TeamsManager.GetById(int(req.Id))
 	if err != nil {
 		return nil, err

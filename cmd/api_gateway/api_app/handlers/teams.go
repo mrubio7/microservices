@@ -44,8 +44,8 @@ func (h *Team_Handlers) GetActiveTeams(c *gin.Context) {
 }
 
 func (h *Team_Handlers) Get(c *gin.Context) {
-	idStr := c.Param("id")
-	nickname := c.Param("nickname")
+	idStr := c.Query("id")
+	nickname := c.Query("nickname")
 
 	if idStr == "" && nickname == "" {
 		c.JSON(http.StatusBadRequest, response.BuildError("Invalid request"))
@@ -60,7 +60,7 @@ func (h *Team_Handlers) Get(c *gin.Context) {
 			return
 		}
 
-		res, err := h.teams_client.GetTeamById(c, &pb.GetTeamByIdRequest{Id: int32(id)})
+		res, err := h.teams_client.GetById(c, &pb.GetTeamByIdRequest{Id: int32(id)})
 		if err != nil {
 			logger.Error("Error getting team by id: %v", err)
 			c.JSON(http.StatusInternalServerError, response.BuildError("Error getting team by id"))
@@ -71,7 +71,7 @@ func (h *Team_Handlers) Get(c *gin.Context) {
 		return
 	}
 
-	res, err := h.teams_client.GetTeamByNickname(c, &pb.GetTeamByNicknameRequest{Nickname: nickname})
+	res, err := h.teams_client.GetByNickname(c, &pb.GetTeamByNicknameRequest{Nickname: nickname})
 	if err != nil {
 		logger.Error("Error getting team by nickname: %v", err)
 		c.JSON(http.StatusInternalServerError, response.BuildError("Error getting team by nickname"))

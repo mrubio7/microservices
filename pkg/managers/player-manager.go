@@ -19,12 +19,14 @@ type PlayerManager struct {
 func NewPlayerManager(database *gorm.DB) *PlayerManager {
 	players := repositories.NewGenericRepository[model.PlayerModel](database)
 	prominent := repositories.NewGenericRepository[model.ProminentWeekModel](database)
+	prominentPlayers := repositories.NewGenericRepository[model.PlayerProminentModel](database)
 	lft := repositories.NewGenericRepository[model.LookingForTeamModel](database)
 
 	return &PlayerManager{
-		repoPlayers:       players,
-		repoProminentWeek: prominent,
-		repoLFT:           lft,
+		repoPlayers:          players,
+		repoProminentWeek:    prominent,
+		repoProminentPlayers: prominentPlayers,
+		repoLFT:              lft,
 	}
 }
 
@@ -51,7 +53,14 @@ func (m *PlayerManager) GetByFaceitId(faceitId string) (*model.PlayerModel, erro
 // Prominent players
 
 func (m *PlayerManager) GetProminentPlayers() (*model.ProminentWeekModel, error) {
-	return m.repoProminentWeek.Get(repositories.Preload("Players"), repositories.OrderBy("year DESC, week DESC"))
+	year, week := time.Now().ISOWeek()
+
+	return m.repoProminentWeek.Get(
+		repositories.Preload("Players"),
+		repositories.Where("year = ?", year),
+		repositories.Where("week = ?", week),
+		repositories.OrderBy("year DESC, week DESC"),
+	)
 }
 
 func (m *PlayerManager) CreateProminentPlayers(prominent *model.ProminentWeekModel) (*model.ProminentWeekModel, error) {
@@ -63,18 +72,18 @@ func (m *PlayerManager) GenerateProminentPlayers() (*model.ProminentWeekModel, e
 
 	query := fmt.Sprintf(`
 		WITH previous_week AS (
-			SELECT ppm.id
-			FROM player_prominent_models ppm
-			INNER JOIN prominent_week_models pwm ON ppm.prominent_week_id = pwm.id
-			WHERE pwm.year = %d AND pwm.week = %d
-		)
+		SELECT ppm.id
+		FROM players.prominent_player ppm
+		INNER JOIN players.prominent_week pwm ON ppm.prominent_week_id = pwm.id
+		WHERE pwm.year = %d AND pwm.week = %d
+	)
 
 		SELECT ps.id, p.avatar, p.nickname, 
 			((kills_average * 0.35) - (deaths_average * 0.15) + (assist_average * 0.1) + (kr_ratio * 0.2) + (mvp_average * 0.1)) * (1 + (elo / 1000)) AS calc
-		FROM player_stats_models ps 
-		INNER JOIN player_models p ON p.id = ps.id 
-		LEFT JOIN player_prominent_models ppm ON ppm.id = ps.id
-		LEFT JOIN prominent_week_models pwm ON pwm.id = ppm.prominent_week_id
+		FROM players.player_stats ps 
+		INNER JOIN players.player p ON p.id = ps.id 
+		LEFT JOIN players.prominent_player ppm ON ppm.id = ps.id
+		LEFT JOIN players.prominent_week pwm ON pwm.id = ppm.prominent_week_id
 		WHERE (pwm.week IS NULL OR pwm.year < %d OR pwm.week < %d)
 		AND ps.id NOT IN (SELECT id FROM previous_week)
 		ORDER BY calc DESC
