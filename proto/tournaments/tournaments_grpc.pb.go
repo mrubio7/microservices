@@ -19,12 +19,12 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	TournamentService_CreateOrganizer_FullMethodName         = "/tournaments.TournamentService/CreateOrganizer"
-	TournamentService_NewTournament_FullMethodName           = "/tournaments.TournamentService/NewTournament"
-	TournamentService_GetAllTournaments_FullMethodName       = "/tournaments.TournamentService/GetAllTournaments"
-	TournamentService_GetTournamentByFaceitId_FullMethodName = "/tournaments.TournamentService/GetTournamentByFaceitId"
-	TournamentService_GetLiveEseaDetails_FullMethodName      = "/tournaments.TournamentService/GetLiveEseaDetails"
-	TournamentService_GetEseaDetailsBySeason_FullMethodName  = "/tournaments.TournamentService/GetEseaDetailsBySeason"
+	TournamentService_CreateOrganizer_FullMethodName             = "/tournaments.TournamentService/CreateOrganizer"
+	TournamentService_NewTournament_FullMethodName               = "/tournaments.TournamentService/NewTournament"
+	TournamentService_GetAllTournaments_FullMethodName           = "/tournaments.TournamentService/GetAllTournaments"
+	TournamentService_GetTournamentByFaceitId_FullMethodName     = "/tournaments.TournamentService/GetTournamentByFaceitId"
+	TournamentService_GetLiveEseaLeague_FullMethodName           = "/tournaments.TournamentService/GetLiveEseaLeague"
+	TournamentService_GetEseaLeagueBySeasonNumber_FullMethodName = "/tournaments.TournamentService/GetEseaLeagueBySeasonNumber"
 )
 
 // TournamentServiceClient is the client API for TournamentService service.
@@ -36,8 +36,8 @@ type TournamentServiceClient interface {
 	GetAllTournaments(ctx context.Context, in *Empty, opts ...grpc.CallOption) (*TournamentList, error)
 	GetTournamentByFaceitId(ctx context.Context, in *GetTournamentByIdRequest, opts ...grpc.CallOption) (*Tournament, error)
 	// ESEA
-	GetLiveEseaDetails(ctx context.Context, in *Empty, opts ...grpc.CallOption) (*Esea, error)
-	GetEseaDetailsBySeason(ctx context.Context, in *GetEseaLeagueBySeasonNumberRequest, opts ...grpc.CallOption) (*Esea, error)
+	GetLiveEseaLeague(ctx context.Context, in *Empty, opts ...grpc.CallOption) (*Esea, error)
+	GetEseaLeagueBySeasonNumber(ctx context.Context, in *GetEseaLeagueBySeasonNumberRequest, opts ...grpc.CallOption) (*Esea, error)
 }
 
 type tournamentServiceClient struct {
@@ -88,20 +88,20 @@ func (c *tournamentServiceClient) GetTournamentByFaceitId(ctx context.Context, i
 	return out, nil
 }
 
-func (c *tournamentServiceClient) GetLiveEseaDetails(ctx context.Context, in *Empty, opts ...grpc.CallOption) (*Esea, error) {
+func (c *tournamentServiceClient) GetLiveEseaLeague(ctx context.Context, in *Empty, opts ...grpc.CallOption) (*Esea, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(Esea)
-	err := c.cc.Invoke(ctx, TournamentService_GetLiveEseaDetails_FullMethodName, in, out, cOpts...)
+	err := c.cc.Invoke(ctx, TournamentService_GetLiveEseaLeague_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *tournamentServiceClient) GetEseaDetailsBySeason(ctx context.Context, in *GetEseaLeagueBySeasonNumberRequest, opts ...grpc.CallOption) (*Esea, error) {
+func (c *tournamentServiceClient) GetEseaLeagueBySeasonNumber(ctx context.Context, in *GetEseaLeagueBySeasonNumberRequest, opts ...grpc.CallOption) (*Esea, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(Esea)
-	err := c.cc.Invoke(ctx, TournamentService_GetEseaDetailsBySeason_FullMethodName, in, out, cOpts...)
+	err := c.cc.Invoke(ctx, TournamentService_GetEseaLeagueBySeasonNumber_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -117,8 +117,8 @@ type TournamentServiceServer interface {
 	GetAllTournaments(context.Context, *Empty) (*TournamentList, error)
 	GetTournamentByFaceitId(context.Context, *GetTournamentByIdRequest) (*Tournament, error)
 	// ESEA
-	GetLiveEseaDetails(context.Context, *Empty) (*Esea, error)
-	GetEseaDetailsBySeason(context.Context, *GetEseaLeagueBySeasonNumberRequest) (*Esea, error)
+	GetLiveEseaLeague(context.Context, *Empty) (*Esea, error)
+	GetEseaLeagueBySeasonNumber(context.Context, *GetEseaLeagueBySeasonNumberRequest) (*Esea, error)
 	mustEmbedUnimplementedTournamentServiceServer()
 }
 
@@ -141,11 +141,11 @@ func (UnimplementedTournamentServiceServer) GetAllTournaments(context.Context, *
 func (UnimplementedTournamentServiceServer) GetTournamentByFaceitId(context.Context, *GetTournamentByIdRequest) (*Tournament, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetTournamentByFaceitId not implemented")
 }
-func (UnimplementedTournamentServiceServer) GetLiveEseaDetails(context.Context, *Empty) (*Esea, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method GetLiveEseaDetails not implemented")
+func (UnimplementedTournamentServiceServer) GetLiveEseaLeague(context.Context, *Empty) (*Esea, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetLiveEseaLeague not implemented")
 }
-func (UnimplementedTournamentServiceServer) GetEseaDetailsBySeason(context.Context, *GetEseaLeagueBySeasonNumberRequest) (*Esea, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method GetEseaDetailsBySeason not implemented")
+func (UnimplementedTournamentServiceServer) GetEseaLeagueBySeasonNumber(context.Context, *GetEseaLeagueBySeasonNumberRequest) (*Esea, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetEseaLeagueBySeasonNumber not implemented")
 }
 func (UnimplementedTournamentServiceServer) mustEmbedUnimplementedTournamentServiceServer() {}
 func (UnimplementedTournamentServiceServer) testEmbeddedByValue()                           {}
@@ -240,38 +240,38 @@ func _TournamentService_GetTournamentByFaceitId_Handler(srv interface{}, ctx con
 	return interceptor(ctx, in, info, handler)
 }
 
-func _TournamentService_GetLiveEseaDetails_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _TournamentService_GetLiveEseaLeague_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(Empty)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(TournamentServiceServer).GetLiveEseaDetails(ctx, in)
+		return srv.(TournamentServiceServer).GetLiveEseaLeague(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: TournamentService_GetLiveEseaDetails_FullMethodName,
+		FullMethod: TournamentService_GetLiveEseaLeague_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(TournamentServiceServer).GetLiveEseaDetails(ctx, req.(*Empty))
+		return srv.(TournamentServiceServer).GetLiveEseaLeague(ctx, req.(*Empty))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _TournamentService_GetEseaDetailsBySeason_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _TournamentService_GetEseaLeagueBySeasonNumber_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(GetEseaLeagueBySeasonNumberRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(TournamentServiceServer).GetEseaDetailsBySeason(ctx, in)
+		return srv.(TournamentServiceServer).GetEseaLeagueBySeasonNumber(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: TournamentService_GetEseaDetailsBySeason_FullMethodName,
+		FullMethod: TournamentService_GetEseaLeagueBySeasonNumber_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(TournamentServiceServer).GetEseaDetailsBySeason(ctx, req.(*GetEseaLeagueBySeasonNumberRequest))
+		return srv.(TournamentServiceServer).GetEseaLeagueBySeasonNumber(ctx, req.(*GetEseaLeagueBySeasonNumberRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -300,12 +300,12 @@ var TournamentService_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _TournamentService_GetTournamentByFaceitId_Handler,
 		},
 		{
-			MethodName: "GetLiveEseaDetails",
-			Handler:    _TournamentService_GetLiveEseaDetails_Handler,
+			MethodName: "GetLiveEseaLeague",
+			Handler:    _TournamentService_GetLiveEseaLeague_Handler,
 		},
 		{
-			MethodName: "GetEseaDetailsBySeason",
-			Handler:    _TournamentService_GetEseaDetailsBySeason_Handler,
+			MethodName: "GetEseaLeagueBySeasonNumber",
+			Handler:    _TournamentService_GetEseaLeagueBySeasonNumber_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

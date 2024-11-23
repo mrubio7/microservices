@@ -141,7 +141,7 @@ func (s *Server) GetAllTournaments(ctx context.Context, _ *pb.Empty) (*pb.Tourna
 }
 
 // Esea
-func (s *Server) GetLiveEseaDetails(ctx context.Context, _ *pb.Empty) (*pb.Esea, error) {
+func (s *Server) GetLiveEseaLeague(ctx context.Context, _ *pb.Empty) (*pb.Esea, error) {
 	eseaDetails, err := s.EseaManager.GetEseaLeagueLive()
 	if err != nil {
 		logger.Error("Error getting live esea details: %v", err)
@@ -174,7 +174,19 @@ func (s *Server) GetEseaLeagueBySeasonNumber(ctx context.Context, req *pb.GetEse
 		return nil, err
 	}
 
-	res := mapper.Convert[model.EseaLeagueModel, *pb.Esea](*eseaDetails)
+	teams, err := s.TeamsServer.GetActiveTeams(ctx, nil)
+	if err != nil {
+		logger.Error("Error getting active teams: %v", err)
+		err := status.Errorf(codes.Internal, "Error getting active teams: %v", err)
+		return nil, err
+	}
+
+	teamsMap := make(map[string]*pb_teams.Team, len(teams.Teams))
+	for _, t := range teams.Teams {
+		teamsMap[t.FaceitId] = t
+	}
+
+	res := mapper.Convert[model.EseaLeagueModel, *pb.Esea](*eseaDetails, teamsMap)
 
 	return res, nil
 }

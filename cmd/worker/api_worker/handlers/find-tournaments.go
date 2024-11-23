@@ -31,7 +31,9 @@ func FindTournaments(c *gin.Context) {
 	tournamentsDatabase := database.NewDatabase(cfg.TournamentsDb)
 	tournamentManager := managers.NewTournamentManager(tournamentsDatabase.GetDB())
 
-	tournamentsNumber, err := workerFindTournaments(tournamentManager, faceitClient)
+	teamsMap := buildTeamsMap(cfg.TeamsDb)
+
+	tournamentsNumber, err := workerFindTournaments(tournamentManager, faceitClient, teamsMap)
 	if err != nil {
 		logger.Error(err.Error())
 		c.JSON(http.StatusInternalServerError, response.BuildError("Error while find tournaments"))
@@ -47,7 +49,7 @@ func FindTournaments(c *gin.Context) {
 	c.JSON(http.StatusOK, response.BuildOk(fmt.Sprintf("%d new tournaments found", tournamentsNumber), nil))
 }
 
-func workerFindTournaments(tournamentManager *managers.TournamentManager, faceitClient *faceit.FaceitClient) (int, error) {
+func workerFindTournaments(tournamentManager *managers.TournamentManager, faceitClient *faceit.FaceitClient, teamsMap map[string]bool) (int, error) {
 	var newTournaments int
 
 	organizers, err := tournamentManager.GetAllOrganizers()
@@ -61,6 +63,13 @@ func workerFindTournaments(tournamentManager *managers.TournamentManager, faceit
 		for _, tournament := range tournaments {
 			if !slices.Contains(tournament.GeoCountries, "ES") || tournament.JoinPolicy != "public" {
 				continue
+			}
+
+			teams := faceitClient.GetTeamsInTournament(tournament.FaceitId)
+			for _, team := range teams {
+				if teamsMap[team.FaceitId] {
+					tournament.TeamsId = append(tournament.TeamsId, team.FaceitId)
+				}
 			}
 
 			_, err := tournamentManager.CreateTournament(&tournament)

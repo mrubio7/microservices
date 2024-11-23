@@ -59,3 +59,15 @@ func (m *StateManager) Update_MatchLastFind() error {
 
 	return m.repoState.Update(state)
 }
+
+func (m *StateManager) Update_TeamLastUpdate() error {
+	state, err := m.repoState.Get()
+	if err != nil {
+		return err
+	}
+
+	state.TeamsLastUpdate.Time = time.Now()
+	state.TeamsLastUpdate.Valid = true
+
+	return m.repoState.Update(state)
+}

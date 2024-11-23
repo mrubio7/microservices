@@ -42,8 +42,8 @@ service TournamentService {
     rpc GetTournamentByFaceitId (GetTournamentByIdRequest) returns (Tournament);
 
     // ESEA
-    rpc GetLiveEseaDetails (Empty) returns (Esea);
-    rpc GetEseaDetailsBySeason (GetEseaLeagueBySeasonNumberRequest) returns (Esea);
+    rpc GetLiveEseaLeague (Empty) returns (Esea);
+    rpc GetEseaLeagueBySeasonNumber (GetEseaLeagueBySeasonNumberRequest) returns (Esea);
 }
 
 message GetTournamentByIdRequest {

@@ -45,11 +45,11 @@ func (m *EseaManager) CreateDivision(division *model.EseaDivisionModel) (*model.
 	return m.repoEseaDivisions.Create(division)
 }
 
-func (m *EseaManager) GetDivisionsByTournamentId(tournamentId string) ([]model.EseaDivisionModel, error) {
+func (m *EseaManager) GetDivisionsByEseaLeagueFaceitId(tournamentId string) ([]model.EseaDivisionModel, error) {
 	return m.repoEseaDivisions.Find(repositories.Where("tournament_id = ?", tournamentId))
 }
 
-func (m *EseaManager) GetStandingsByConferenceId(conferenceId string) ([]model.EseaStandingModel, error) {
+func (m *EseaManager) GetStandingsByDivisionFaceitId(conferenceId string) ([]model.EseaStandingModel, error) {
 	return m.repoEseaStandings.Find(repositories.Where("tournament_id = ?", conferenceId))
 }
 

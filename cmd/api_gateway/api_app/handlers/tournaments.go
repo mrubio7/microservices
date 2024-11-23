@@ -70,7 +70,7 @@ func (h *Tournament_Handlers) GetEseaLeagues(c *gin.Context) {
 	var res *pb.Esea
 	var err error
 	if seasonStr == "current" {
-		res, err = h.tournament_client.GetLiveEseaDetails(c, nil)
+		res, err = h.tournament_client.GetLiveEseaLeague(c, nil)
 		if err != nil {
 			logger.Error(err.Error())
 			c.JSON(http.StatusBadRequest, response.BuildError("Error getting current esea league"))
@@ -84,7 +84,7 @@ func (h *Tournament_Handlers) GetEseaLeagues(c *gin.Context) {
 			return
 		}
 
-		res, err = h.tournament_client.GetEseaDetailsBySeason(c, &pb.GetEseaLeagueBySeasonNumberRequest{Season: int32(season)})
+		res, err = h.tournament_client.GetEseaLeagueBySeasonNumber(c, &pb.GetEseaLeagueBySeasonNumberRequest{Season: int32(season)})
 		if err != nil {
 			logger.Error(err.Error())
 			c.JSON(http.StatusBadRequest, response.BuildError("Error getting esea league"))
