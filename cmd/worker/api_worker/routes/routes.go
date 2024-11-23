@@ -22,4 +22,5 @@ func (r routes) RegisterUpdates() {
 	r.router.POST("/update/matches/nearby", handlers.UpdateNearbyMatches)
 	r.router.POST("/update/players", handlers.UpdatePlayers)
 	r.router.POST("/update/tournaments", handlers.UpdateTournaments)
+	r.router.POST("/update/teams", handlers.UpdateTeams)
 }
