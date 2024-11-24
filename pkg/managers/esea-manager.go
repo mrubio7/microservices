@@ -53,8 +53,8 @@ func (m *EseaManager) GetDivisionByFaceitId(divisionId string) (*model.EseaDivis
 	return m.repoEseaDivisions.Get(repositories.Where("faceit_id = ?", divisionId))
 }
 
-func (m *EseaManager) GetStandingsByDivisionFaceitId(conferenceId string) ([]model.EseaStandingModel, error) {
-	return m.repoEseaStandings.Find(repositories.Where("tournament_id = ?", conferenceId))
+func (m *EseaManager) GetStandingsByDivisionId(divisionId int) ([]model.EseaStandingModel, error) {
+	return m.repoEseaStandings.Find(repositories.Where("division_id = ?", divisionId))
 }
 
 func (m *EseaManager) GetStandingByTeamFaceitId(teamId string) (*model.EseaStandingModel, error) {

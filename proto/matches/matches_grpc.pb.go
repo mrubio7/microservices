@@ -20,7 +20,7 @@ const _ = grpc.SupportPackageIsVersion9
 
 const (
 	MatchesService_GetAllMatches_FullMethodName      = "/matches.MatchesService/GetAllMatches"
-	MatchesService_GetUpcomingMatches_FullMethodName = "/matches.MatchesService/GetUpcomingMatches"
+	MatchesService_GetNearbyMatches_FullMethodName   = "/matches.MatchesService/GetNearbyMatches"
 	MatchesService_GetMatchByFaceitId_FullMethodName = "/matches.MatchesService/GetMatchByFaceitId"
 	MatchesService_SetStreamToMatch_FullMethodName   = "/matches.MatchesService/SetStreamToMatch"
 	MatchesService_GetMatchesByTeamId_FullMethodName = "/matches.MatchesService/GetMatchesByTeamId"
@@ -32,7 +32,7 @@ const (
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type MatchesServiceClient interface {
 	GetAllMatches(ctx context.Context, in *Empty, opts ...grpc.CallOption) (*MatchList, error)
-	GetUpcomingMatches(ctx context.Context, in *GetUpcomingRequest, opts ...grpc.CallOption) (*MatchList, error)
+	GetNearbyMatches(ctx context.Context, in *GetNearbyMatchesRequest, opts ...grpc.CallOption) (*MatchList, error)
 	GetMatchByFaceitId(ctx context.Context, in *GetMatchRequest, opts ...grpc.CallOption) (*Match, error)
 	SetStreamToMatch(ctx context.Context, in *SetStreamRequest, opts ...grpc.CallOption) (*Bool, error)
 	GetMatchesByTeamId(ctx context.Context, in *GetMatchRequest, opts ...grpc.CallOption) (*MatchList, error)
@@ -57,10 +57,10 @@ func (c *matchesServiceClient) GetAllMatches(ctx context.Context, in *Empty, opt
 	return out, nil
 }
 
-func (c *matchesServiceClient) GetUpcomingMatches(ctx context.Context, in *GetUpcomingRequest, opts ...grpc.CallOption) (*MatchList, error) {
+func (c *matchesServiceClient) GetNearbyMatches(ctx context.Context, in *GetNearbyMatchesRequest, opts ...grpc.CallOption) (*MatchList, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(MatchList)
-	err := c.cc.Invoke(ctx, MatchesService_GetUpcomingMatches_FullMethodName, in, out, cOpts...)
+	err := c.cc.Invoke(ctx, MatchesService_GetNearbyMatches_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -112,7 +112,7 @@ func (c *matchesServiceClient) NewMatch(ctx context.Context, in *NewMatchRequest
 // for forward compatibility.
 type MatchesServiceServer interface {
 	GetAllMatches(context.Context, *Empty) (*MatchList, error)
-	GetUpcomingMatches(context.Context, *GetUpcomingRequest) (*MatchList, error)
+	GetNearbyMatches(context.Context, *GetNearbyMatchesRequest) (*MatchList, error)
 	GetMatchByFaceitId(context.Context, *GetMatchRequest) (*Match, error)
 	SetStreamToMatch(context.Context, *SetStreamRequest) (*Bool, error)
 	GetMatchesByTeamId(context.Context, *GetMatchRequest) (*MatchList, error)
@@ -130,8 +130,8 @@ type UnimplementedMatchesServiceServer struct{}
 func (UnimplementedMatchesServiceServer) GetAllMatches(context.Context, *Empty) (*MatchList, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetAllMatches not implemented")
 }
-func (UnimplementedMatchesServiceServer) GetUpcomingMatches(context.Context, *GetUpcomingRequest) (*MatchList, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method GetUpcomingMatches not implemented")
+func (UnimplementedMatchesServiceServer) GetNearbyMatches(context.Context, *GetNearbyMatchesRequest) (*MatchList, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetNearbyMatches not implemented")
 }
 func (UnimplementedMatchesServiceServer) GetMatchByFaceitId(context.Context, *GetMatchRequest) (*Match, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetMatchByFaceitId not implemented")
@@ -184,20 +184,20 @@ func _MatchesService_GetAllMatches_Handler(srv interface{}, ctx context.Context,
 	return interceptor(ctx, in, info, handler)
 }
 
-func _MatchesService_GetUpcomingMatches_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(GetUpcomingRequest)
+func _MatchesService_GetNearbyMatches_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetNearbyMatchesRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(MatchesServiceServer).GetUpcomingMatches(ctx, in)
+		return srv.(MatchesServiceServer).GetNearbyMatches(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: MatchesService_GetUpcomingMatches_FullMethodName,
+		FullMethod: MatchesService_GetNearbyMatches_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(MatchesServiceServer).GetUpcomingMatches(ctx, req.(*GetUpcomingRequest))
+		return srv.(MatchesServiceServer).GetNearbyMatches(ctx, req.(*GetNearbyMatchesRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -286,8 +286,8 @@ var MatchesService_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _MatchesService_GetAllMatches_Handler,
 		},
 		{
-			MethodName: "GetUpcomingMatches",
-			Handler:    _MatchesService_GetUpcomingMatches_Handler,
+			MethodName: "GetNearbyMatches",
+			Handler:    _MatchesService_GetNearbyMatches_Handler,
 		},
 		{
 			MethodName: "GetMatchByFaceitId",

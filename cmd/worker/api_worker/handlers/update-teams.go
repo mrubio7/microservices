@@ -61,7 +61,7 @@ func workerTeamsUpdate(teamManager *managers.TeamManager, tournamentManager *man
 
 	var standings []model.EseaStandingModel
 	for _, division := range eseaLeague.Divisions {
-		temp, err := eseaManager.GetStandingsByDivisionFaceitId(division.FaceitId)
+		temp, err := eseaManager.GetStandingsByDivisionId(int(division.Id))
 		if err != nil {
 			logger.Error("Unable to get standings by division faceit id: %s", err.Error())
 			return err

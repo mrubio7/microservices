@@ -24,8 +24,9 @@ func GenerateEseaDivision(seed int64) model.EseaDivisionModel {
 	gofakeit.Seed(seed)
 
 	return model.EseaDivisionModel{
-		FaceitId: gofakeit.UUID(),
-		Name:     gofakeit.Company(),
+		FaceitId:     gofakeit.UUID(),
+		DivisionName: gofakeit.Company(),
+		StageName:    gofakeit.Company(),
 		Standings: []model.EseaStandingModel{
 			GenerateEseaStanding(seed),
 			GenerateEseaStanding(seed),

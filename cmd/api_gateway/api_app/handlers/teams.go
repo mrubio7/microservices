@@ -107,8 +107,26 @@ func (h *Team_Handlers) CreateFromFaceit(c *gin.Context) {
 	c.JSON(http.StatusOK, response.BuildOk("ok", res))
 }
 
+func (h *Team_Handlers) GetTeamFromFaceit(c *gin.Context) {
+	faceitId := c.Query("faceit_id")
+
+	if faceitId == "" {
+		c.JSON(http.StatusBadRequest, response.BuildError("Invalid request"))
+		return
+	}
+
+	res, err := h.teams_client.GetTeamFromFaceit(c, &pb.GetTeamFromFaceitRequest{FaceitId: faceitId})
+	if err != nil {
+		logger.Error("Error gettin player from faceit id: %v", err)
+		c.JSON(http.StatusBadRequest, response.BuildError("Invalid request"))
+		return
+	}
+
+	c.JSON(http.StatusOK, response.BuildOk("Ok", res))
+}
+
 func (h *Team_Handlers) FindTeamByPlayerId(c *gin.Context) {
-	playerId := c.Param("player_id")
+	playerId := c.Query("player_id")
 	if playerId == "" {
 		c.JSON(http.StatusBadRequest, response.BuildError("Invalid request"))
 		return

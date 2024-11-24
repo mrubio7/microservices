@@ -53,10 +53,11 @@ service TeamService {
     rpc GetActiveTeams (Empty) returns (TeamList);
     rpc GetById (GetTeamByIdRequest) returns (Team);
     rpc GetByNickname (GetTeamByNicknameRequest) returns (Team);
+    rpc GetByFaceitId (GetTeamByFaceitIdRequest) returns (Team);
     rpc CreateFromFaceit (NewTeamFromFaceitRequest) returns (Team);
+    rpc GetTeamFromFaceit(GetTeamFromFaceitRequest) returns (Team);
     rpc Update(NewTeamFromFaceitRequest) returns (Team);
     rpc FindTeamsByPlayerId(GetTeamByPlayerIdRequest) returns (TeamList);
-    rpc GetTeamFromFaceit(GetTeamFromFaceitRequest) returns (Team);
 }
 
 message TeamList {
@@ -73,6 +74,10 @@ message GetTeamByIdRequest {
 
 message GetTeamByNicknameRequest {
     string Nickname = 1;
+}
+
+message GetTeamByFaceitIdRequest {
+    string FaceitId = 1;
 }
 
 message NewTeamFromFaceitRequest {

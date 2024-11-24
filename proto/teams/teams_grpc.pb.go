@@ -23,10 +23,11 @@ const (
 	TeamService_GetActiveTeams_FullMethodName      = "/teams.TeamService/GetActiveTeams"
 	TeamService_GetById_FullMethodName             = "/teams.TeamService/GetById"
 	TeamService_GetByNickname_FullMethodName       = "/teams.TeamService/GetByNickname"
+	TeamService_GetByFaceitId_FullMethodName       = "/teams.TeamService/GetByFaceitId"
 	TeamService_CreateFromFaceit_FullMethodName    = "/teams.TeamService/CreateFromFaceit"
+	TeamService_GetTeamFromFaceit_FullMethodName   = "/teams.TeamService/GetTeamFromFaceit"
 	TeamService_Update_FullMethodName              = "/teams.TeamService/Update"
 	TeamService_FindTeamsByPlayerId_FullMethodName = "/teams.TeamService/FindTeamsByPlayerId"
-	TeamService_GetTeamFromFaceit_FullMethodName   = "/teams.TeamService/GetTeamFromFaceit"
 )
 
 // TeamServiceClient is the client API for TeamService service.
@@ -37,10 +38,11 @@ type TeamServiceClient interface {
 	GetActiveTeams(ctx context.Context, in *Empty, opts ...grpc.CallOption) (*TeamList, error)
 	GetById(ctx context.Context, in *GetTeamByIdRequest, opts ...grpc.CallOption) (*Team, error)
 	GetByNickname(ctx context.Context, in *GetTeamByNicknameRequest, opts ...grpc.CallOption) (*Team, error)
+	GetByFaceitId(ctx context.Context, in *GetTeamByFaceitIdRequest, opts ...grpc.CallOption) (*Team, error)
 	CreateFromFaceit(ctx context.Context, in *NewTeamFromFaceitRequest, opts ...grpc.CallOption) (*Team, error)
+	GetTeamFromFaceit(ctx context.Context, in *GetTeamFromFaceitRequest, opts ...grpc.CallOption) (*Team, error)
 	Update(ctx context.Context, in *NewTeamFromFaceitRequest, opts ...grpc.CallOption) (*Team, error)
 	FindTeamsByPlayerId(ctx context.Context, in *GetTeamByPlayerIdRequest, opts ...grpc.CallOption) (*TeamList, error)
-	GetTeamFromFaceit(ctx context.Context, in *GetTeamFromFaceitRequest, opts ...grpc.CallOption) (*Team, error)
 }
 
 type teamServiceClient struct {
@@ -91,10 +93,30 @@ func (c *teamServiceClient) GetByNickname(ctx context.Context, in *GetTeamByNick
 	return out, nil
 }
 
+func (c *teamServiceClient) GetByFaceitId(ctx context.Context, in *GetTeamByFaceitIdRequest, opts ...grpc.CallOption) (*Team, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(Team)
+	err := c.cc.Invoke(ctx, TeamService_GetByFaceitId_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 func (c *teamServiceClient) CreateFromFaceit(ctx context.Context, in *NewTeamFromFaceitRequest, opts ...grpc.CallOption) (*Team, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(Team)
 	err := c.cc.Invoke(ctx, TeamService_CreateFromFaceit_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *teamServiceClient) GetTeamFromFaceit(ctx context.Context, in *GetTeamFromFaceitRequest, opts ...grpc.CallOption) (*Team, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(Team)
+	err := c.cc.Invoke(ctx, TeamService_GetTeamFromFaceit_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -121,16 +143,6 @@ func (c *teamServiceClient) FindTeamsByPlayerId(ctx context.Context, in *GetTeam
 	return out, nil
 }
 
-func (c *teamServiceClient) GetTeamFromFaceit(ctx context.Context, in *GetTeamFromFaceitRequest, opts ...grpc.CallOption) (*Team, error) {
-	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(Team)
-	err := c.cc.Invoke(ctx, TeamService_GetTeamFromFaceit_FullMethodName, in, out, cOpts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
 // TeamServiceServer is the server API for TeamService service.
 // All implementations must embed UnimplementedTeamServiceServer
 // for forward compatibility.
@@ -139,10 +151,11 @@ type TeamServiceServer interface {
 	GetActiveTeams(context.Context, *Empty) (*TeamList, error)
 	GetById(context.Context, *GetTeamByIdRequest) (*Team, error)
 	GetByNickname(context.Context, *GetTeamByNicknameRequest) (*Team, error)
+	GetByFaceitId(context.Context, *GetTeamByFaceitIdRequest) (*Team, error)
 	CreateFromFaceit(context.Context, *NewTeamFromFaceitRequest) (*Team, error)
+	GetTeamFromFaceit(context.Context, *GetTeamFromFaceitRequest) (*Team, error)
 	Update(context.Context, *NewTeamFromFaceitRequest) (*Team, error)
 	FindTeamsByPlayerId(context.Context, *GetTeamByPlayerIdRequest) (*TeamList, error)
-	GetTeamFromFaceit(context.Context, *GetTeamFromFaceitRequest) (*Team, error)
 	mustEmbedUnimplementedTeamServiceServer()
 }
 
@@ -165,17 +178,20 @@ func (UnimplementedTeamServiceServer) GetById(context.Context, *GetTeamByIdReque
 func (UnimplementedTeamServiceServer) GetByNickname(context.Context, *GetTeamByNicknameRequest) (*Team, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetByNickname not implemented")
 }
+func (UnimplementedTeamServiceServer) GetByFaceitId(context.Context, *GetTeamByFaceitIdRequest) (*Team, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetByFaceitId not implemented")
+}
 func (UnimplementedTeamServiceServer) CreateFromFaceit(context.Context, *NewTeamFromFaceitRequest) (*Team, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CreateFromFaceit not implemented")
+}
+func (UnimplementedTeamServiceServer) GetTeamFromFaceit(context.Context, *GetTeamFromFaceitRequest) (*Team, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetTeamFromFaceit not implemented")
 }
 func (UnimplementedTeamServiceServer) Update(context.Context, *NewTeamFromFaceitRequest) (*Team, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Update not implemented")
 }
 func (UnimplementedTeamServiceServer) FindTeamsByPlayerId(context.Context, *GetTeamByPlayerIdRequest) (*TeamList, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method FindTeamsByPlayerId not implemented")
-}
-func (UnimplementedTeamServiceServer) GetTeamFromFaceit(context.Context, *GetTeamFromFaceitRequest) (*Team, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method GetTeamFromFaceit not implemented")
 }
 func (UnimplementedTeamServiceServer) mustEmbedUnimplementedTeamServiceServer() {}
 func (UnimplementedTeamServiceServer) testEmbeddedByValue()                     {}
@@ -270,6 +286,24 @@ func _TeamService_GetByNickname_Handler(srv interface{}, ctx context.Context, de
 	return interceptor(ctx, in, info, handler)
 }
 
+func _TeamService_GetByFaceitId_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetTeamByFaceitIdRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(TeamServiceServer).GetByFaceitId(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: TeamService_GetByFaceitId_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(TeamServiceServer).GetByFaceitId(ctx, req.(*GetTeamByFaceitIdRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _TeamService_CreateFromFaceit_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(NewTeamFromFaceitRequest)
 	if err := dec(in); err != nil {
@@ -284,6 +318,24 @@ func _TeamService_CreateFromFaceit_Handler(srv interface{}, ctx context.Context,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(TeamServiceServer).CreateFromFaceit(ctx, req.(*NewTeamFromFaceitRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _TeamService_GetTeamFromFaceit_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetTeamFromFaceitRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(TeamServiceServer).GetTeamFromFaceit(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: TeamService_GetTeamFromFaceit_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(TeamServiceServer).GetTeamFromFaceit(ctx, req.(*GetTeamFromFaceitRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -324,24 +376,6 @@ func _TeamService_FindTeamsByPlayerId_Handler(srv interface{}, ctx context.Conte
 	return interceptor(ctx, in, info, handler)
 }
 
-func _TeamService_GetTeamFromFaceit_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(GetTeamFromFaceitRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(TeamServiceServer).GetTeamFromFaceit(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: TeamService_GetTeamFromFaceit_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(TeamServiceServer).GetTeamFromFaceit(ctx, req.(*GetTeamFromFaceitRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
 // TeamService_ServiceDesc is the grpc.ServiceDesc for TeamService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -366,8 +400,16 @@ var TeamService_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _TeamService_GetByNickname_Handler,
 		},
 		{
+			MethodName: "GetByFaceitId",
+			Handler:    _TeamService_GetByFaceitId_Handler,
+		},
+		{
 			MethodName: "CreateFromFaceit",
 			Handler:    _TeamService_CreateFromFaceit_Handler,
+		},
+		{
+			MethodName: "GetTeamFromFaceit",
+			Handler:    _TeamService_GetTeamFromFaceit_Handler,
 		},
 		{
 			MethodName: "Update",
@@ -376,10 +418,6 @@ var TeamService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "FindTeamsByPlayerId",
 			Handler:    _TeamService_FindTeamsByPlayerId_Handler,
-		},
-		{
-			MethodName: "GetTeamFromFaceit",
-			Handler:    _TeamService_GetTeamFromFaceit_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

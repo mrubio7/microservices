@@ -9,12 +9,12 @@ import "proto/tournaments.proto";
 message Match {
     int32 ID = 1;
     string FaceitId = 2;
-    teams.Team TeamA = 3;
+    optional teams.Team TeamA = 3;
     string TeamAName = 4;
     string TeamAFaceitId = 5;
     bool IsTeamAKnown = 6;
     int32 ScoreTeamA = 7;
-    teams.Team TeamB = 8;
+    optional teams.Team TeamB = 8;
     string TeamBName = 9;
     string TeamBFaceitId = 10;
     bool IsTeamBKnown = 11;
@@ -39,7 +39,7 @@ message Bool {
 
 service MatchesService {
     rpc GetAllMatches (Empty) returns (MatchList);
-    rpc GetUpcomingMatches (GetUpcomingRequest) returns (MatchList);
+    rpc GetNearbyMatches (GetNearbyMatchesRequest) returns (MatchList);
     rpc GetMatchByFaceitId (GetMatchRequest) returns (Match);
     rpc SetStreamToMatch (SetStreamRequest) returns (Bool);
     rpc GetMatchesByTeamId (GetMatchRequest) returns (MatchList);
@@ -54,7 +54,7 @@ message GetMatchRequest {
     string FaceitId = 1;
 }
 
-message GetUpcomingRequest {
+message GetNearbyMatchesRequest {
     int32 Days = 1;
 }
 

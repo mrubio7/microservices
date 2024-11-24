@@ -95,6 +95,17 @@ func (s *Server) GetByNickname(ctx context.Context, req *pb.GetTeamByNicknameReq
 	return res, nil
 }
 
+func (s *Server) GetByFaceitId(ctx context.Context, req *pb.GetTeamByFaceitIdRequest) (*pb.Team, error) {
+	team, err := s.TeamsManager.GetByFaceitId(req.FaceitId)
+	if err != nil {
+		return nil, err
+	}
+
+	res := mapper.Convert[model.TeamModel, *pb.Team](*team)
+
+	return res, nil
+}
+
 func (s *Server) CreateFromFaceit(ctx context.Context, req *pb.NewTeamFromFaceitRequest) (*pb.Team, error) {
 	faceitTeam := s.FaceitService.GetTeamById(req.FaceitId)
 	if faceitTeam == nil {
@@ -111,6 +122,19 @@ func (s *Server) CreateFromFaceit(ctx context.Context, req *pb.NewTeamFromFaceit
 	}
 
 	res := mapper.Convert[model.TeamModel, *pb.Team](*createdTeam)
+
+	return res, nil
+}
+
+func (s *Server) GetTeamFromFaceit(ctx context.Context, req *pb.GetTeamFromFaceitRequest) (*pb.Team, error) {
+	faceitTeam := s.FaceitService.GetTeamById(req.FaceitId)
+	if faceitTeam == nil {
+		logger.Error("Team with faceit id %s not found", req.FaceitId)
+		err := status.Errorf(codes.NotFound, "Team with faceit id %s not found", req.FaceitId)
+		return nil, err
+	}
+
+	res := mapper.Convert[model.TeamModel, *pb.Team](*faceitTeam)
 
 	return res, nil
 }

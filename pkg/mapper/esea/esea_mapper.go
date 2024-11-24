@@ -50,7 +50,8 @@ func (EseaDivisionMapper) Proto(entity model.EseaDivisionModel, params ...interf
 	return &pb.EseaDivision{
 		FaceitId:           entity.FaceitId,
 		EseaLeagueFaceitId: entity.EseaLeagueFaceitId,
-		Name:               entity.Name,
+		DivisionName:       entity.DivisionName,
+		StageName:          entity.StageName,
 		Standings:          standings,
 		Playoffs:           entity.Playoffs,
 		PlayoffsData:       string(entity.PlayoffsData),
@@ -66,7 +67,8 @@ func (EseaDivisionMapper) Model(proto *pb.EseaDivision, _ ...interface{}) model.
 
 	return model.EseaDivisionModel{
 		FaceitId:           proto.FaceitId,
-		Name:               proto.Name,
+		DivisionName:       proto.DivisionName,
+		StageName:          proto.StageName,
 		EseaLeagueFaceitId: proto.EseaLeagueFaceitId,
 		Standings:          standings,
 		Playoffs:           proto.Playoffs,

@@ -2,6 +2,7 @@ package matches_mapper
 
 import (
 	"ibercs/internal/model"
+	teams_mapper "ibercs/pkg/mapper/teams"
 	pb "ibercs/proto/matches"
 	"time"
 )
@@ -25,6 +26,8 @@ func (MatchMapper) Proto(model model.MatchModel, _ ...interface{}) *pb.Match {
 		Streams:            model.Streams,
 		TournamentName:     model.TournamentName,
 		TournamentFaceitId: model.TournamentFaceitId,
+		TeamA:              teams_mapper.TeamMapper{}.Proto(model.TeamA),
+		TeamB:              teams_mapper.TeamMapper{}.Proto(model.TeamB),
 	}
 }
 
@@ -45,5 +48,7 @@ func (MatchMapper) Model(proto *pb.Match, _ ...interface{}) model.MatchModel {
 		Streams:            proto.Streams,
 		TournamentName:     proto.TournamentName,
 		TournamentFaceitId: proto.TournamentFaceitId,
+		TeamA:              teams_mapper.TeamMapper{}.Model(proto.TeamA),
+		TeamB:              teams_mapper.TeamMapper{}.Model(proto.TeamB),
 	}
 }

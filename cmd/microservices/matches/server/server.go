@@ -15,6 +15,7 @@ import (
 
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
+	"gorm.io/gorm"
 )
 
 type Server struct {
@@ -28,14 +29,14 @@ func registerTeamsClient(cfg config.MicroserviceConfig) *pb_teams.TeamServiceCli
 	return microservices.New(cfg.Host_gRPC, cfg.Port_gRPC, pb_teams.NewTeamServiceClient)
 }
 
-func New(cfg config.MicroserviceConfig, cfgThirdParty config.ThirdPartyApiTokens) *Server {
+func New(cfg config.MicroserviceConfig, cfgTeams config.MicroserviceConfig, cfgThirdParty config.ThirdPartyApiTokens) *Server {
 	db := database.NewDatabase(cfg.Database)
 	matchesService := managers.NewMatchManager(db.GetDB())
 	faceit := faceit.New(cfgThirdParty.FaceitApiToken)
 
 	return &Server{
 		MatchesManager: matchesService,
-		TeamsClient:    *registerTeamsClient(cfg),
+		TeamsClient:    *registerTeamsClient(cfgTeams),
 		FaceitService:  faceit,
 	}
 }
@@ -83,4 +84,55 @@ func (s *Server) GetMatchesByTeamId(ctx context.Context, req *pb.GetMatchRequest
 	}
 
 	return &pb.MatchList{Matches: pbMatches}, nil
+}
+
+func (s *Server) GetNearbyMatches(ctx context.Context, req *pb.GetNearbyMatchesRequest) (*pb.MatchList, error) {
+	matches, err := s.MatchesManager.GetNearbyMatches(int(req.Days))
+	if err != nil {
+		logger.Error(err.Error())
+		err := status.Errorf(codes.NotFound, "matches not found")
+		return nil, err
+	}
+
+	var pbMatches []*pb.Match
+	for _, match := range matches {
+		if match.IsTeamAKnown {
+			teamA, err := s.TeamsClient.GetByFaceitId(ctx, &pb_teams.GetTeamByFaceitIdRequest{FaceitId: match.TeamAFaceitId})
+			if err != nil {
+				err := status.Errorf(codes.NotFound, "teamA %s not found", match.TeamAName)
+				return nil, err
+			}
+			match.TeamA = mapper.Convert[*pb_teams.Team, model.TeamModel](teamA)
+		}
+		if match.IsTeamBKnown {
+			teamB, err := s.TeamsClient.GetByFaceitId(ctx, &pb_teams.GetTeamByFaceitIdRequest{FaceitId: match.TeamBFaceitId})
+			if err != nil {
+				logger.Error(err.Error())
+				err := status.Errorf(codes.NotFound, "teamB %s not found", match.TeamBName)
+				return nil, err
+			}
+			match.TeamB = mapper.Convert[*pb_teams.Team, model.TeamModel](teamB)
+		}
+
+		m := mapper.Convert[model.MatchModel, *pb.Match](match)
+		pbMatches = append(pbMatches, m)
+	}
+
+	return &pb.MatchList{Matches: pbMatches}, nil
+}
+
+func (s *Server) SetStreamToMatch(ctx context.Context, req *pb.SetStreamRequest) (*pb.Bool, error) {
+	err := s.MatchesManager.SetStreamUrl(req.FaceitId, req.StreamChannel)
+	if err != nil {
+		if err == gorm.ErrDuplicatedKey {
+			logger.Warning("Not updated, stream already exist")
+			err := status.Errorf(codes.AlreadyExists, "stream already exists")
+			return &pb.Bool{Res: true}, err
+		}
+		logger.Error("unable to set stream into match: %s", err.Error())
+		err := status.Errorf(codes.Internal, "stream not setted")
+		return &pb.Bool{Res: false}, err
+	}
+
+	return &pb.Bool{Res: true}, nil
 }

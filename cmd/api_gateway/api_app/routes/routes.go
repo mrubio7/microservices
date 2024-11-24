@@ -53,7 +53,8 @@ func (r routes) RegisterTeamRoutes() {
 	teamHandler := handlers.NewTeamsHandlers(*r.router.TeamsServer)
 
 	r.router.POST("/api/v2/team/faceit", teamHandler.CreateFromFaceit, r.authMiddleware)
-	r.router.GET("/api/v2/team", teamHandler.Get) // query param: id or nickname
+	r.router.GET("/api/v2/team/faceit", teamHandler.GetTeamFromFaceit) // query param: faceit_id
+	r.router.GET("/api/v2/team", teamHandler.Get)                      // query param: id or nickname
 	r.router.GET("/api/v2/teams", teamHandler.GetAll)
 	r.router.GET("/api/v2/teams/active", teamHandler.GetActiveTeams)
 	r.router.GET("/api/v2/team/player", teamHandler.FindTeamByPlayerId)
@@ -72,9 +73,9 @@ func (r routes) RegisterMatchRoutes() {
 
 	r.router.GET("/api/v2/match", matchHandler.Get)      // query param: id
 	r.router.GET("/api/v2/matches", matchHandler.GetAll) // query param: team_id
-	r.router.GET("/api/v2/matches/range", matchHandler.GetRange)
-	r.router.POST("/api/v2/match/stream", matchHandler.SetStreamMatch)
 	r.router.GET("/api/v2/matches/team", matchHandler.GetMatchesByTeamId)
+	r.router.POST("/api/v2/match/stream", matchHandler.SetStreamMatch)
+	r.router.GET("/api/v2/matches/range", matchHandler.GetRange)
 }
 
 func (r routes) RegisterStateRoutes() {

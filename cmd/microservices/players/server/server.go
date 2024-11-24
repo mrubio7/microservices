@@ -142,6 +142,13 @@ func (s *Server) GetAllLookingForTeam(ctx context.Context, _ *pb.Empty) (*pb.Pla
 
 	playersRes := make([]*pb.PlayerLookingForTeam, len(players))
 	for i, p := range players {
+		playerData, err := s.PlayerManager.GetByFaceitId(p.FaceitId)
+		if err != nil {
+			logger.Error("Error getting player data")
+			return nil, status.Errorf(codes.Internal, "Error getting player data")
+		}
+		p.Player = *playerData
+
 		pbPlayer := mapper.Convert[model.LookingForTeamModel, *pb.PlayerLookingForTeam](p)
 		playersRes[i] = pbPlayer
 	}

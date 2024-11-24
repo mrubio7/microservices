@@ -1,7 +1,6 @@
 package managers
 
 import (
-	"errors"
 	"ibercs/internal/model"
 	"ibercs/internal/repositories"
 	"time"
@@ -45,6 +44,13 @@ func (m *MatchManager) GetYesterdayMatches() ([]model.MatchModel, error) {
 	return m.repo.Find(repositories.Where("DATE(timestamp) = ?", currentDate))
 }
 
+func (m *MatchManager) GetNearbyMatches(days int) ([]model.MatchModel, error) {
+	past := time.Now().AddDate(0, 0, -days).Format("2006-01-02")
+	future := time.Now().AddDate(0, 0, days).Format("2006-01-02")
+
+	return m.repo.Find(repositories.Where("DATE(timestamp) BETWEEN ? AND ?", past, future))
+}
+
 func (m *MatchManager) GetMatchesByTeamId(teamId string) ([]model.MatchModel, error) {
 	return m.repo.Find(repositories.Where("team_a_faceit_id = ? OR team_b_faceit_id = ?", teamId, teamId))
 }
@@ -57,7 +63,7 @@ func (m *MatchManager) SetStreamUrl(faceitId, streamUrl string) error {
 
 	for _, stream := range existingMatch.Streams {
 		if stream == streamUrl {
-			return errors.New("stream already exists")
+			return gorm.ErrDuplicatedKey
 		}
 	}
 	existingMatch.Streams = append(existingMatch.Streams, streamUrl)

@@ -85,6 +85,7 @@ func (PlayerLookingForTeamMapper) Proto(model model.LookingForTeamModel, _ ...in
 		Description:  model.Description,
 		CreatedAt:    model.CreatedAt,
 		UpdatedAt:    model.UpdatedAt,
+		Player:       PlayerMapper{}.Proto(model.Player),
 	}
 }
 
@@ -99,6 +100,7 @@ func (PlayerLookingForTeamMapper) Model(proto *pb.PlayerLookingForTeam, _ ...int
 		Description:  proto.Description,
 		CreatedAt:    proto.CreatedAt,
 		UpdatedAt:    proto.UpdatedAt,
+		Player:       PlayerMapper{}.Model(proto.Player),
 	}
 }
 

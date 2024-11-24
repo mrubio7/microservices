@@ -75,10 +75,11 @@ message Esea {
 message EseaDivision {
     string FaceitId = 1;
     string EseaLeagueFaceitId = 2;
-    string Name = 3;
-    repeated EseaStanding Standings = 4;
-    bool Playoffs = 5;
-    string PlayoffsData = 6;
+    string DivisionName = 3;
+    string StageName = 4;
+    repeated EseaStanding Standings = 5;
+    bool Playoffs = 6;
+    string PlayoffsData = 7;
 }
 
 message EseaStanding {

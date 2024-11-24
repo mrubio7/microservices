@@ -8,6 +8,8 @@ import (
 	"strconv"
 
 	"github.com/gin-gonic/gin"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 )
 
 type Matches_Handlers struct {
@@ -80,7 +82,7 @@ func (h *Matches_Handlers) GetRange(c *gin.Context) {
 		return
 	}
 
-	res, err := h.matches_client.GetUpcomingMatches(c, &pb_matches.GetUpcomingRequest{Days: int32(q)})
+	res, err := h.matches_client.GetNearbyMatches(c, &pb_matches.GetNearbyMatchesRequest{Days: int32(q)})
 	if err != nil {
 		logger.Error(err.Error())
 		c.JSON(http.StatusBadRequest, response.BuildError("Error getting matches in the range days"))
@@ -105,6 +107,10 @@ func (h *Matches_Handlers) SetStreamMatch(c *gin.Context) {
 	res, err := h.matches_client.SetStreamToMatch(c, &pb_matches.SetStreamRequest{FaceitId: payload.FaceitId, StreamChannel: payload.StreamChannel})
 	if err != nil {
 		logger.Error("Error saving stream")
+		if s, _ := status.FromError(err); s.Code() == codes.AlreadyExists {
+			c.JSON(http.StatusOK, response.BuildError("Stream already exist"))
+			return
+		}
 		c.JSON(http.StatusInternalServerError, response.BuildError("Internal error"))
 		return
 	}
