@@ -60,16 +60,21 @@ func workerFindEseaLeague(eseaManager *managers.EseaManager, faceitClient *facei
 
 		if eseaLeagues[i].Status == "live" {
 			for j := range eseaDivisions {
-				standings := faceitClient.GetESEADivisionStanding_PRODUCTION(eseaDivisions[j].FaceitId)
-				if standings == nil {
-					err := errors.New("unable to get ESEA standings")
-					logger.Error(err.Error())
-					return 0, err
-				}
+				if eseaDivisions[j].Playoffs {
+					//Playoffs
 
-				for _, standing := range standings {
-					if teamsMap[standing.TeamFaceitId] {
-						eseaDivisions[j].Standings = append(eseaDivisions[j].Standings, standing)
+				} else {
+					standings := faceitClient.GetESEADivisionStanding_PRODUCTION(eseaDivisions[j].FaceitId)
+					if standings == nil {
+						err := errors.New("unable to get ESEA standings")
+						logger.Error(err.Error())
+						return 0, err
+					}
+
+					for _, standing := range standings {
+						if teamsMap[standing.TeamFaceitId] {
+							eseaDivisions[j].Standings = append(eseaDivisions[j].Standings, standing)
+						}
 					}
 				}
 
@@ -82,8 +87,7 @@ func workerFindEseaLeague(eseaManager *managers.EseaManager, faceitClient *facei
 			if pgErr, ok := err.(*pgconn.PgError); ok && pgErr.Code == "23505" {
 				continue
 			} else {
-				err := errors.New("unable to create ESEA league")
-				logger.Error(err.Error())
+				logger.Error("unable to create ESEA league: %s", err.Error())
 				return 0, err
 			}
 		}

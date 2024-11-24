@@ -11,6 +11,7 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+	"gorm.io/gorm"
 )
 
 func UpdateEsea(c *gin.Context) {
@@ -47,28 +48,56 @@ func workerEseaLeagueUpdate(eseaManager *managers.EseaManager, faceitClient *fac
 
 	eseaDivisions := faceitClient.GetESEADivisionBySeasonId_PRODUCTION(eseaLeague.FaceitId, eseaLeague.Name)
 	if eseaDivisions == nil {
-		err := errors.New("unable to get ESEA divisions")
 		logger.Error(err.Error())
+		err := errors.New("unable to get ESEA divisions")
 		return err
 	}
 
-	for i, division := range eseaDivisions {
-		division.Id = eseaLeague.Divisions[i].Id
-
-		standings := faceitClient.GetESEADivisionStanding_PRODUCTION(division.FaceitId)
-		if standings == nil {
-			err := errors.New("unable to get ESEA standings")
-			logger.Error(err.Error())
-			return err
-		}
-
-		for _, standing := range standings {
-			if teamsMap[standing.TeamFaceitId] {
-				division.Standings = append(division.Standings, standing)
+	for _, division := range eseaDivisions {
+		d, err := eseaManager.GetDivisionByFaceitId(division.FaceitId)
+		if err != nil {
+			if err == gorm.ErrRecordNotFound {
+				division.EseaLeagueId = eseaLeague.Id
+				divCreated, err := eseaManager.CreateDivision(&division)
+				if err != nil {
+					return err
+				}
+				division = *divCreated
+			} else {
+				return err
 			}
 		}
 
-		err := eseaManager.UpdateDivision(division)
+		if d != nil {
+			division.Id = d.Id
+		} else {
+			continue
+		}
+
+		if !division.Playoffs {
+			// Regular season
+			standings := faceitClient.GetESEADivisionStanding_PRODUCTION(division.FaceitId)
+			if standings == nil {
+				logger.Error(err.Error())
+				err := errors.New("unable to get ESEA standings")
+				return err
+			}
+
+			for _, standing := range standings {
+				if teamsMap[standing.TeamFaceitId] {
+					s, err := eseaManager.GetStandingByTeamFaceitId(standing.TeamFaceitId)
+					if err != nil {
+						return err
+					}
+					standing.Id = s.Id
+					division.Standings = append(division.Standings, standing)
+				}
+			}
+		} else {
+			// Playoffs
+		}
+
+		err = eseaManager.UpdateDivision(division)
 		if err != nil {
 			logger.Error("unable to update division: %s", err.Error())
 			return err

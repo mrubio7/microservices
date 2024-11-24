@@ -40,7 +40,8 @@ type EseaDivisionModel struct {
 	EseaLeagueId       int32               `gorm:"not null;index"`
 	EseaLeagueFaceitId string              `gorm:"not null"`
 	FaceitId           string              `gorm:"not null"`
-	Name               string              `gorm:"not null"`
+	DivisionName       string              `gorm:"not null"`
+	StageName          string              `gorm:"not null"`
 	Playoffs           bool                `gorm:"not null; default:false"`
 	PlayoffsData       JSONString          `gorm:"type:jsonb; null"`
 	Standings          []EseaStandingModel `gorm:"foreignKey:DivisionId;constraint:OnUpdate:CASCADE,OnDelete:CASCADE"`
@@ -63,7 +64,7 @@ type EseaStandingModel struct {
 	MatchesLost    int    `gorm:"not null"`
 	MatchesTied    int    `gorm:"not null"`
 	BuchholzScore  int    `gorm:"not null"`
-	TeamFaceitId   string `gorm:"not null"`
+	TeamFaceitId   string `gorm:"not null;unique"`
 }
 
 func (EseaStandingModel) TableName() string {
