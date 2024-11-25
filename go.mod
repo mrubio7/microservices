@@ -2,6 +2,8 @@ module ibercs
 
 go 1.23.0
 
+replace github.com/mconnat/go-faceit => ./pkg/mconnat/faceit
+
 require (
 	github.com/gin-gonic/gin v1.10.0
 	github.com/joho/godotenv v1.5.1
