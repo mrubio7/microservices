@@ -55,13 +55,16 @@ func workerPlayersUpdate(playerManager *managers.PlayerManager, faceitClient *fa
 		return err
 	}
 
-	semaphore := make(chan struct{}, 5)
+	semaphore := make(chan struct{}, 6)
 	errorChan := make(chan error, len(players))
-	defer close(errorChan)
 
 	totalPlayers := len(players)
 	logger.Info("Starting worker to process %d players...", totalPlayers)
-	processPlayers(players, playerManager, faceitClient, semaphore, errorChan)
+
+	go func() {
+		processPlayers(players, playerManager, faceitClient, semaphore, errorChan)
+		close(errorChan)
+	}()
 
 	return handleWorkerErrors(errorChan)
 }
@@ -82,7 +85,6 @@ func processPlayers(players []model.PlayerModel, playerManager *managers.PlayerM
 	}
 
 	wg.Wait()
-	close(errorChan)
 }
 
 func updatePlayer(player model.PlayerModel, playerManager *managers.PlayerManager, faceitClient *faceit.FaceitClient, errorChan chan error, processedCount *int32, totalPlayers int) {
