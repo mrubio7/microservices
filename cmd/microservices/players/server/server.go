@@ -119,12 +119,18 @@ func (s *Server) CreatePlayerFromFaceitId(ctx context.Context, req *pb.CreatePla
 	if player != nil {
 		err := status.Errorf(codes.AlreadyExists, "Player already exist")
 		return nil, err
-	} else {
-		player = s.FaceitService.GetPlayerAverageDetails(req.FaceitId, consts.LAST_MATCHES_NUMBER)
-		if player == nil {
-			err := status.Errorf(codes.NotFound, "Player not found")
-			return nil, err
-		}
+	}
+
+	playerData := s.FaceitService.GetPlayerAverageDetails(req.FaceitId, consts.LAST_MATCHES_NUMBER)
+	if playerData == nil {
+		err := status.Errorf(codes.NotFound, "Player not found")
+		return nil, err
+	}
+
+	player, err := s.PlayerManager.Create(playerData)
+	if err != nil {
+		err := status.Errorf(codes.NotFound, "Error creating player")
+		return nil, err
 	}
 
 	pbPlayer := mapper.Convert[model.PlayerModel, *pb.Player](*player)

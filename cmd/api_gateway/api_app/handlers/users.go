@@ -195,7 +195,7 @@ func (h *Users_Handlers) AuthCallback_Faceit(c *gin.Context) {
 	res, err = h.users_client.GetUserByFaceitId(c, &pb_users.GetUserRequest{Id: user.FaceitId})
 	if res == nil {
 		if st, ok := status.FromError(err); ok && st.Code() == codes.NotFound {
-			res, err = h.users_client.NewUser(c, &pb_users.NewUserRequest{FaceitId: user.FaceitId})
+			res, err = h.users_client.Create(c, &pb_users.NewUserRequest{FaceitId: user.FaceitId})
 			if err != nil {
 				c.JSON(http.StatusBadRequest, response.BuildError("Error creating user"))
 				return

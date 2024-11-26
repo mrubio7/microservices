@@ -83,19 +83,25 @@ func (s *Server) GetUserByFaceitId(ctx context.Context, req *pb.GetUserRequest) 
 }
 
 func (s *Server) Create(ctx context.Context, req *pb.NewUserRequest) (*pb.User, error) {
-	payload := mapper.Convert[*pb.NewUserRequest, model.UserModel](req)
+	player, err := s.PlayerServer.CreatePlayerFromFaceitId(ctx, &pb_players.CreatePlayerByFaceitIdRequest{FaceitId: req.FaceitId})
+	if err != nil {
+		logger.Error("Error creating player: %s", err.Error())
+		err := status.Errorf(codes.Internal, "error creating player")
+		return nil, err
+	}
+
+	payload := model.UserModel{
+		FaceitId:       player.FaceitId,
+		Name:           player.Nickname,
+		Role:           0,
+		Player:         mapper.Convert[*pb_players.Player, model.PlayerModel](player),
+		IsProfessional: false,
+	}
 
 	user, err := s.UserManager.Create(&payload)
 	if err != nil {
 		logger.Error("Error creating user: %s", err.Error())
 		err := status.Errorf(codes.Internal, "error creating user")
-		return nil, err
-	}
-
-	player, err := s.PlayerServer.CreatePlayerFromFaceitId(ctx, &pb_players.CreatePlayerByFaceitIdRequest{FaceitId: req.FaceitId})
-	if err != nil {
-		logger.Error("Error creating player: %s", err.Error())
-		err := status.Errorf(codes.Internal, "error creating player")
 		return nil, err
 	}
 
