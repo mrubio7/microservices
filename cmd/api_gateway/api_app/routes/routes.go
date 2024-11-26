@@ -32,7 +32,7 @@ func (r routes) RegisterUserRoutes() {
 	r.router.GET("/api/v2/users/streams", userHandler.GetStreams)
 
 	//Auth
-	r.router.GET("/api/v2/auth/callback/faceit", userHandler.AuthCallback_Faceit)
+	r.router.POST("/api/v2/auth/callback/faceit", userHandler.AuthCallback_Faceit)
 	r.router.POST("/api/v2/auth", userHandler.Login, r.authMiddleware)
 	r.router.DELETE("/api/v2/auth", userHandler.Logout, r.authMiddleware)
 }
