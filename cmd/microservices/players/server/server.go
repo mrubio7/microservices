@@ -109,6 +109,24 @@ func (s *Server) GetAllPlayers(ctx context.Context, _ *pb.Empty) (*pb.PlayerList
 	return &pb.PlayerList{Players: playersRes}, nil
 }
 
+func (s *Server) CreatePlayerFromFaceitId(ctx context.Context, req *pb.CreatePlayerByFaceitIdRequest) (*pb.Player, error) {
+	var player *model.PlayerModel
+	player, _ = s.PlayerManager.GetByFaceitId(req.FaceitId)
+	if player != nil {
+		err := status.Errorf(codes.AlreadyExists, "Player already exist")
+		return nil, err
+	} else {
+		player = s.FaceitService.GetPlayerAverageDetails(req.FaceitId, consts.LAST_MATCHES_NUMBER)
+		if player == nil {
+			err := status.Errorf(codes.NotFound, "Player not found")
+			return nil, err
+		}
+	}
+
+	pbPlayer := mapper.Convert[model.PlayerModel, *pb.Player](*player)
+	return pbPlayer, nil
+}
+
 // ProminentPlayers
 func (s *Server) GetProminentPlayers(ctx context.Context, _ *pb.Empty) (*pb.ProminentPlayerList, error) {
 	var prominentWeek *model.ProminentWeekModel

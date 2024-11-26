@@ -48,7 +48,15 @@ func (s *Server) GetUserById(ctx context.Context, req *pb.GetUserByIdRequest) (*
 		return nil, err
 	}
 
+	player, err := s.PlayerServer.GetPlayersByFaceitId(ctx, &pb_players.GetPlayerRequest{FaceitId: []string{user.FaceitId}})
+	if err != nil {
+		logger.Error("Player %s not found: %s", req.Id, err.Error())
+		err := status.Errorf(codes.NotFound, "player not found")
+		return nil, err
+	}
+
 	res := mapper.Convert[model.UserModel, *pb.User](*user)
+	res.Player = player.Players[0]
 
 	return res, nil
 }
@@ -76,7 +84,15 @@ func (s *Server) Create(ctx context.Context, req *pb.NewUserRequest) (*pb.User, 
 		return nil, err
 	}
 
+	player, err := s.PlayerServer.CreatePlayerFromFaceitId(ctx, &pb_players.CreatePlayerByFaceitIdRequest{FaceitId: req.FaceitId})
+	if err != nil {
+		logger.Error("Error creating player: %s", err.Error())
+		err := status.Errorf(codes.Internal, "error creating player")
+		return nil, err
+	}
+
 	res := mapper.Convert[model.UserModel, *pb.User](*user)
+	res.Player = player
 
 	return res, nil
 }

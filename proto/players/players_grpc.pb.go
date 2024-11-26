@@ -19,15 +19,15 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	PlayerService_GetPlayersByFaceitId_FullMethodName = "/players.PlayerService/GetPlayersByFaceitId"
-	PlayerService_GetPlayerByNickname_FullMethodName  = "/players.PlayerService/GetPlayerByNickname"
-	PlayerService_GetAllPlayers_FullMethodName        = "/players.PlayerService/GetAllPlayers"
-	PlayerService_GetProminentPlayers_FullMethodName  = "/players.PlayerService/GetProminentPlayers"
-	PlayerService_NewPlayer_FullMethodName            = "/players.PlayerService/NewPlayer"
-	PlayerService_CreateLookingForTeam_FullMethodName = "/players.PlayerService/CreateLookingForTeam"
-	PlayerService_UpdateLookingForTeam_FullMethodName = "/players.PlayerService/UpdateLookingForTeam"
-	PlayerService_GetAllLookingForTeam_FullMethodName = "/players.PlayerService/GetAllLookingForTeam"
-	PlayerService_DeleteLookingForTeam_FullMethodName = "/players.PlayerService/DeleteLookingForTeam"
+	PlayerService_GetPlayersByFaceitId_FullMethodName     = "/players.PlayerService/GetPlayersByFaceitId"
+	PlayerService_GetPlayerByNickname_FullMethodName      = "/players.PlayerService/GetPlayerByNickname"
+	PlayerService_GetAllPlayers_FullMethodName            = "/players.PlayerService/GetAllPlayers"
+	PlayerService_GetProminentPlayers_FullMethodName      = "/players.PlayerService/GetProminentPlayers"
+	PlayerService_CreatePlayerFromFaceitId_FullMethodName = "/players.PlayerService/CreatePlayerFromFaceitId"
+	PlayerService_CreateLookingForTeam_FullMethodName     = "/players.PlayerService/CreateLookingForTeam"
+	PlayerService_UpdateLookingForTeam_FullMethodName     = "/players.PlayerService/UpdateLookingForTeam"
+	PlayerService_GetAllLookingForTeam_FullMethodName     = "/players.PlayerService/GetAllLookingForTeam"
+	PlayerService_DeleteLookingForTeam_FullMethodName     = "/players.PlayerService/DeleteLookingForTeam"
 )
 
 // PlayerServiceClient is the client API for PlayerService service.
@@ -38,7 +38,7 @@ type PlayerServiceClient interface {
 	GetPlayerByNickname(ctx context.Context, in *GetPlayerByNicknameRequest, opts ...grpc.CallOption) (*Player, error)
 	GetAllPlayers(ctx context.Context, in *Empty, opts ...grpc.CallOption) (*PlayerList, error)
 	GetProminentPlayers(ctx context.Context, in *Empty, opts ...grpc.CallOption) (*ProminentPlayerList, error)
-	NewPlayer(ctx context.Context, in *NewPlayerRequest, opts ...grpc.CallOption) (*Player, error)
+	CreatePlayerFromFaceitId(ctx context.Context, in *CreatePlayerByFaceitIdRequest, opts ...grpc.CallOption) (*Player, error)
 	CreateLookingForTeam(ctx context.Context, in *CreatePlayerLookingForTeamRequest, opts ...grpc.CallOption) (*PlayerLookingForTeam, error)
 	UpdateLookingForTeam(ctx context.Context, in *CreatePlayerLookingForTeamRequest, opts ...grpc.CallOption) (*PlayerLookingForTeam, error)
 	GetAllLookingForTeam(ctx context.Context, in *Empty, opts ...grpc.CallOption) (*PlayerLookingForTeamList, error)
@@ -93,10 +93,10 @@ func (c *playerServiceClient) GetProminentPlayers(ctx context.Context, in *Empty
 	return out, nil
 }
 
-func (c *playerServiceClient) NewPlayer(ctx context.Context, in *NewPlayerRequest, opts ...grpc.CallOption) (*Player, error) {
+func (c *playerServiceClient) CreatePlayerFromFaceitId(ctx context.Context, in *CreatePlayerByFaceitIdRequest, opts ...grpc.CallOption) (*Player, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(Player)
-	err := c.cc.Invoke(ctx, PlayerService_NewPlayer_FullMethodName, in, out, cOpts...)
+	err := c.cc.Invoke(ctx, PlayerService_CreatePlayerFromFaceitId_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -151,7 +151,7 @@ type PlayerServiceServer interface {
 	GetPlayerByNickname(context.Context, *GetPlayerByNicknameRequest) (*Player, error)
 	GetAllPlayers(context.Context, *Empty) (*PlayerList, error)
 	GetProminentPlayers(context.Context, *Empty) (*ProminentPlayerList, error)
-	NewPlayer(context.Context, *NewPlayerRequest) (*Player, error)
+	CreatePlayerFromFaceitId(context.Context, *CreatePlayerByFaceitIdRequest) (*Player, error)
 	CreateLookingForTeam(context.Context, *CreatePlayerLookingForTeamRequest) (*PlayerLookingForTeam, error)
 	UpdateLookingForTeam(context.Context, *CreatePlayerLookingForTeamRequest) (*PlayerLookingForTeam, error)
 	GetAllLookingForTeam(context.Context, *Empty) (*PlayerLookingForTeamList, error)
@@ -178,8 +178,8 @@ func (UnimplementedPlayerServiceServer) GetAllPlayers(context.Context, *Empty) (
 func (UnimplementedPlayerServiceServer) GetProminentPlayers(context.Context, *Empty) (*ProminentPlayerList, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetProminentPlayers not implemented")
 }
-func (UnimplementedPlayerServiceServer) NewPlayer(context.Context, *NewPlayerRequest) (*Player, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method NewPlayer not implemented")
+func (UnimplementedPlayerServiceServer) CreatePlayerFromFaceitId(context.Context, *CreatePlayerByFaceitIdRequest) (*Player, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method CreatePlayerFromFaceitId not implemented")
 }
 func (UnimplementedPlayerServiceServer) CreateLookingForTeam(context.Context, *CreatePlayerLookingForTeamRequest) (*PlayerLookingForTeam, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CreateLookingForTeam not implemented")
@@ -286,20 +286,20 @@ func _PlayerService_GetProminentPlayers_Handler(srv interface{}, ctx context.Con
 	return interceptor(ctx, in, info, handler)
 }
 
-func _PlayerService_NewPlayer_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(NewPlayerRequest)
+func _PlayerService_CreatePlayerFromFaceitId_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CreatePlayerByFaceitIdRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(PlayerServiceServer).NewPlayer(ctx, in)
+		return srv.(PlayerServiceServer).CreatePlayerFromFaceitId(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: PlayerService_NewPlayer_FullMethodName,
+		FullMethod: PlayerService_CreatePlayerFromFaceitId_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(PlayerServiceServer).NewPlayer(ctx, req.(*NewPlayerRequest))
+		return srv.(PlayerServiceServer).CreatePlayerFromFaceitId(ctx, req.(*CreatePlayerByFaceitIdRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -400,8 +400,8 @@ var PlayerService_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _PlayerService_GetProminentPlayers_Handler,
 		},
 		{
-			MethodName: "NewPlayer",
-			Handler:    _PlayerService_NewPlayer_Handler,
+			MethodName: "CreatePlayerFromFaceitId",
+			Handler:    _PlayerService_CreatePlayerFromFaceitId_Handler,
 		},
 		{
 			MethodName: "CreateLookingForTeam",

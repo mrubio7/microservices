@@ -52,7 +52,7 @@ service PlayerService {
     rpc GetPlayerByNickname (GetPlayerByNicknameRequest) returns (Player);
     rpc GetAllPlayers (Empty) returns (PlayerList);
     rpc GetProminentPlayers (Empty) returns (ProminentPlayerList);
-    rpc NewPlayer (NewPlayerRequest) returns (Player);
+    rpc CreatePlayerFromFaceitId (CreatePlayerByFaceitIdRequest) returns (Player);
     rpc CreateLookingForTeam (CreatePlayerLookingForTeamRequest) returns (PlayerLookingForTeam);
     rpc UpdateLookingForTeam (CreatePlayerLookingForTeamRequest) returns (PlayerLookingForTeam);
     rpc GetAllLookingForTeam (Empty) returns (PlayerLookingForTeamList);
@@ -83,11 +83,8 @@ message GetPlayerByNicknameRequest {
     string Nickname = 1;
 }
 
-message NewPlayerRequest {
-    string Nickname = 1;
-    string FaceitId = 2;
-    string SteamId = 3;
-    PlayerStats Stats = 4;
+message CreatePlayerByFaceitIdRequest {
+    string FaceitId = 1;
 }
 
 message ProminentPlayer {
