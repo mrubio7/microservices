@@ -89,7 +89,7 @@ func (h *Users_Handlers) Update(c *gin.Context) {
 		return
 	}
 
-	res, err := h.users_client.UpdateUser(c, pbUser)
+	res, err := h.users_client.Update(c, pbUser)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, response.BuildError("Error updating user"))
 		return

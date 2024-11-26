@@ -22,7 +22,7 @@ service UserService {
     rpc GetUserById (GetUserByIdRequest) returns (User);
     rpc GetUserByFaceitId (GetUserRequest) returns (User);
     rpc GetUserByPlayerNickname (GetUserRequest) returns (User);
-    rpc UpdateUser (User) returns (User);
+    rpc Update (User) returns (User);
     rpc Create (NewUserRequest) returns (User);
     rpc CreateSession (NewSessionRequest) returns (SessionResponse);
     rpc DeleteSession (NewSessionRequest) returns (Empty);

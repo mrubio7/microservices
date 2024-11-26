@@ -22,7 +22,7 @@ const (
 	UserService_GetUserById_FullMethodName             = "/users.UserService/GetUserById"
 	UserService_GetUserByFaceitId_FullMethodName       = "/users.UserService/GetUserByFaceitId"
 	UserService_GetUserByPlayerNickname_FullMethodName = "/users.UserService/GetUserByPlayerNickname"
-	UserService_UpdateUser_FullMethodName              = "/users.UserService/UpdateUser"
+	UserService_Update_FullMethodName                  = "/users.UserService/Update"
 	UserService_Create_FullMethodName                  = "/users.UserService/Create"
 	UserService_CreateSession_FullMethodName           = "/users.UserService/CreateSession"
 	UserService_DeleteSession_FullMethodName           = "/users.UserService/DeleteSession"
@@ -38,7 +38,7 @@ type UserServiceClient interface {
 	GetUserById(ctx context.Context, in *GetUserByIdRequest, opts ...grpc.CallOption) (*User, error)
 	GetUserByFaceitId(ctx context.Context, in *GetUserRequest, opts ...grpc.CallOption) (*User, error)
 	GetUserByPlayerNickname(ctx context.Context, in *GetUserRequest, opts ...grpc.CallOption) (*User, error)
-	UpdateUser(ctx context.Context, in *User, opts ...grpc.CallOption) (*User, error)
+	Update(ctx context.Context, in *User, opts ...grpc.CallOption) (*User, error)
 	Create(ctx context.Context, in *NewUserRequest, opts ...grpc.CallOption) (*User, error)
 	CreateSession(ctx context.Context, in *NewSessionRequest, opts ...grpc.CallOption) (*SessionResponse, error)
 	DeleteSession(ctx context.Context, in *NewSessionRequest, opts ...grpc.CallOption) (*Empty, error)
@@ -85,10 +85,10 @@ func (c *userServiceClient) GetUserByPlayerNickname(ctx context.Context, in *Get
 	return out, nil
 }
 
-func (c *userServiceClient) UpdateUser(ctx context.Context, in *User, opts ...grpc.CallOption) (*User, error) {
+func (c *userServiceClient) Update(ctx context.Context, in *User, opts ...grpc.CallOption) (*User, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(User)
-	err := c.cc.Invoke(ctx, UserService_UpdateUser_FullMethodName, in, out, cOpts...)
+	err := c.cc.Invoke(ctx, UserService_Update_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -162,7 +162,7 @@ type UserServiceServer interface {
 	GetUserById(context.Context, *GetUserByIdRequest) (*User, error)
 	GetUserByFaceitId(context.Context, *GetUserRequest) (*User, error)
 	GetUserByPlayerNickname(context.Context, *GetUserRequest) (*User, error)
-	UpdateUser(context.Context, *User) (*User, error)
+	Update(context.Context, *User) (*User, error)
 	Create(context.Context, *NewUserRequest) (*User, error)
 	CreateSession(context.Context, *NewSessionRequest) (*SessionResponse, error)
 	DeleteSession(context.Context, *NewSessionRequest) (*Empty, error)
@@ -188,8 +188,8 @@ func (UnimplementedUserServiceServer) GetUserByFaceitId(context.Context, *GetUse
 func (UnimplementedUserServiceServer) GetUserByPlayerNickname(context.Context, *GetUserRequest) (*User, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetUserByPlayerNickname not implemented")
 }
-func (UnimplementedUserServiceServer) UpdateUser(context.Context, *User) (*User, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method UpdateUser not implemented")
+func (UnimplementedUserServiceServer) Update(context.Context, *User) (*User, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Update not implemented")
 }
 func (UnimplementedUserServiceServer) Create(context.Context, *NewUserRequest) (*User, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Create not implemented")
@@ -284,20 +284,20 @@ func _UserService_GetUserByPlayerNickname_Handler(srv interface{}, ctx context.C
 	return interceptor(ctx, in, info, handler)
 }
 
-func _UserService_UpdateUser_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _UserService_Update_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(User)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(UserServiceServer).UpdateUser(ctx, in)
+		return srv.(UserServiceServer).Update(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: UserService_UpdateUser_FullMethodName,
+		FullMethod: UserService_Update_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(UserServiceServer).UpdateUser(ctx, req.(*User))
+		return srv.(UserServiceServer).Update(ctx, req.(*User))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -430,8 +430,8 @@ var UserService_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _UserService_GetUserByPlayerNickname_Handler,
 		},
 		{
-			MethodName: "UpdateUser",
-			Handler:    _UserService_UpdateUser_Handler,
+			MethodName: "Update",
+			Handler:    _UserService_Update_Handler,
 		},
 		{
 			MethodName: "Create",
