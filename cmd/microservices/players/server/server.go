@@ -80,7 +80,14 @@ func (s *Server) GetPlayerByNickname(ctx context.Context, req *pb.GetPlayerByNic
 		logger.Warning("Error updating player: %s", err.Error())
 	}
 
-	pbPlayer := mapper.Convert[model.PlayerModel, *pb.Player](*playerUpdated)
+	res, err := s.PlayerManager.GetByFaceitId(playerUpdated.FaceitId)
+	if err != nil {
+		logger.Error("Error getting player: %s", err.Error())
+		err := status.Errorf(codes.NotFound, "player not found")
+		return nil, err
+	}
+
+	pbPlayer := mapper.Convert[model.PlayerModel, *pb.Player](*res)
 
 	return pbPlayer, nil
 }
