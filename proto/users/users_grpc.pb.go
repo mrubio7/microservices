@@ -24,7 +24,7 @@ const (
 	UserService_GetUserByPlayerNickname_FullMethodName = "/users.UserService/GetUserByPlayerNickname"
 	UserService_UpdateUser_FullMethodName              = "/users.UserService/UpdateUser"
 	UserService_NewUser_FullMethodName                 = "/users.UserService/NewUser"
-	UserService_NewSession_FullMethodName              = "/users.UserService/NewSession"
+	UserService_CreateSession_FullMethodName           = "/users.UserService/CreateSession"
 	UserService_DeleteSession_FullMethodName           = "/users.UserService/DeleteSession"
 	UserService_GetSessionById_FullMethodName          = "/users.UserService/GetSessionById"
 	UserService_GetSessionByUserId_FullMethodName      = "/users.UserService/GetSessionByUserId"
@@ -40,7 +40,7 @@ type UserServiceClient interface {
 	GetUserByPlayerNickname(ctx context.Context, in *GetUserRequest, opts ...grpc.CallOption) (*User, error)
 	UpdateUser(ctx context.Context, in *User, opts ...grpc.CallOption) (*User, error)
 	NewUser(ctx context.Context, in *NewUserRequest, opts ...grpc.CallOption) (*User, error)
-	NewSession(ctx context.Context, in *NewSessionRequest, opts ...grpc.CallOption) (*SessionResponse, error)
+	CreateSession(ctx context.Context, in *NewSessionRequest, opts ...grpc.CallOption) (*SessionResponse, error)
 	DeleteSession(ctx context.Context, in *NewSessionRequest, opts ...grpc.CallOption) (*Empty, error)
 	GetSessionById(ctx context.Context, in *GetSessionByIdRequest, opts ...grpc.CallOption) (*SessionResponse, error)
 	GetSessionByUserId(ctx context.Context, in *GetSessionByUserIdRequest, opts ...grpc.CallOption) (*SessionResponse, error)
@@ -105,10 +105,10 @@ func (c *userServiceClient) NewUser(ctx context.Context, in *NewUserRequest, opt
 	return out, nil
 }
 
-func (c *userServiceClient) NewSession(ctx context.Context, in *NewSessionRequest, opts ...grpc.CallOption) (*SessionResponse, error) {
+func (c *userServiceClient) CreateSession(ctx context.Context, in *NewSessionRequest, opts ...grpc.CallOption) (*SessionResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(SessionResponse)
-	err := c.cc.Invoke(ctx, UserService_NewSession_FullMethodName, in, out, cOpts...)
+	err := c.cc.Invoke(ctx, UserService_CreateSession_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -164,7 +164,7 @@ type UserServiceServer interface {
 	GetUserByPlayerNickname(context.Context, *GetUserRequest) (*User, error)
 	UpdateUser(context.Context, *User) (*User, error)
 	NewUser(context.Context, *NewUserRequest) (*User, error)
-	NewSession(context.Context, *NewSessionRequest) (*SessionResponse, error)
+	CreateSession(context.Context, *NewSessionRequest) (*SessionResponse, error)
 	DeleteSession(context.Context, *NewSessionRequest) (*Empty, error)
 	GetSessionById(context.Context, *GetSessionByIdRequest) (*SessionResponse, error)
 	GetSessionByUserId(context.Context, *GetSessionByUserIdRequest) (*SessionResponse, error)
@@ -194,8 +194,8 @@ func (UnimplementedUserServiceServer) UpdateUser(context.Context, *User) (*User,
 func (UnimplementedUserServiceServer) NewUser(context.Context, *NewUserRequest) (*User, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method NewUser not implemented")
 }
-func (UnimplementedUserServiceServer) NewSession(context.Context, *NewSessionRequest) (*SessionResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method NewSession not implemented")
+func (UnimplementedUserServiceServer) CreateSession(context.Context, *NewSessionRequest) (*SessionResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method CreateSession not implemented")
 }
 func (UnimplementedUserServiceServer) DeleteSession(context.Context, *NewSessionRequest) (*Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method DeleteSession not implemented")
@@ -320,20 +320,20 @@ func _UserService_NewUser_Handler(srv interface{}, ctx context.Context, dec func
 	return interceptor(ctx, in, info, handler)
 }
 
-func _UserService_NewSession_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _UserService_CreateSession_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(NewSessionRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(UserServiceServer).NewSession(ctx, in)
+		return srv.(UserServiceServer).CreateSession(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: UserService_NewSession_FullMethodName,
+		FullMethod: UserService_CreateSession_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(UserServiceServer).NewSession(ctx, req.(*NewSessionRequest))
+		return srv.(UserServiceServer).CreateSession(ctx, req.(*NewSessionRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -438,8 +438,8 @@ var UserService_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _UserService_NewUser_Handler,
 		},
 		{
-			MethodName: "NewSession",
-			Handler:    _UserService_NewSession_Handler,
+			MethodName: "CreateSession",
+			Handler:    _UserService_CreateSession_Handler,
 		},
 		{
 			MethodName: "DeleteSession",

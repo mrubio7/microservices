@@ -70,18 +70,19 @@ func processPlayers(players []model.PlayerModel, playerManager *managers.PlayerM
 	var wg sync.WaitGroup
 	var processedCount int32
 
-	for i, player := range players {
+	for _, player := range players {
 		wg.Add(1)
 		semaphore <- struct{}{}
 
-		go func(p model.PlayerModel, index int) {
+		go func(p model.PlayerModel) {
 			defer wg.Done()
 			defer func() { <-semaphore }()
 			updatePlayer(p, playerManager, faceitClient, errorChan, &processedCount, len(players))
-		}(player, i)
+		}(player)
 	}
 
 	wg.Wait()
+	close(errorChan)
 }
 
 func updatePlayer(player model.PlayerModel, playerManager *managers.PlayerManager, faceitClient *faceit.FaceitClient, errorChan chan error, processedCount *int32, totalPlayers int) {
