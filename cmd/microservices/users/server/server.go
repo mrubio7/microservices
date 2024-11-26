@@ -69,7 +69,15 @@ func (s *Server) GetUserByFaceitId(ctx context.Context, req *pb.GetUserRequest) 
 		return nil, err
 	}
 
+	player, err := s.PlayerServer.GetPlayersByFaceitId(ctx, &pb_players.GetPlayerRequest{FaceitId: []string{user.FaceitId}})
+	if err != nil {
+		logger.Error("Player %s not found: %s", req.Id, err.Error())
+		err := status.Errorf(codes.NotFound, "player not found")
+		return nil, err
+	}
+
 	res := mapper.Convert[model.UserModel, *pb.User](*user)
+	res.Player = player.Players[0]
 
 	return res, nil
 }
