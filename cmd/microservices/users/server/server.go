@@ -28,7 +28,7 @@ func registerPlayerClient(cfg config.MicroserviceConfig) *pb_players.PlayerServi
 	return microservices.New(cfg.Host_gRPC, cfg.Port_gRPC, pb_players.NewPlayerServiceClient)
 }
 
-func New(cfg config.MicroserviceConfig, cfgThirdParty config.ThirdPartyApiTokens) *Server {
+func New(cfg config.MicroserviceConfig, cfgPlayers config.MicroserviceConfig, cfgThirdParty config.ThirdPartyApiTokens) *Server {
 	db := database.NewDatabase(cfg.Database)
 	userManager := managers.NewUserManager(db.GetDB())
 	faceit := faceit.New(cfgThirdParty.FaceitApiToken)
@@ -36,7 +36,7 @@ func New(cfg config.MicroserviceConfig, cfgThirdParty config.ThirdPartyApiTokens
 	return &Server{
 		UserManager:   userManager,
 		FaceitService: faceit,
-		PlayerServer:  *registerPlayerClient(cfg),
+		PlayerServer:  *registerPlayerClient(cfgPlayers),
 	}
 }
 

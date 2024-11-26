@@ -28,7 +28,7 @@ func main() {
 	}
 
 	grpcServer := grpc.NewServer()
-	microserviceUsers := microservice_users.New(cfg.MicroserviceUsers, cfg.ThirdPartyApiTokens)
+	microserviceUsers := microservice_users.New(cfg.MicroserviceUsers, cfg.MicroservicePlayers, cfg.ThirdPartyApiTokens)
 
 	pb.RegisterUserServiceServer(grpcServer, microserviceUsers)
 

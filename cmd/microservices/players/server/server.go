@@ -46,17 +46,19 @@ func (s *Server) GetPlayersByFaceitId(ctx context.Context, req *pb.GetPlayerRequ
 	playersRes := make([]*pb.Player, len(req.FaceitId))
 
 	for i, id := range req.FaceitId {
-		playerUpdated := s.FaceitService.GetPlayerAverageDetails(id, consts.LAST_MATCHES_NUMBER)
-		err := s.PlayerManager.Update(playerUpdated)
-		if err != nil {
-			logger.Warning("Error updating player: %s", err.Error())
-		}
-
 		p, err := s.PlayerManager.GetByFaceitId(id)
 		if err != nil {
 			logger.Error("Error getting player: %s", err.Error())
 			err := status.Errorf(codes.NotFound, "player not found")
 			return nil, err
+		}
+
+		playerUpdated := s.FaceitService.GetPlayerAverageDetails(id, consts.LAST_MATCHES_NUMBER)
+		playerUpdated.Id = p.Id
+		playerUpdated.Stats.Id = p.Stats.Id
+		err = s.PlayerManager.Update(playerUpdated)
+		if err != nil {
+			logger.Warning("Error updating player: %s", err.Error())
 		}
 
 		pbPlayer := mapper.Convert[model.PlayerModel, *pb.Player](*p)
@@ -75,6 +77,8 @@ func (s *Server) GetPlayerByNickname(ctx context.Context, req *pb.GetPlayerByNic
 	}
 
 	playerUpdated := s.FaceitService.GetPlayerAverageDetails(p.FaceitId, consts.LAST_MATCHES_NUMBER)
+	playerUpdated.Id = p.Id
+	playerUpdated.Stats.Id = p.Stats.Id
 	err = s.PlayerManager.Update(playerUpdated)
 	if err != nil {
 		logger.Warning("Error updating player: %s", err.Error())
