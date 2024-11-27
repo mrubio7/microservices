@@ -52,8 +52,9 @@ func (EseaDivisionModel) TableName() string {
 }
 
 type EseaStandingModel struct {
-	Id             int32  `gorm:"primaryKey; autoIncrement"`
-	DivisionId     string `gorm:"not null;index"`
+	Id             int32  `gorm:"primaryKey;autoIncrement"`
+	TeamFaceitId   string `gorm:"not null;uniqueIndex:idx_team_division"`
+	DivisionId     string `gorm:"not null;uniqueIndex:idx_team_division"`
 	IsDisqualified bool   `gorm:"not null"`
 	TournamentName string `gorm:"not null"`
 	RankStart      int    `gorm:"not null"`
@@ -64,7 +65,6 @@ type EseaStandingModel struct {
 	MatchesLost    int    `gorm:"not null"`
 	MatchesTied    int    `gorm:"not null"`
 	BuchholzScore  int    `gorm:"not null"`
-	TeamFaceitId   string `gorm:"not null;unique"`
 }
 
 func (EseaStandingModel) TableName() string {

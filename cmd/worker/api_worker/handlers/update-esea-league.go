@@ -1,7 +1,6 @@
 package handlers
 
 import (
-	"errors"
 	"ibercs/pkg/config"
 	"ibercs/pkg/database"
 	"ibercs/pkg/faceit"
@@ -32,7 +31,7 @@ func UpdateEsea(c *gin.Context) {
 	err = workerEseaLeagueUpdate(eseaManager, faceitClient, teamsMap)
 	if err != nil {
 		logger.Error(err.Error())
-		c.JSON(http.StatusInternalServerError, response.BuildError("Error while update players"))
+		c.JSON(http.StatusInternalServerError, response.BuildError("Error while update esea leagues"))
 		return
 	}
 
@@ -48,8 +47,7 @@ func workerEseaLeagueUpdate(eseaManager *managers.EseaManager, faceitClient *fac
 
 	eseaDivisions := faceitClient.GetESEADivisionBySeasonId_PRODUCTION(eseaLeague.FaceitId, eseaLeague.Name)
 	if eseaDivisions == nil {
-		logger.Error(err.Error())
-		err := errors.New("unable to get ESEA divisions")
+		logger.Error("unable to get ESEA divisions")
 		return err
 	}
 
@@ -74,27 +72,23 @@ func workerEseaLeagueUpdate(eseaManager *managers.EseaManager, faceitClient *fac
 			continue
 		}
 
-		if !division.Playoffs {
-			// Regular season
-			standings := faceitClient.GetESEADivisionStanding_PRODUCTION(division.FaceitId)
-			if standings == nil {
-				logger.Error(err.Error())
-				err := errors.New("unable to get ESEA standings")
-				return err
-			}
+		standings := faceitClient.GetESEADivisionStanding_PRODUCTION(division.FaceitId)
+		if standings == nil {
+			logger.Warning("Error getting ESEA %s %s: %s", division.DivisionName, division.StageName, err.Error())
+			continue
+		}
 
-			for _, standing := range standings {
-				if teamsMap[standing.TeamFaceitId] {
-					s, err := eseaManager.GetStandingByTeamFaceitId(standing.TeamFaceitId)
-					if err != nil {
-						return err
-					}
-					standing.Id = s.Id
+		for _, standing := range standings {
+			if teamsMap[standing.TeamFaceitId] {
+				s, err := eseaManager.GetStandingByTeamFaceitIdAndDivisionId(standing.TeamFaceitId, int(division.Id))
+				if err != nil {
+					logger.Warning("Esea standing for team %s does not exist", standing.TeamFaceitId)
 					division.Standings = append(division.Standings, standing)
+					continue
 				}
+				standing.Id = s.Id
+				division.Standings = append(division.Standings, standing)
 			}
-		} else {
-			// Playoffs
 		}
 
 		err = eseaManager.UpdateDivision(division)
