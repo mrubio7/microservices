@@ -66,7 +66,25 @@ func (s *Server) GetMatchByFaceitId(ctx context.Context, req *pb.GetMatchRequest
 		return nil, err
 	}
 
-	return mapper.Convert[model.MatchModel, *pb.Match](*match), nil
+	teamA, err := s.TeamsClient.GetByFaceitId(ctx, &pb_teams.GetTeamByFaceitIdRequest{FaceitId: match.TeamAFaceitId})
+	if err != nil {
+		logger.Error(err.Error())
+		err := status.Errorf(codes.NotFound, "teamA not found")
+		return nil, err
+	}
+
+	teamB, err := s.TeamsClient.GetByFaceitId(ctx, &pb_teams.GetTeamByFaceitIdRequest{FaceitId: match.TeamBFaceitId})
+	if err != nil {
+		logger.Error(err.Error())
+		err := status.Errorf(codes.NotFound, "teamB not found")
+		return nil, err
+	}
+
+	res := mapper.Convert[model.MatchModel, *pb.Match](*match)
+
+	res.TeamA = teamA
+	res.TeamB = teamB
+	return res, nil
 }
 
 func (s *Server) GetMatchesByTeamId(ctx context.Context, req *pb.GetMatchRequest) (*pb.MatchList, error) {
