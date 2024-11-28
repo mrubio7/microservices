@@ -55,7 +55,7 @@ func workerPlayersUpdate(playerManager *managers.PlayerManager, faceitClient *fa
 		return err
 	}
 
-	semaphore := make(chan struct{}, 6)
+	semaphore := make(chan struct{}, 2)
 	errorChan := make(chan error, len(players))
 
 	totalPlayers := len(players)
