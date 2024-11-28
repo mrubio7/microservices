@@ -66,18 +66,37 @@ func (s *Server) GetMatchByFaceitId(ctx context.Context, req *pb.GetMatchRequest
 		return nil, err
 	}
 
-	teamA, err := s.TeamsClient.GetByFaceitId(ctx, &pb_teams.GetTeamByFaceitIdRequest{FaceitId: match.TeamAFaceitId})
-	if err != nil {
-		logger.Error(err.Error())
-		err := status.Errorf(codes.NotFound, "teamA not found")
-		return nil, err
+	var teamA, teamB *pb_teams.Team
+	if match.IsTeamAKnown {
+		teamA, err = s.TeamsClient.GetByFaceitId(ctx, &pb_teams.GetTeamByFaceitIdRequest{FaceitId: match.TeamAFaceitId})
+		if err != nil {
+			logger.Error(err.Error())
+			err := status.Errorf(codes.NotFound, "teamA not found")
+			return nil, err
+		}
+	} else {
+		teamA, err = s.TeamsClient.GetTeamFromFaceit(ctx, &pb_teams.GetTeamFromFaceitRequest{FaceitId: match.TeamAFaceitId})
+		if err != nil {
+			logger.Error(err.Error())
+			err := status.Errorf(codes.NotFound, "teamA not found")
+			return nil, err
+		}
 	}
 
-	teamB, err := s.TeamsClient.GetByFaceitId(ctx, &pb_teams.GetTeamByFaceitIdRequest{FaceitId: match.TeamBFaceitId})
-	if err != nil {
-		logger.Error(err.Error())
-		err := status.Errorf(codes.NotFound, "teamB not found")
-		return nil, err
+	if match.IsTeamBKnown {
+		teamB, err = s.TeamsClient.GetByFaceitId(ctx, &pb_teams.GetTeamByFaceitIdRequest{FaceitId: match.TeamBFaceitId})
+		if err != nil {
+			logger.Error(err.Error())
+			err := status.Errorf(codes.NotFound, "teamB not found")
+			return nil, err
+		}
+	} else {
+		teamB, err = s.TeamsClient.GetTeamFromFaceit(ctx, &pb_teams.GetTeamFromFaceitRequest{FaceitId: match.TeamBFaceitId})
+		if err != nil {
+			logger.Error(err.Error())
+			err := status.Errorf(codes.NotFound, "teamB not found")
+			return nil, err
+		}
 	}
 
 	res := mapper.Convert[model.MatchModel, *pb.Match](*match)
