@@ -39,6 +39,7 @@ message PlayerLookingForTeam {
     int64 CreatedAt = 8;
     int64 UpdatedAt = 9;
     Player Player = 10;
+    string FaceitId = 11;
 }
 
 message PlayerLookingForTeamList {
@@ -70,8 +71,8 @@ message CreatePlayerLookingForTeamRequest {
     string OldTeams = 4;
     int32 PlayingYears = 5;
     string Description = 6;
-    string Location = 7;
-    int32 UserId = 8;
+    int32 UserId = 7;
+    string FaceitId = 8;
 }
 
 message GetPlayerRequest {

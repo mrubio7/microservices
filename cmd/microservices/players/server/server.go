@@ -231,7 +231,7 @@ func (s *Server) UpdateLookingForTeam(ctx context.Context, req *pb.CreatePlayerL
 		return nil, err
 	}
 
-	if user.Player.FaceitId != lookingForTeam.FaceitId {
+	if user.PlayerID != lookingForTeam.FaceitId {
 		if user.Role < consts.ROLE_ADMIN {
 			logger.Error("Error creating looking for team")
 			return nil, status.Errorf(codes.PermissionDenied, "Error creating looking for team")
@@ -248,4 +248,22 @@ func (s *Server) UpdateLookingForTeam(ctx context.Context, req *pb.CreatePlayerL
 	res := mapper.Convert[model.LookingForTeamModel, *pb.PlayerLookingForTeam](lookingForTeam)
 
 	return res, nil
+}
+
+func (s *Server) DeleteLookingForTeam(ctx context.Context, req *pb.DeleteLookingForTeamRequest) (*pb.Empty, error) {
+	user, err := s.UserServer.GetUserById(ctx, &pb_users.GetUserByIdRequest{Id: req.UserId})
+	if err != nil {
+		logger.Error("Error getting user: %s", err.Error())
+		err := status.Errorf(codes.Internal, "error deleting looking for team")
+		return nil, err
+	}
+
+	err = s.PlayerManager.DeleteLookingForTeamPlayer(user.PlayerID)
+	if err != nil {
+		logger.Error("Error deleting looking for team: %s", err.Error())
+		err := status.Errorf(codes.Internal, "error deleting looking for team")
+		return nil, err
+	}
+
+	return nil, nil
 }

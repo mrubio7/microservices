@@ -12,6 +12,7 @@ type CreateLookingForTeam struct {
 	OldTeams     string   `json:"old_teams"`
 	PlayingYears int32    `json:"playing_years"`
 	Description  string   `json:"description"`
+	FaceitId     string   `json:"faceit_id"`
 	UserId       int32    `json:"-"`
 }
 
@@ -33,6 +34,7 @@ func (req CreateLookingForTeam) ToProto(identity int32) (*pb_players.CreatePlaye
 		OldTeams:     req.OldTeams,
 		PlayingYears: req.PlayingYears,
 		Description:  req.Description,
+		FaceitId:     req.FaceitId,
 		UserId:       identity,
 	}, nil
 }
