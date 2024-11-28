@@ -61,7 +61,7 @@ func workerFindEseaLeague(eseaManager *managers.EseaManager, faceitClient *facei
 		if eseaLeagues[i].Status == "live" {
 			for j := range eseaDivisions {
 
-				standings := faceitClient.GetESEADivisionStanding_PRODUCTION(eseaDivisions[j].FaceitId)
+				standings := faceitClient.GetESEADivisionStanding_PRODUCTION(eseaDivisions[j].ConferenceId)
 				if standings == nil {
 					err := errors.New("unable to get ESEA standings")
 					logger.Error(err.Error())

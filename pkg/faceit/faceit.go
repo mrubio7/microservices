@@ -376,7 +376,8 @@ func (c *FaceitClient) GetESEADivisionBySeasonId_PRODUCTION(seasonId string, nam
 				for _, stage := range division.Stages {
 					isPlayoffs := strings.Contains(stage.Name, "Playoffs")
 					eseaDivisions = append(eseaDivisions, model.EseaDivisionModel{
-						FaceitId:           stage.Conferences[0].ID,
+						ConferenceId:       stage.Conferences[0].ID,
+						TournamentId:       stage.Conferences[0].ChampionshipID,
 						EseaLeagueFaceitId: seasonId,
 						DivisionName:       division.Name,
 						StageName:          stage.Name,

@@ -39,7 +39,8 @@ type EseaDivisionModel struct {
 	Id                 int32               `gorm:"primaryKey;autoIncrement"`
 	EseaLeagueId       int32               `gorm:"not null;index"`
 	EseaLeagueFaceitId string              `gorm:"not null"`
-	FaceitId           string              `gorm:"not null"`
+	ConferenceId       string              `gorm:"not null"`
+	TournamentId       string              `gorm:"not null"`
 	DivisionName       string              `gorm:"not null"`
 	StageName          string              `gorm:"not null"`
 	Playoffs           bool                `gorm:"not null; default:false"`

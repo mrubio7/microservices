@@ -23,6 +23,6 @@ func TestCreateEseaLeague(t *testing.T) {
 	leagueFound, err := managers.GetEseaLeagueBySeasonNumber(league.Season)
 	assert.Nil(t, err, "Error should be nil")
 	assert.Equal(t, league.FaceitId, leagueFound.FaceitId, "FaceitId should match")
-	assert.Equal(t, league.Divisions[1].FaceitId, leagueFound.Divisions[1].FaceitId, "Name should match")
+	assert.Equal(t, league.Divisions[1].ConferenceId, leagueFound.Divisions[1].ConferenceId, "Name should match")
 	assert.Equal(t, league.Divisions[1].Standings[1].TeamFaceitId, leagueFound.Divisions[1].Standings[1].TeamFaceitId, "Name should match")
 }

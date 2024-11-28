@@ -52,7 +52,7 @@ func workerEseaLeagueUpdate(eseaManager *managers.EseaManager, faceitClient *fac
 	}
 
 	for _, division := range eseaDivisions {
-		d, err := eseaManager.GetDivisionByFaceitId(division.FaceitId)
+		d, err := eseaManager.GetDivisionByFaceitId(division.ConferenceId)
 		if err != nil {
 			if err == gorm.ErrRecordNotFound {
 				division.EseaLeagueId = eseaLeague.Id
@@ -72,7 +72,7 @@ func workerEseaLeagueUpdate(eseaManager *managers.EseaManager, faceitClient *fac
 			continue
 		}
 
-		standings := faceitClient.GetESEADivisionStanding_PRODUCTION(division.FaceitId)
+		standings := faceitClient.GetESEADivisionStanding_PRODUCTION(division.ConferenceId)
 		if standings == nil {
 			logger.Warning("Error getting ESEA %s %s: %s", division.DivisionName, division.StageName, err.Error())
 			continue
