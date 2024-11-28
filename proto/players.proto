@@ -72,7 +72,6 @@ message CreatePlayerLookingForTeamRequest {
     string Description = 6;
     string Location = 7;
     int32 UserId = 8;
-    string FaceitId = 9;
 }
 
 message GetPlayerRequest {

@@ -192,12 +192,19 @@ func (s *Server) GetAllLookingForTeam(ctx context.Context, _ *pb.Empty) (*pb.Pla
 }
 
 func (s *Server) CreateLookingForTeam(ctx context.Context, req *pb.CreatePlayerLookingForTeamRequest) (*pb.PlayerLookingForTeam, error) {
+	user, err := s.UserServer.GetUserById(ctx, &pb_users.GetUserByIdRequest{Id: req.UserId})
+	if err != nil {
+		logger.Error("Error getting user: %s", err.Error())
+		err := status.Errorf(codes.Internal, "error creating looking for team")
+		return nil, err
+	}
+
 	lookingForTeam := &model.LookingForTeamModel{
 		InGameRole:   req.InGameRole,
 		TimeTable:    req.TimeTable,
 		OldTeams:     req.OldTeams,
 		PlayingYears: req.PlayingYears,
-		FaceitId:     req.FaceitId,
+		FaceitId:     user.PlayerID,
 		Description:  req.Description,
 		Id:           req.UserId,
 	}

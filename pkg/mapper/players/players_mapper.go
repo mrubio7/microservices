@@ -122,7 +122,6 @@ func (CreatePlayerLookingForTeamMapper) Proto(model model.LookingForTeamModel, p
 		OldTeams:     model.OldTeams,
 		PlayingYears: model.PlayingYears,
 		Description:  model.Description,
-		FaceitId:     model.FaceitId,
 		UserId:       userId,
 	}
 }
@@ -131,7 +130,6 @@ func (CreatePlayerLookingForTeamMapper) Model(proto *pb.CreatePlayerLookingForTe
 	return model.LookingForTeamModel{
 		Id:           int32(proto.UserId),
 		InGameRole:   proto.InGameRole,
-		FaceitId:     proto.FaceitId,
 		TimeTable:    proto.TimeTable,
 		OldTeams:     proto.OldTeams,
 		PlayingYears: proto.PlayingYears,

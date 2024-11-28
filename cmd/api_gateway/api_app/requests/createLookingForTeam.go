@@ -7,7 +7,6 @@ import (
 )
 
 type CreateLookingForTeam struct {
-	FaceitId     string   `json:"faceit_id"`
 	InGameRole   []string `json:"in_game_role"`
 	TimeTable    string   `json:"time_table"`
 	OldTeams     string   `json:"old_teams"`
@@ -18,7 +17,6 @@ type CreateLookingForTeam struct {
 
 func (req CreateLookingForTeam) validate() error {
 	return validation.ValidateStruct(&req,
-		validation.Field(&req.FaceitId, validation.Required),
 		validation.Field(&req.InGameRole, validation.Required),
 	)
 }
@@ -30,7 +28,6 @@ func (req CreateLookingForTeam) ToProto(identity int32) (*pb_players.CreatePlaye
 	}
 
 	return &pb_players.CreatePlayerLookingForTeamRequest{
-		FaceitId:     req.FaceitId,
 		InGameRole:   req.InGameRole,
 		TimeTable:    req.TimeTable,
 		OldTeams:     req.OldTeams,
