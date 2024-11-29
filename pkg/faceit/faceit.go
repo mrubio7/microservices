@@ -15,6 +15,7 @@ import (
 	"time"
 
 	"github.com/mconnat/go-faceit/pkg/client"
+	"github.com/mconnat/go-faceit/pkg/models"
 )
 
 type FaceitClient struct {
@@ -137,6 +138,15 @@ func (c *FaceitClient) GetPlayerAverageDetails(userId string, matchesNumber int)
 			PentaKillsAverage:      stats.PentaKillsAverage / float32(matchesNumber),
 		},
 	}
+}
+
+func (c *FaceitClient) GetPlayerDetails(playerId string) *models.Player {
+	p, err := c.client.GetPlayerByID(playerId, nil)
+	if err != nil {
+		return nil
+	}
+
+	return &p
 }
 
 func (c *FaceitClient) GetTeamById(teamId string) *model.TeamModel {
@@ -568,7 +578,15 @@ func (c *FaceitClient) GetMatchDetails(faceitId string) *model.MatchModel {
 		ScoreTeamA:         int32(m.Results.Score["faction1"]),
 		ScoreTeamB:         int32(m.Results.Score["faction2"]),
 	}
+}
 
+func (c *FaceitClient) GetMatchDetailsComplete(faceitId string) *models.Match {
+	m, err := c.client.GetMatchByID(faceitId, nil)
+	if err != nil {
+		return nil
+	}
+
+	return &m
 }
 
 func convertToEseaModel(season map[string]any) *model.EseaLeagueModel {

@@ -71,3 +71,15 @@ func (m *StateManager) Update_TeamLastUpdate() error {
 
 	return m.repoState.Update(state)
 }
+
+func (m *StateManager) Update_TeamsRanksLastUpdate() error {
+	state, err := m.repoState.Get()
+	if err != nil {
+		return err
+	}
+
+	state.TeamsRankLastUpdate.Time = time.Now()
+	state.TeamsRankLastUpdate.Valid = true
+
+	return m.repoState.Update(state)
+}

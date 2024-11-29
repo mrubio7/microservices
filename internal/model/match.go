@@ -25,6 +25,8 @@ type MatchModel struct {
 	Tournament         TournamentModel `gorm:"-"`
 	Map                JSONStringArray `gorm:"type:jsonb; null"`
 	Status             string          `gorm:"not null"`
+	PointsMatchTeamA   float32         `gorm:"null"`
+	PointsMatchTeamB   float32         `gorm:"null"`
 }
 
 func (MatchModel) TableName() string {

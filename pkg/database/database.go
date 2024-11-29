@@ -85,6 +85,9 @@ func (d *Database) Automigrate() {
 		if err := d.db.AutoMigrate(&model.TeamStatsModel{}); err != nil {
 			log.Fatalf("Failed to automigrate: %v", err)
 		}
+		if err := d.db.AutoMigrate(&model.TeamRankModel{}); err != nil {
+			log.Fatalf("Failed to automigrate: %v", err)
+		}
 	case "tournaments":
 		if err := d.db.AutoMigrate(&model.OrganizerModel{}); err != nil {
 			log.Fatalf("Failed to automigrate: %v", err)

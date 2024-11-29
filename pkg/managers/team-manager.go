@@ -9,14 +9,17 @@ import (
 )
 
 type TeamManager struct {
-	repoTeams *repositories.GenericRepository[model.TeamModel]
+	repoTeams     *repositories.GenericRepository[model.TeamModel]
+	repoTeamsRank *repositories.GenericRepository[model.TeamRankModel]
 }
 
 func NewTeamManager(database *gorm.DB) *TeamManager {
 	teams := repositories.NewGenericRepository[model.TeamModel](database)
+	teamRanks := repositories.NewGenericRepository[model.TeamRankModel](database)
 
 	return &TeamManager{
-		repoTeams: teams,
+		repoTeams:     teams,
+		repoTeamsRank: teamRanks,
 	}
 }
 
@@ -70,4 +73,21 @@ func (m *TeamManager) ActivateTeam(id int) error {
 
 	team.Active = true
 	return m.repoTeams.Update(team)
+}
+
+// TeamRank
+func (m *TeamManager) GetTeamRankByFaceitId(faceitId string) (*model.TeamRankModel, error) {
+	return m.repoTeamsRank.Get(repositories.Where("faceit_id = ?", faceitId))
+}
+
+func (m *TeamManager) GetAllTeamRank(faceitId string) ([]model.TeamRankModel, error) {
+	return m.repoTeamsRank.Find()
+}
+
+func (m *TeamManager) UpdateTeamRank(teamRank *model.TeamRankModel) error {
+	return m.repoTeamsRank.Update(teamRank)
+}
+
+func (m *TeamManager) CreateTeamRank(teamRank *model.TeamRankModel) (*model.TeamRankModel, error) {
+	return m.repoTeamsRank.Create(teamRank)
 }

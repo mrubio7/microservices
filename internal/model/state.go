@@ -8,6 +8,7 @@ type StateModel struct {
 	ID                  int32        `gorm:"primaryKey"`
 	PlayersLastUpdate   sql.NullTime `gorm:"null"`
 	TeamsLastUpdate     sql.NullTime `gorm:"null"`
+	TeamsRankLastUpdate sql.NullTime `gorm:"null"`
 	TournamentsLastFind sql.NullTime `gorm:"null"`
 	MatchesLastFind     sql.NullTime `gorm:"null"`
 }

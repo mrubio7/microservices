@@ -52,7 +52,10 @@ func (m *MatchManager) GetNearbyMatches(days int) ([]model.MatchModel, error) {
 }
 
 func (m *MatchManager) GetMatchesByTeamId(teamId string) ([]model.MatchModel, error) {
-	return m.repo.Find(repositories.Where("team_a_faceit_id = ? OR team_b_faceit_id = ?", teamId, teamId))
+	return m.repo.Find(
+		repositories.Where("team_a_faceit_id = ? OR team_b_faceit_id = ?", teamId, teamId),
+		repositories.OrderBy("timestamp DESC"),
+	)
 }
 
 func (m *MatchManager) SetStreamUrl(faceitId, streamUrl string) error {
