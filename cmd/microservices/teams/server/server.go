@@ -189,3 +189,25 @@ func (s *Server) FindTeamsByPlayerId(ctx context.Context, req *pb.GetTeamByPlaye
 
 	return &pb.TeamList{Teams: res}, nil
 }
+
+func (s *Server) GetTeamsRank(ctx context.Context, _ *pb.Empty) (*pb.TeamRankList, error) {
+	ranks, err := s.TeamsManager.GetAllTeamRank()
+	if err != nil {
+		logger.Error("Teams rank not found")
+		err := status.Errorf(codes.NotFound, "Error getting team ranks")
+		return nil, err
+	}
+
+	var teamRanks []*pb.TeamRank
+	for _, rank := range ranks {
+		team, err := s.TeamsManager.GetByFaceitId(rank.FaceitId)
+		if err != nil {
+			logger.Error("Team not found")
+			err := status.Errorf(codes.NotFound, "Error getting team")
+			return nil, err
+		}
+		teamRanks = append(teamRanks, mapper.Convert[model.TeamRankModel, *pb.TeamRank](rank, team))
+	}
+
+	return &pb.TeamRankList{Ranks: teamRanks}, nil
+}

@@ -46,10 +46,24 @@ message TeamMapStats {
     int32 Matches = 3;
 }
 
+message TeamRank {
+    string FaceitId = 1;
+    float ActualPoints = 2;
+    float OldPoints = 3;
+    int32 Matches = 4;
+    float LeaguePoints = 5;
+    teams.Team Team = 6;
+}
+
+message TeamRankList {
+    repeated TeamRank Ranks = 1;
+}
+
 message Empty {}
 
 service TeamService {
     rpc GetAllTeams (Empty) returns (TeamList);
+    rpc GetTeamsRank (Empty) returns (TeamRankList);
     rpc GetActiveTeams (Empty) returns (TeamList);
     rpc GetById (GetTeamByIdRequest) returns (Team);
     rpc GetByNickname (GetTeamByNicknameRequest) returns (Team);

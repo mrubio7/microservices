@@ -20,6 +20,7 @@ const _ = grpc.SupportPackageIsVersion9
 
 const (
 	TeamService_GetAllTeams_FullMethodName         = "/teams.TeamService/GetAllTeams"
+	TeamService_GetTeamsRank_FullMethodName        = "/teams.TeamService/GetTeamsRank"
 	TeamService_GetActiveTeams_FullMethodName      = "/teams.TeamService/GetActiveTeams"
 	TeamService_GetById_FullMethodName             = "/teams.TeamService/GetById"
 	TeamService_GetByNickname_FullMethodName       = "/teams.TeamService/GetByNickname"
@@ -35,6 +36,7 @@ const (
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type TeamServiceClient interface {
 	GetAllTeams(ctx context.Context, in *Empty, opts ...grpc.CallOption) (*TeamList, error)
+	GetTeamsRank(ctx context.Context, in *Empty, opts ...grpc.CallOption) (*TeamRankList, error)
 	GetActiveTeams(ctx context.Context, in *Empty, opts ...grpc.CallOption) (*TeamList, error)
 	GetById(ctx context.Context, in *GetTeamByIdRequest, opts ...grpc.CallOption) (*Team, error)
 	GetByNickname(ctx context.Context, in *GetTeamByNicknameRequest, opts ...grpc.CallOption) (*Team, error)
@@ -57,6 +59,16 @@ func (c *teamServiceClient) GetAllTeams(ctx context.Context, in *Empty, opts ...
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(TeamList)
 	err := c.cc.Invoke(ctx, TeamService_GetAllTeams_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *teamServiceClient) GetTeamsRank(ctx context.Context, in *Empty, opts ...grpc.CallOption) (*TeamRankList, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(TeamRankList)
+	err := c.cc.Invoke(ctx, TeamService_GetTeamsRank_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -148,6 +160,7 @@ func (c *teamServiceClient) FindTeamsByPlayerId(ctx context.Context, in *GetTeam
 // for forward compatibility.
 type TeamServiceServer interface {
 	GetAllTeams(context.Context, *Empty) (*TeamList, error)
+	GetTeamsRank(context.Context, *Empty) (*TeamRankList, error)
 	GetActiveTeams(context.Context, *Empty) (*TeamList, error)
 	GetById(context.Context, *GetTeamByIdRequest) (*Team, error)
 	GetByNickname(context.Context, *GetTeamByNicknameRequest) (*Team, error)
@@ -168,6 +181,9 @@ type UnimplementedTeamServiceServer struct{}
 
 func (UnimplementedTeamServiceServer) GetAllTeams(context.Context, *Empty) (*TeamList, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetAllTeams not implemented")
+}
+func (UnimplementedTeamServiceServer) GetTeamsRank(context.Context, *Empty) (*TeamRankList, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetTeamsRank not implemented")
 }
 func (UnimplementedTeamServiceServer) GetActiveTeams(context.Context, *Empty) (*TeamList, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetActiveTeams not implemented")
@@ -228,6 +244,24 @@ func _TeamService_GetAllTeams_Handler(srv interface{}, ctx context.Context, dec 
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(TeamServiceServer).GetAllTeams(ctx, req.(*Empty))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _TeamService_GetTeamsRank_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(Empty)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(TeamServiceServer).GetTeamsRank(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: TeamService_GetTeamsRank_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(TeamServiceServer).GetTeamsRank(ctx, req.(*Empty))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -386,6 +420,10 @@ var TeamService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GetAllTeams",
 			Handler:    _TeamService_GetAllTeams_Handler,
+		},
+		{
+			MethodName: "GetTeamsRank",
+			Handler:    _TeamService_GetTeamsRank_Handler,
 		},
 		{
 			MethodName: "GetActiveTeams",

@@ -81,3 +81,26 @@ func (TeamMapMapper) Proto(model model.TeamMapStats) *pb.TeamMapStats {
 func (TeamMapMapper) Model(proto *pb.TeamMapStats) model.TeamMapStats {
 	return model.TeamMapStats{}
 }
+
+type TeamRankMapper struct{}
+
+func (TeamRankMapper) Proto(entity model.TeamRankModel, params ...interface{}) *pb.TeamRank {
+	return &pb.TeamRank{
+		FaceitId:     entity.FaceitId,
+		ActualPoints: entity.ActualPoints,
+		OldPoints:    entity.OldPoints,
+		Matches:      int32(entity.Matches),
+		LeaguePoints: entity.LeaguePoints,
+		Team:         TeamMapper{}.Proto(*params[0].(*model.TeamModel)),
+	}
+}
+
+func (TeamRankMapper) Model(proto *pb.TeamRank, _ ...interface{}) model.TeamRankModel {
+	return model.TeamRankModel{
+		FaceitId:     proto.FaceitId,
+		ActualPoints: proto.ActualPoints,
+		OldPoints:    proto.OldPoints,
+		LeaguePoints: proto.LeaguePoints,
+		Matches:      int(proto.Matches),
+	}
+}

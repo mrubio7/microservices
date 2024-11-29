@@ -56,6 +56,7 @@ func (r routes) RegisterTeamRoutes() {
 	r.router.GET("/api/v2/team/faceit", teamHandler.GetTeamFromFaceit) // query param: faceit_id
 	r.router.GET("/api/v2/team", teamHandler.Get)                      // query param: id or nickname
 	r.router.GET("/api/v2/teams", teamHandler.GetAll)
+	r.router.GET("/api/v2/teams/ranks", teamHandler.GetTeamsRank)
 	r.router.GET("/api/v2/teams/active", teamHandler.GetActiveTeams)
 	r.router.GET("/api/v2/team/player", teamHandler.FindTeamByPlayerId)
 }

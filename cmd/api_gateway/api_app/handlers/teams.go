@@ -81,6 +81,17 @@ func (h *Team_Handlers) Get(c *gin.Context) {
 	c.JSON(http.StatusOK, response.BuildOk("ok", res))
 }
 
+func (h *Team_Handlers) GetTeamsRank(c *gin.Context) {
+	ranks, err := h.teams_client.GetTeamsRank(c, nil)
+	if err != nil {
+		logger.Error("Error getting team ranks: %v", err)
+		c.JSON(http.StatusInternalServerError, response.BuildError("Error gettin team ranks"))
+		return
+	}
+
+	c.JSON(http.StatusOK, response.BuildOk("Ok", ranks))
+}
+
 func (h *Team_Handlers) CreateFromFaceit(c *gin.Context) {
 	var req requests.CreateTeamFromFaceitRequest
 

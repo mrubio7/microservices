@@ -80,7 +80,7 @@ func (m *TeamManager) GetTeamRankByFaceitId(faceitId string) (*model.TeamRankMod
 	return m.repoTeamsRank.Get(repositories.Where("faceit_id = ?", faceitId))
 }
 
-func (m *TeamManager) GetAllTeamRank(faceitId string) ([]model.TeamRankModel, error) {
+func (m *TeamManager) GetAllTeamRank() ([]model.TeamRankModel, error) {
 	return m.repoTeamsRank.Find()
 }
 

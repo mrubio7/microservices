@@ -80,6 +80,17 @@ func RegisterMappers() {
 		To:   teams_mapper.TeamMapper{}.Proto,
 	})
 
+	// Mapper para TeamRankModel -> Proto
+	Register(Mapper[model.TeamRankModel, *pb_teams.TeamRank]{
+		From: teams_mapper.TeamRankMapper{}.Proto,
+		To:   teams_mapper.TeamRankMapper{}.Model,
+	})
+	// Mapper para Proto -> TeamRankModel
+	Register(Mapper[*pb_teams.TeamRank, model.TeamRankModel]{
+		From: teams_mapper.TeamRankMapper{}.Model,
+		To:   teams_mapper.TeamRankMapper{}.Proto,
+	})
+
 	// User
 	// Mapper para User -> Proto
 	Register(Mapper[model.UserModel, *pb_users.User]{
