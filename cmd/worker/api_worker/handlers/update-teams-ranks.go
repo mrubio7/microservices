@@ -67,8 +67,8 @@ func workerTeamsRanksUpdate(teamManager *managers.TeamManager, matchManager *man
 			// Si no existe, inicializamos el ranking
 			teamRank = &model.TeamRankModel{
 				FaceitId:     team.FaceitId,
-				ActualPoints: 200,
-				OldPoints:    200,
+				ActualPoints: 100,
+				OldPoints:    100,
 				Matches:      0,
 			}
 			teamRank, err = teamManager.CreateTeamRank(teamRank)
@@ -192,11 +192,11 @@ func workerTeamsRanksUpdate(teamManager *managers.TeamManager, matchManager *man
 }
 
 var leagueMultipliers = map[string]float32{
-	"Open":         0.5,
-	"Open10":       1.0,
-	"Intermediate": 1.5,
-	"Main":         2.0,
-	"Advanced":     2.5,
+	"Open":         0.6,
+	"Open10":       1.2,
+	"Intermediate": 1.8,
+	"Main":         2.4,
+	"Advanced":     3.2,
 }
 
 func extractLeague(competitionName string) string {
