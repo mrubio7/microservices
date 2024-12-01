@@ -32,8 +32,13 @@ func UpdateTeamsRanks(c *gin.Context) {
 	teamDatabase := database.NewDatabase(cfg.TeamsDb)
 	teamManager := managers.NewTeamManager(teamDatabase.GetDB())
 
-	MatchesDatabase := database.NewDatabase(cfg.MatchesDb)
-	matchManager := managers.NewMatchManager(MatchesDatabase.GetDB())
+	matchesDatabase := database.NewDatabase(cfg.MatchesDb)
+	matchManager := managers.NewMatchManager(matchesDatabase.GetDB())
+
+	dbmatches, _ := matchesDatabase.GetDB().DB()
+	dbstates, _ := stateDatabase.GetDB().DB()
+	defer dbmatches.Close()
+	defer dbstates.Close()
 
 	teamsMap := buildTeamsMap(cfg.TeamsDb)
 

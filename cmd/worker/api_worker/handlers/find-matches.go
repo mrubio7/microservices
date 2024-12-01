@@ -38,6 +38,15 @@ func FindMatches(c *gin.Context) {
 	matchesDatabase := database.NewDatabase(cfg.MatchesDb)
 	matchManager := managers.NewMatchManager(matchesDatabase.GetDB())
 
+	dbtournament, _ := tournamentsDatabase.GetDB().DB()
+	dbteams, _ := teamsDatabase.GetDB().DB()
+	dbmatches, _ := matchesDatabase.GetDB().DB()
+	dbstates, _ := stateDatabase.GetDB().DB()
+	defer dbtournament.Close()
+	defer dbteams.Close()
+	defer dbmatches.Close()
+	defer dbstates.Close()
+
 	matchesNumber, err := workerFindMatches(tournamentManager, eseaManager, matchManager, teamManager, faceitClient)
 	if err != nil {
 		logger.Error(err.Error())

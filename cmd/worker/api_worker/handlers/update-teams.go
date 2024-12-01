@@ -33,6 +33,13 @@ func UpdateTeams(c *gin.Context) {
 	tournamentManager := managers.NewTournamentManager(tournamentsDatabase.GetDB())
 	eseaManager := managers.NewEseaManager(tournamentsDatabase.GetDB())
 
+	dbtournament, _ := tournamentsDatabase.GetDB().DB()
+	dbteams, _ := teamDatabase.GetDB().DB()
+	dbstates, _ := stateDatabase.GetDB().DB()
+	defer dbtournament.Close()
+	defer dbteams.Close()
+	defer dbstates.Close()
+
 	err = workerTeamsUpdate(teamManager, tournamentManager, eseaManager, faceitClient)
 	if err != nil {
 		logger.Error(err.Error())

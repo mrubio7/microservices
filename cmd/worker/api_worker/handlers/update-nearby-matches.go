@@ -29,6 +29,9 @@ func UpdateNearbyMatches(c *gin.Context) {
 	matchesDatabase := database.NewDatabase(cfg.MatchesDb)
 	matchManager := managers.NewMatchManager(matchesDatabase.GetDB())
 
+	dbmatches, _ := matchesDatabase.GetDB().DB()
+	defer dbmatches.Close()
+
 	matchesNumber, err := workerUpdateNearMatches(matchManager, faceitClient)
 	if err != nil {
 		if err == gorm.ErrRecordNotFound {

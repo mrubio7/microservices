@@ -33,6 +33,11 @@ func UpdatePlayers(c *gin.Context) {
 	playersDatabase := database.NewDatabase(cfg.PlayersDb)
 	playerManager := managers.NewPlayerManager(playersDatabase.GetDB())
 
+	dbstates, _ := stateDatabase.GetDB().DB()
+	dbplayers, _ := playersDatabase.GetDB().DB()
+	defer dbstates.Close()
+	defer dbplayers.Close()
+
 	err = workerPlayersUpdate(playerManager, faceitClient)
 	if err != nil {
 		logger.Error(err.Error())

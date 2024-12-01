@@ -31,6 +31,11 @@ func FindTournaments(c *gin.Context) {
 	tournamentsDatabase := database.NewDatabase(cfg.TournamentsDb)
 	tournamentManager := managers.NewTournamentManager(tournamentsDatabase.GetDB())
 
+	dbtournament, _ := tournamentsDatabase.GetDB().DB()
+	dbstates, _ := stateDatabase.GetDB().DB()
+	defer dbtournament.Close()
+	defer dbstates.Close()
+
 	teamsMap := buildTeamsMap(cfg.TeamsDb)
 
 	tournamentsNumber, err := workerFindTournaments(tournamentManager, faceitClient, teamsMap)

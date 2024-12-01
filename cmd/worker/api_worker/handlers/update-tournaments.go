@@ -29,6 +29,11 @@ func UpdateTournaments(c *gin.Context) {
 	tournamentsDatabase := database.NewDatabase(cfg.TournamentsDb)
 	tournamentManager := managers.NewTournamentManager(tournamentsDatabase.GetDB())
 
+	dbtournament, _ := tournamentsDatabase.GetDB().DB()
+	dbteams, _ := teamsDatabase.GetDB().DB()
+	defer dbtournament.Close()
+	defer dbteams.Close()
+
 	tournamentsNumber, err := workerUpdateTournaments(tournamentManager, teamManager, faceitClient)
 	if err != nil {
 		logger.Error(err.Error())

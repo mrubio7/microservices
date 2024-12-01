@@ -28,6 +28,9 @@ func FindEseaLeague(c *gin.Context) {
 	tournamentsDatabase := database.NewDatabase(cfg.TournamentsDb)
 	eseaManager := managers.NewEseaManager(tournamentsDatabase.GetDB())
 
+	dbtournament, _ := tournamentsDatabase.GetDB().DB()
+	defer dbtournament.Close()
+
 	teamsMap := buildTeamsMap(cfg.TeamsDb)
 
 	eseaLeaguesNumber, err := workerFindEseaLeague(eseaManager, faceitClient, teamsMap)
