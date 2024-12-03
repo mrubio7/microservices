@@ -1,0 +1,103 @@
+syntax = "proto3";
+
+package players;
+option go_package = "ibercs/proto/players;players";
+
+message Player {
+    int32 Id = 1;
+    string Nickname = 2;
+    string FaceitId = 3;
+    string SteamId = 4;
+    string Avatar = 5;
+    PlayerStats Stats = 6;
+}
+
+message PlayerStats {
+    int32 PlayerId = 1;
+    float KdRatio = 2;
+    float KrRatio = 3;
+	float KillsAverage = 4;
+	float DeathsAverage = 5;
+	float HeadshotPercentAverage = 6;
+	float MVPAverage = 7;
+	float AssistAverage = 8;
+    int32 Elo = 9;
+}
+
+message PlayerList {
+    repeated Player players = 1;
+}
+
+message PlayerLookingForTeam {
+    int32 Id = 1;
+    repeated string InGameRole = 2;
+    string TimeTable = 3;
+    string OldTeams = 4;
+    int32 PlayingYears = 5;
+    int64 BornDate = 6;
+    string Description = 7;
+    int64 CreatedAt = 8;
+    int64 UpdatedAt = 9;
+    Player Player = 10;
+    string FaceitId = 11;
+}
+
+message PlayerLookingForTeamList {
+    repeated PlayerLookingForTeam LookingForTeam = 1;
+}
+
+message Empty {}
+
+service PlayerService {
+    rpc GetPlayersByFaceitId (GetPlayerRequest) returns (PlayerList);
+    rpc GetPlayerByNickname (GetPlayerByNicknameRequest) returns (Player);
+    rpc GetAllPlayers (Empty) returns (PlayerList);
+    rpc GetProminentPlayers (Empty) returns (ProminentPlayerList);
+    rpc CreatePlayerFromFaceitId (CreatePlayerByFaceitIdRequest) returns (Player);
+    rpc CreateLookingForTeam (CreatePlayerLookingForTeamRequest) returns (PlayerLookingForTeam);
+    rpc UpdateLookingForTeam (CreatePlayerLookingForTeamRequest) returns (PlayerLookingForTeam);
+    rpc GetAllLookingForTeam (Empty) returns (PlayerLookingForTeamList);
+    rpc DeleteLookingForTeam (DeleteLookingForTeamRequest) returns (Empty);
+}
+
+message DeleteLookingForTeamRequest {
+    string PlayerId = 1;
+    int32 UserId = 2;
+}
+
+message CreatePlayerLookingForTeamRequest {
+    repeated string InGameRole = 2;
+    string TimeTable = 3;
+    string OldTeams = 4;
+    int32 PlayingYears = 5;
+    string Description = 6;
+    int32 UserId = 7;
+    string FaceitId = 8;
+}
+
+message GetPlayerRequest {
+    repeated string FaceitId = 1;
+}
+
+message GetPlayerByNicknameRequest {
+    string Nickname = 1;
+}
+
+message CreatePlayerByFaceitIdRequest {
+    string FaceitId = 1;
+}
+
+message ProminentPlayer {
+    int32 Id = 1;
+    float Score = 2;
+    string Nickname = 3;
+    string Faceit_id = 4;
+    string Steam_id = 5;
+    string Avatar = 6; 
+}
+
+message ProminentPlayerList {
+    repeated ProminentPlayer players = 1;
+    int32 Week = 2;    
+    int32 Year = 3;   
+}

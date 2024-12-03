@@ -1,0 +1,107 @@
+syntax = "proto3";
+
+package teams;
+option go_package = "ibercs/proto/teams;teams";
+
+message Team {
+    int32 Id = 1;
+    string FaceitId = 2;
+    string Name = 3;
+    string Nickname = 4;
+    string Avatar = 5;
+    bool Active = 6;
+    repeated string PlayersId = 7;
+    TeamStats Stats = 8;
+    string Twitter = 9;
+    string Instagram = 10;
+    string Web = 11;
+    repeated string Tournaments = 12;
+}
+
+message Standing {
+    string FaceitId = 1;
+    string TournamentId = 2;
+    bool IsDisqualified = 3;
+    int32 RankStart = 4;
+    int32 RankEnd = 5;
+    int32 Points = 6;
+    int32 MatchesPlayed = 7;
+    int32 MatchesWon = 8;
+    int32 MatchesLost = 9;
+    int32 MatchesTied = 10;
+    int32 BuchholzScore = 11;
+}
+
+message TeamStats {
+    int32 TotalMatches = 1;
+    int32 Wins = 2;
+    float Winrate = 3;
+    repeated int32 RecentResults = 4;
+    map<string, TeamMapStats> MapStats = 5;
+}
+
+message TeamMapStats {
+    string MapName = 1;
+    int32 Winrate = 2;
+    int32 Matches = 3;
+}
+
+message TeamRank {
+    string FaceitId = 1;
+    float ActualPoints = 2;
+    float OldPoints = 3;
+    int32 Matches = 4;
+    float LeaguePoints = 5;
+    teams.Team Team = 6;
+}
+
+message TeamRankList {
+    repeated TeamRank Ranks = 1;
+}
+
+message Empty {}
+
+service TeamService {
+    rpc GetAllTeams (Empty) returns (TeamList);
+    rpc GetTeamsRank (Empty) returns (TeamRankList);
+    rpc GetActiveTeams (Empty) returns (TeamList);
+    rpc GetById (GetTeamByIdRequest) returns (Team);
+    rpc GetByNickname (GetTeamByNicknameRequest) returns (Team);
+    rpc GetByFaceitId (GetTeamByFaceitIdRequest) returns (Team);
+    rpc CreateFromFaceit (NewTeamFromFaceitRequest) returns (Team);
+    rpc GetTeamFromFaceit(GetTeamFromFaceitRequest) returns (Team);
+    rpc Update(NewTeamFromFaceitRequest) returns (Team);
+    rpc FindTeamsByPlayerId(GetTeamByPlayerIdRequest) returns (TeamList);
+}
+
+message TeamList {
+    repeated Team teams = 1;
+}
+
+message GetTeamsRequest {
+    bool active = 1;
+}
+
+message GetTeamByIdRequest {
+    int32 Id = 1;
+}
+
+message GetTeamByNicknameRequest {
+    string Nickname = 1;
+}
+
+message GetTeamByFaceitIdRequest {
+    string FaceitId = 1;
+}
+
+message NewTeamFromFaceitRequest {
+    string FaceitId = 1;
+}
+
+message GetTeamByPlayerIdRequest {
+    string PlayerId = 1;
+}
+
+message GetTeamFromFaceitRequest {
+    string FaceitId = 1;
+}

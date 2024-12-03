@@ -1,0 +1,64 @@
+syntax = "proto3";
+
+package matches;
+option go_package = "ibercs/proto/matches;matches";
+
+import "proto/teams.proto";
+import "proto/tournaments.proto";
+
+message Match {
+    int32 ID = 1;
+    string FaceitId = 2;
+    optional teams.Team TeamA = 3;
+    string TeamAName = 4;
+    string TeamAFaceitId = 5;
+    bool IsTeamAKnown = 6;
+    int32 ScoreTeamA = 7;
+    optional teams.Team TeamB = 8;
+    string TeamBName = 9;
+    string TeamBFaceitId = 10;
+    bool IsTeamBKnown = 11;
+    int32 ScoreTeamB = 12;
+    int32 BestOf = 13;
+    int64 Timestamp = 14;
+    repeated string Streams = 15;
+    string TournamentName = 16;
+    string TournamentFaceitId = 17;
+    tournaments.Tournament Tournament = 18;
+    repeated string Map = 19;
+}
+
+message MatchList {
+    repeated Match Matches = 1;
+}
+
+message Empty {}
+message Bool {
+    bool res = 1;
+}
+
+service MatchesService {
+    rpc GetAllMatches (Empty) returns (MatchList);
+    rpc GetNearbyMatches (GetNearbyMatchesRequest) returns (MatchList);
+    rpc GetMatchByFaceitId (GetMatchRequest) returns (Match);
+    rpc SetStreamToMatch (SetStreamRequest) returns (Bool);
+    rpc GetMatchesByTeamId (GetMatchRequest) returns (MatchList);
+    rpc NewMatch (NewMatchRequest) returns (Match);
+}
+
+message NewMatchRequest {
+    string FaceitId = 1;
+}
+
+message GetMatchRequest {
+    string FaceitId = 1;
+}
+
+message GetNearbyMatchesRequest {
+    int32 Days = 1;
+}
+
+message SetStreamRequest {
+    string FaceitId = 1;
+    string StreamChannel = 2;
+}
