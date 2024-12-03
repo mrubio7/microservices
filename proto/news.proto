@@ -1,0 +1,18 @@
+syntax = "proto3";
+
+package news;
+option go_package = "ibercs/proto/news;news";
+
+import "proto/users.proto";
+
+message News {
+    int32 ID = 1;
+    string Title = 2;
+    string Images = 3;
+    users.User User = 8;
+}
+
+message CreateNewsRequest {
+    string Title = 1;
+    
+}

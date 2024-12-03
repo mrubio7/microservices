@@ -1,0 +1,70 @@
+syntax = "proto3";
+
+package users;
+option go_package = "ibercs/proto/users;users";
+
+import "proto/players.proto";
+
+message User {
+    int32 ID = 1;
+    string PlayerID = 2;
+    string Name = 3;
+    string Description = 4;
+    string Twitter = 5;
+    string Twitch = 6;
+    int32 Role = 7;
+    players.Player Player = 8;
+}
+
+message Empty {}
+
+service UserService {
+    rpc GetUserById (GetUserByIdRequest) returns (User);
+    rpc GetUserByFaceitId (GetUserRequest) returns (User);
+    rpc GetUserByPlayerNickname (GetUserRequest) returns (User);
+    rpc Update (User) returns (User);
+    rpc Create (NewUserRequest) returns (User);
+    rpc CreateSession (NewSessionRequest) returns (SessionResponse);
+    rpc DeleteSession (NewSessionRequest) returns (Empty);
+    rpc GetSessionById (GetSessionByIdRequest) returns (SessionResponse);
+    rpc GetSessionByUserId (GetSessionByUserIdRequest) returns (SessionResponse);
+    rpc GetAllStreams (Empty) returns (StreamsResponse);
+}
+
+message StreamsResponse {
+    repeated StreamResponse streams = 1;
+}
+
+message StreamResponse {
+    string Stream = 1;
+    string Name = 2;
+}
+
+message NewSessionRequest{
+    int32 id = 1;
+}
+
+message GetSessionByIdRequest{
+    string token = 1;
+}
+
+message GetSessionByUserIdRequest{
+    int32 id = 1;
+}
+
+message SessionResponse {
+    string token = 1;
+    int32 userId = 2;
+}
+
+message NewUserRequest {
+    string FaceitId = 1;
+}
+
+message GetUserByIdRequest {
+    int32 Id = 1;
+}
+
+message GetUserRequest {
+    string Id = 1;
+}
